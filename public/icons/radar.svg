@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ECDC4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#44A08D;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="radarWave" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#4ECDC4;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#4ECDC4;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#4ECDC4;stop-opacity:0.1" />
+    </radialGradient>
+  </defs>
+  <g>
+    <!-- 雷达波 -->
+    <circle cx="16" cy="16" r="14" fill="url(#radarWave)" opacity="0.6"/>
+    <circle cx="16" cy="16" r="10" fill="none" stroke="#4ECDC4" stroke-width="1" opacity="0.8"/>
+    <circle cx="16" cy="16" r="6" fill="none" stroke="#4ECDC4" stroke-width="1" opacity="0.8"/>
+    <!-- 雷达基座 -->
+    <rect x="12" y="20" width="8" height="8" fill="url(#radarGrad)" rx="1"/>
+    <!-- 雷达天线 -->
+    <circle cx="16" cy="16" r="4" fill="url(#radarGrad)"/>
+    <!-- 扫描线 -->
+    <line x1="16" y1="16" x2="26" y2="10" stroke="#FFFFFF" stroke-width="2" opacity="0.9"/>
+    <!-- 中心点 -->
+    <circle cx="16" cy="16" r="1" fill="#FFFFFF"/>
+  </g>
+</svg>

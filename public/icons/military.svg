@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="militaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DDA0DD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#BA68C8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g>
+    <!-- 基地围墙 -->
+    <rect x="4" y="8" width="24" height="20" fill="none" stroke="url(#militaryGrad)" stroke-width="2" rx="2"/>
+    <!-- 主建筑 -->
+    <rect x="8" y="12" width="16" height="12" fill="url(#militaryGrad)" rx="1"/>
+    <!-- 屋顶 -->
+    <polygon points="8,12 16,6 24,12" fill="#8B4513"/>
+    <!-- 门 -->
+    <rect x="14" y="20" width="4" height="4" fill="#654321"/>
+    <!-- 窗户 -->
+    <rect x="10" y="14" width="2" height="2" fill="#87CEEB"/>
+    <rect x="20" y="14" width="2" height="2" fill="#87CEEB"/>
+    <rect x="10" y="17" width="2" height="2" fill="#87CEEB"/>
+    <rect x="20" y="17" width="2" height="2" fill="#87CEEB"/>
+    <!-- 旗杆 -->
+    <rect x="26" y="8" width="1" height="12" fill="#8B4513"/>
+    <!-- 旗帜 -->
+    <rect x="22" y="8" width="4" height="3" fill="#FF0000"/>
+    <!-- 哨塔 -->
+    <rect x="6" y="8" width="2" height="6" fill="url(#militaryGrad)"/>
+    <rect x="5" y="8" width="4" height="2" fill="url(#militaryGrad)"/>
+    <!-- 警戒线 -->
+    <line x1="4" y1="28" x2="28" y2="28" stroke="#FFFF00" stroke-width="2" stroke-dasharray="2,2"/>
+    <!-- 星形标识 -->
+    <polygon points="16,18 17,20 19,20 17.5,21.5 18,23 16,22 14,23 14.5,21.5 13,20 15,20" fill="#FFFFFF"/>
+  </g>
+</svg>
