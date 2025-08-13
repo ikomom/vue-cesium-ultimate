@@ -1,7 +1,12 @@
 <template>
-  <div class="target-panel" :class="{ collapsed: isCollapsed }">
+  <div 
+    ref="panelRef" 
+    class="target-panel" 
+    :class="{ collapsed: isCollapsed, dragging: isDragging }"
+    :style="panelStyle"
+  >
     <!-- 面板头部 -->
-    <div class="panel-header" @click="togglePanel">
+    <div class="panel-header" @click="toggleCollapse">
       <div class="panel-title">
         <i class="icon-targets"></i>
         <span>目标点位</span>
@@ -91,9 +96,23 @@
 import { ref, computed, onMounted } from 'vue'
 import { targetBaseData } from '../../data/targetBaseData.js'
 import { targetLocationData } from '../../data/targetLocationData.js'
+import { useDraggableCollapse } from '../../composables/useDraggableCollapse.js'
+
+// 使用拖拽折叠hook
+const {
+  isCollapsed,
+  isDragging,
+  panelRef,
+  toggleCollapse,
+  panelStyle
+} = useDraggableCollapse({
+  initialCollapsed: true,
+  initialPosition: { x: 20, y: 20 },
+  enableDrag: true,
+  enableCollapse: true
+})
 
 // 响应式数据
-const isCollapsed = ref(false)
 const searchQuery = ref('')
 const selectedTypes = ref([])
 const selectedTarget = ref(null)
@@ -123,7 +142,7 @@ const filteredTargets = computed(() => {
   // 搜索筛选
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(target => 
+    filtered = filtered.filter(target =>
       target.name.toLowerCase().includes(query) ||
       target.type.toLowerCase().includes(query) ||
       target.province.toLowerCase().includes(query) ||
@@ -154,9 +173,7 @@ const sortedTargets = computed(() => {
 })
 
 // 方法
-const togglePanel = () => {
-  isCollapsed.value = !isCollapsed.value
-}
+// togglePanel方法已由useDraggableCollapse hook提供
 
 const toggleSort = () => {
   sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
@@ -214,23 +231,23 @@ onMounted(() => {
 
 <style scoped>
 .target-panel {
-  position: fixed;
-  left: 20px;
-  top: 20px;
   width: 350px;
   background: rgba(0, 0, 0, 0.85);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 1000;
-  transition: all 0.3s ease;
   max-height: 80vh;
   overflow: hidden;
 }
 
 .target-panel.collapsed {
   width: 200px;
+}
+
+.target-panel.dragging {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: scale(1.02);
 }
 
 .panel-header {

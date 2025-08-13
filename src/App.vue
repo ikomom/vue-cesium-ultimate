@@ -1,9 +1,17 @@
 <script setup>
-import AppContainer from './containers/App.vue'
+import CesiumView from './containers/CesiumView.vue'
+import { useGlobalMapStore } from '@/stores/globalMap.js'
+import { onMounted } from 'vue'
+
+const globalMapStore = useGlobalMapStore()
+
+onMounted(() => {
+  globalMapStore.init()
+})
 </script>
 
 <template>
-  <AppContainer />
+  <CesiumView v-loading="globalMapStore.loading" />
 </template>
 
 <style lang="less">

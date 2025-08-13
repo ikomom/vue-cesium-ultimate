@@ -1,5 +1,23 @@
 <template>
-  <div class="control-panel">
+  <div 
+    ref="panelRef" 
+    class="control-panel" 
+    :class="{ collapsed: isCollapsed, dragging: isDragging }"
+    :style="panelStyle"
+  >
+    <!-- 面板头部 -->
+    <div class="panel-header" @click="toggleCollapse">
+      <div class="panel-title">
+        <i class="icon-control">⚙️</i>
+        <span>控制面板</span>
+      </div>
+      <div class="toggle-btn" :class="{ rotated: isCollapsed }">
+        <i class="icon-chevron">‹</i>
+      </div>
+    </div>
+
+    <!-- 面板内容 -->
+    <div class="panel-content" v-show="!isCollapsed">
     <!-- 基础显示控制 -->
     <div class="control-group">
       <div class="control-section-title">显示控制</div>
@@ -99,17 +117,33 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { useVisualizationStore } from '@/stores/visualization'
+import { useVisualizationStore } from '../../stores/visualization.js'
+import { useDraggableCollapse } from '../../composables/useDraggableCollapse.js'
 
 // 定义事件
 const emit = defineEmits(['materialModeChange'])
 
 // 使用 Pinia store
 const visualizationStore = useVisualizationStore()
+
+// 使用拖拽折叠hook
+const {
+  isCollapsed,
+  isDragging,
+  panelRef,
+  toggleCollapse,
+  panelStyle
+} = useDraggableCollapse({
+  initialCollapsed: false,
+  initialPosition: { x: window.innerWidth - 300, y: 20 },
+  enableDrag: true,
+  enableCollapse: true
+})
 
 // 颜色预设
 const colorPresets = {
@@ -164,16 +198,56 @@ const applyColorPreset = (preset) => {
 <style scoped>
 /* 控制面板样式 */
 .control-panel {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 15px;
+  background: rgba(0, 0, 0, 0.85);
   border-radius: 8px;
-  z-index: 1000;
   min-width: 280px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.control-panel.collapsed {
+  min-width: 200px;
+}
+
+.control-panel.dragging {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: scale(1.02);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.toggle-btn {
+  color: #fff;
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-btn.rotated {
+  transform: rotate(180deg);
+}
+
+.panel-content {
+  padding: 15px;
 }
 
 .control-group {
