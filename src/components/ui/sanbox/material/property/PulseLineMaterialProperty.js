@@ -1,13 +1,17 @@
 import { MATERIAL_TYPES } from '../../constanst'
-import { PulseLineShader } from '../shaders'
+import { AdvancedPulseLineShader } from '../shaders'
 import { addMaterial } from '../../utils/map'
+
+const defaultColor = 'blue'
+const defaultSpeed = 1.5
+const defaultPulseWidth = 0.2
 
 /**
  * 脉冲线材质属性
  */
 export class PulseLineMaterialProperty {
   constructor(options = {}) {
-    this._definitionChanged = new Cesium.Event()
+    this._definitionChanged = new window.Cesium.Event()
     this._color = undefined
     this._colorSubscription = undefined
     this._speed = undefined
@@ -15,22 +19,9 @@ export class PulseLineMaterialProperty {
     this._pulseWidth = undefined
     this._pulseWidthSubscription = undefined
 
-    this.color = options.color || new Cesium.Color(1.0, 0.5, 0.0, 0.9)
-    this.speed = options.speed || 1.5
-    this.pulseWidth = options.pulseWidth || 0.2
-
-    addMaterial(this.getType(), {
-      translucent: true,
-      fabric: {
-        type: this.getType(),
-        uniforms: {
-          color: this.color,
-          speed: this.speed,
-          pulseWidth: this.pulseWidth,
-        },
-        source: PulseLineShader,
-      },
-    })
+    this.color = new Cesium.Color.fromCssColorString(options.color || defaultColor)
+    this.speed = options.speed || defaultSpeed
+    this.pulseWidth = options.pulseWidth || defaultPulseWidth
   }
 
   getType() {
@@ -43,9 +34,13 @@ export class PulseLineMaterialProperty {
       result = {}
     }
 
-    result.color = this._getPropertyValue(this._color, time, Cesium.Color.WHITE)
-    result.speed = this._getPropertyValue(this._speed, time, 1.5)
-    result.pulseWidth = this._getPropertyValue(this._pulseWidth, time, 0.2)
+    result.color = this._getPropertyValue(
+      this._color,
+      time,
+      Cesium.Color.fromCssColorString(defaultColor),
+    )
+    result.speed = this._getPropertyValue(this._speed, time, defaultSpeed)
+    result.pulseWidth = this._getPropertyValue(this._pulseWidth, time, defaultPulseWidth)
 
     return result
   }
@@ -98,67 +93,29 @@ export class PulseLineMaterialProperty {
       Cesium.Property.isConstant(this._pulseWidth)
     )
   }
+}
 
-  get color() {
-    return this._color
+export function initPulseLineMaterialProperty() {
+  // 检查是否已经定义过属性，避免重复定义
+  if (!PulseLineMaterialProperty.prototype.hasOwnProperty('color')) {
+    Object.defineProperties(PulseLineMaterialProperty.prototype, {
+      color: window.Cesium.createPropertyDescriptor('color'),
+      speed: window.Cesium.createPropertyDescriptor('speed'),
+      pulseWidth: window.Cesium.createPropertyDescriptor('pulseWidth'),
+    })
   }
 
-  set color(value) {
-    if (this._colorSubscription) {
-      this._colorSubscription()
-      this._colorSubscription = undefined
-    }
-
-    this._color = value
-
-    if (Cesium.defined(value) && value.definitionChanged) {
-      this._colorSubscription = value.definitionChanged.addEventListener(() =>
-        this._definitionChanged.raiseEvent(this),
-      )
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
-
-  get speed() {
-    return this._speed
-  }
-
-  set speed(value) {
-    if (this._speedSubscription) {
-      this._speedSubscription()
-      this._speedSubscription = undefined
-    }
-
-    this._speed = value
-
-    if (Cesium.defined(value) && value.definitionChanged) {
-      this._speedSubscription = value.definitionChanged.addEventListener(() =>
-        this._definitionChanged.raiseEvent(this),
-      )
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
-
-  get pulseWidth() {
-    return this._pulseWidth
-  }
-
-  set pulseWidth(value) {
-    if (this._pulseWidthSubscription) {
-      this._pulseWidthSubscription()
-      this._pulseWidthSubscription = undefined
-    }
-
-    this._pulseWidth = value
-
-    if (Cesium.defined(value) && value.definitionChanged) {
-      this._pulseWidthSubscription = value.definitionChanged.addEventListener(() =>
-        this._definitionChanged.raiseEvent(this),
-      )
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
+  const type = PulseLineMaterialProperty.prototype.getType()
+  addMaterial(type, {
+    translucent: true,
+    fabric: {
+      type,
+      uniforms: {
+        color: Cesium.Color.fromCssColorString(defaultColor),
+        speed: defaultSpeed,
+        pulseWidth: defaultPulseWidth,
+      },
+      source: AdvancedPulseLineShader,
+    },
+  })
 }

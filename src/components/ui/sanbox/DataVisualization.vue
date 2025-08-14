@@ -10,6 +10,8 @@
       :label="target.label"
       :point="target.point"
       @click="onTargetClick(target)"
+      @mouseover="onTargetHover(target)"
+      @mouseout="onTargetLeave(target)"
     />
   </template>
   <template>
@@ -19,12 +21,13 @@
       :key="relation.id"
       :show="showRelation"
       @click="onRelationClick(relation)"
+      @mouseover="onRelationHover(relation)"
+      @mouseout="onRelationLeave(relation)"
     >
       <vc-graphics-polyline
         :positions="relation.polyline.positions"
         :width="relation.polyline.width"
         :material="relation.polyline.material"
-        :clamp-to-ground="false"
       />
     </vc-entity>
   </template>
@@ -36,7 +39,7 @@ import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import { getRelationStyleConfig, getTargetIconConfig } from './config/visualConfig'
 import { getMaterialProperty } from './material'
 import { MATERIAL_TYPES } from './constanst'
-
+import { generateCurve } from './utils/map'
 // Props定义
 const props = defineProps({
   points: {
@@ -60,12 +63,26 @@ const props = defineProps({
     default: true,
   },
 })
+
+// Emits定义
+const emit = defineEmits([
+  'targetClick',
+  'relationClick',
+  'targetHover',
+  'targetLeave',
+  'relationHover',
+  'relationLeave',
+])
+
 const dataManager = new DataManagerFactory()
-console.log('dataManager', {dataManager});
+console.log('dataManager', { dataManager })
 
 const renderPoints = ref([])
 const renderRelations = ref([])
 
+function setPointer(cursor = 'auto') {
+  document.body.style.cursor = cursor
+}
 
 watch(
   () => props.targets,
@@ -122,35 +139,44 @@ function processPoint() {
 
 function processRelation() {
   const allRelation = dataManager.relationManager.getAll()
-  renderRelations.value = allRelation.map((relation) => {
-    const source = dataManager.targetLocationManager.findById(relation.source_id)
-    const target = dataManager.targetLocationManager.findById(relation.target_id)
-    if (!source || !target) {
-      console.error('处理关系数据项失败：缺少必要的源或目标点', relation)
-      return null
-    }
-    const styleConfig = getRelationStyleConfig(relation.type)
-    const material = getMaterialProperty(styleConfig.material, styleConfig)
-    return {
-      id: relation.id,
-      name: relation.name,
-      type: relation.type,
-      polyline: {
-        positions: [
-          [source.longitude, source.latitude, source.height],
-          [target.longitude, target.latitude, target.height],
-        ],
-        width: styleConfig.width,
-        material: material,
-      },
-      materialType: styleConfig.material,
-    }
-  }).filter(Boolean)
+  renderRelations.value = allRelation
+    .map((relation) => {
+      const source = dataManager.targetLocationManager.findById(relation.source_id)
+      const target = dataManager.targetLocationManager.findById(relation.target_id)
+      if (!source || !target) {
+        console.error('处理关系数据项失败：缺少必要的源或目标点', relation)
+        return null
+      }
+      const styleConfig = getRelationStyleConfig(relation.type)
+      const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
+      const positions = styleConfig.curve.enabled
+        ? generateCurve(
+            Cesium.Cartesian3.fromDegrees(source.longitude, source.latitude, source.height),
+            Cesium.Cartesian3.fromDegrees(target.longitude, target.latitude, target.height),
+            styleConfig.curve.height,
+          )
+        : [
+            [source.longitude, source.latitude, source.height],
+            [target.longitude, target.latitude, target.height],
+          ]
+      return {
+        id: relation.id,
+        name: relation.name,
+        type: relation.type,
+        target,
+        source,
+        polyline: {
+          positions,
+          width: styleConfig.width,
+          material: material,
+        },
+        materialType: styleConfig.material,
+      }
+    })
+    .filter(Boolean)
+  // .filter((item) => item.materialType === MATERIAL_TYPES.PolylinePulseLine)
   console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
 }
-
-// Emits定义
-const emit = defineEmits(['targetClick', 'relationClick'])
 
 // 事件处理函数
 const onTargetClick = (target) => {
@@ -159,6 +185,27 @@ const onTargetClick = (target) => {
 
 const onRelationClick = (relation) => {
   emit('relationClick', relation)
+}
+
+// 悬浮事件处理函数
+const onTargetHover = (target) => {
+  setPointer('pointer')
+  emit('targetHover', target)
+}
+
+const onTargetLeave = (target) => {
+  setPointer('auto')
+  emit('targetLeave', target)
+}
+
+const onRelationHover = (relation) => {
+  setPointer('pointer')
+  emit('relationHover', relation)
+}
+
+const onRelationLeave = (relation) => {
+  setPointer('auto')
+  emit('relationLeave', relation)
 }
 </script>
 

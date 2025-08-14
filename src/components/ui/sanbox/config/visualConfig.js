@@ -42,49 +42,92 @@ export const targetIcons = {
 // 关系类型样式配置
 export const relationStyles = {
   航线连接: {
-    color: '#FF6B35',
-    width: 3,
-    material: MATERIAL_TYPES.Color,
-    dashPattern: null,
+    width: 1,
+    curve: {
+      enabled: true,
+      height: 50000,
+    },
+    material: MATERIAL_TYPES.PolylinePulseLine,
+    materialProps: {
+      color: '#96CEB4',
+      speed: 2.5,
+      pulseWidth: 0.2,
+    },
   },
   雷达覆盖: {
-    color: '#4ECDC4',
     width: 2,
+    curve: {
+      enabled: false,
+      height: 0,
+    },
     material: MATERIAL_TYPES.PolylineDash,
-    dashPattern: [10, 5],
+    materialProps: {
+      color: '#4ECDC4',
+      speed: 2,
+    },
   },
   海运航线: {
-    color: '#45B7D1',
-    width: 4,
-    material: MATERIAL_TYPES.Color,
-    dashPattern: null,
+    width: 2,
+    curve: {
+      enabled: false,
+      height: 0,
+    },
+    material: MATERIAL_TYPES.PolylineFlyLine,
+    materialProps: {
+      color: '#45B7D1',
+      speed: 1,
+      percent: 0.6,
+      gradient: 0.5,
+    },
   },
   高铁线路: {
-    color: '#96CEB4',
-    width: 5,
+    width: 3,
+    curve: {
+      enabled: false,
+      height: 0,
+    },
     material: MATERIAL_TYPES.Color,
-    dashPattern: null,
+    materialProps: {
+      color: '#96CEB4',
+    },
   },
   通信链路: {
-    color: '#FFEAA7',
     width: 2,
-    material: MATERIAL_TYPES.PolylineDash,
-    dashPattern: [5, 5],
+    curve: {
+      enabled: true,
+      height: 100000,
+    },
+    material: MATERIAL_TYPES.PolylineArrow,
+    materialProps: {
+      color: '#FFEAA7',
+      gapColor: 'blue',
+    },
   },
   军事协防: {
-    color: '#DDA0DD',
-    width: 3,
+    width: 2,
+    curve: {
+      enabled: true,
+      height: 80000,
+    },
     material: MATERIAL_TYPES.PolylineDash,
-    dashPattern: [15, 5, 5, 5],
+    materialProps: {
+      color: '#DDA0DD',
+      gapColor: 'blue',
+    },
   },
   数据传输: {
-    color: '#FF8C42',
-    width: 3,
+    width: 2,
+    curve: {
+      enabled: true,
+      height: 60000,
+    },
     material: MATERIAL_TYPES.PolylineDynamicTexture,
-    dashPattern: null,
+    materialProps: {
+      color: '#FF8C42',
+      speed: 1,
+    },
   },
 }
-
 // 默认配置
 export const defaultConfig = {
   targetIcon: {

@@ -5,6 +5,7 @@ import DataVisualization from '@/components/ui/sanbox/DataVisualization.vue'
 
 import { useGlobalMapStore } from '@/stores/globalMap.js'
 import { storeToRefs } from 'pinia'
+import { initMaterialProperty } from '@/components/ui/sanbox/material'
 
 const visualizationStore = useVisualizationStore()
 
@@ -110,6 +111,9 @@ function onViewerReady({ viewer, Cesium }) {
   window.viewer = viewer
   window.Cesium = Cesium
   ready.value = true
+
+  // 初始化材质属性
+  initMaterialProperty()
 
   // 初始化材质管理器
   // materialManager.initCustomMaterials()

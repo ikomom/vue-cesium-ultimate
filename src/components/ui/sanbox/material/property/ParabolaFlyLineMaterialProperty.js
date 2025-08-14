@@ -2,6 +2,11 @@ import { MATERIAL_TYPES } from '../../constanst'
 import { ParabolaFlyLineShader } from '../shaders'
 import { addMaterial } from '../../utils/map'
 
+const defaultColor = 'cyan'
+const defaultSpeed = 2.0
+const defaultPercent = 0.1
+const defaultGradient = 0.1
+
 /**
  * 抛物线飞线材质属性
  * 类似于 PolylineTrailMaterialProperty
@@ -18,31 +23,17 @@ export class ParabolaFlyLineMaterialProperty {
     this._gradient = undefined
     this._gradientSubscription = undefined
 
-    this.color = options.color || new window.Cesium.Color(0.0, 1.0, 1.0, 0.8)
-    this.speed = options.speed || 2.0
-    this.percent = options.percent || 0.1
-    this.gradient = options.gradient || 0.1
-
-    addMaterial(this.getType(), {
-      translucent: true,
-      fabric: {
-        type: this.getType(),
-        uniforms: {
-          color: this.color,
-          speed: this.speed,
-          percent: this.percent,
-          gradient: this.gradient,
-        },
-        source: ParabolaFlyLineShader,
-      },
-    })
+    this.color = new Cesium.Color.fromCssColorString(options.color || defaultColor)
+    this.speed = options.speed || defaultSpeed
+    this.percent = options.percent || defaultPercent
+    this.gradient = options.gradient || defaultGradient
   }
 
   /**
    * 获取材质类型
    */
   getType() {
-    return MATERIAL_TYPES.ParabolaFlyLine
+    return MATERIAL_TYPES.PolylineFlyLine
   }
 
   /**
@@ -53,10 +44,14 @@ export class ParabolaFlyLineMaterialProperty {
       result = {}
     }
 
-    result.color = this._getPropertyValue(this._color, time, window.Cesium.Color.WHITE)
-    result.speed = this._getPropertyValue(this._speed, time, 2.0)
-    result.percent = this._getPropertyValue(this._percent, time, 0.1)
-    result.gradient = this._getPropertyValue(this._gradient, time, 0.1)
+    result.color = this._getPropertyValue(
+      this._color,
+      time,
+      Cesium.Color.fromCssColorString(defaultColor),
+    )
+    result.speed = this._getPropertyValue(this._speed, time, defaultSpeed)
+    result.percent = this._getPropertyValue(this._percent, time, defaultPercent)
+    result.gradient = this._getPropertyValue(this._gradient, time, defaultGradient)
 
     return result
   }
@@ -120,100 +115,31 @@ export class ParabolaFlyLineMaterialProperty {
       Cesium.Property.isConstant(this._gradient)
     )
   }
+}
 
-  /**
-   * 颜色属性
-   */
-  get color() {
-    return this._color
+export function initParabolaFlyLineMaterialProperty() {
+  // 检查是否已经定义过属性，避免重复定义
+  if (!ParabolaFlyLineMaterialProperty.prototype.hasOwnProperty('color')) {
+    Object.defineProperties(ParabolaFlyLineMaterialProperty.prototype, {
+      color: window.Cesium.createPropertyDescriptor('color'),
+      speed: window.Cesium.createPropertyDescriptor('speed'),
+      percent: window.Cesium.createPropertyDescriptor('percent'),
+      gradient: window.Cesium.createPropertyDescriptor('gradient'),
+    })
   }
 
-  set color(value) {
-    if (this._colorSubscription) {
-      this._colorSubscription()
-      this._colorSubscription = undefined
-    }
-
-    this._color = value
-
-    if (Cesium.defined(value) && value.definitionChanged) {
-      this._colorSubscription = value.definitionChanged.addEventListener(() =>
-        this._definitionChanged.raiseEvent(this),
-      )
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
-
-  /**
-   * 速度属性
-   */
-  get speed() {
-    return this._speed
-  }
-
-  set speed(value) {
-    if (this._speedSubscription) {
-      this._speedSubscription()
-      this._speedSubscription = undefined
-    }
-
-    this._speed = value
-
-    if (Cesium.defined(value) && value.definitionChanged) {
-      this._speedSubscription = value.definitionChanged.addEventListener(() =>
-        this._definitionChanged.raiseEvent(this),
-      )
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
-
-  /**
-   * 百分比属性
-   */
-  get percent() {
-    return this._percent
-  }
-
-  set percent(value) {
-    if (this._percentSubscription) {
-      this._percentSubscription()
-      this._percentSubscription = undefined
-    }
-
-    this._percent = value
-
-    if (Cesium.defined(value) && value.definitionChanged) {
-      this._percentSubscription = value.definitionChanged.addEventListener(() =>
-        this._definitionChanged.raiseEvent(this),
-      )
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
-
-  /**
-   * 渐变属性
-   */
-  get gradient() {
-    return this._gradient
-  }
-
-  set gradient(value) {
-    if (this._gradientSubscription) {
-      this._gradientSubscription()
-      this._gradientSubscription = undefined
-    }
-
-    this._gradient = value
-
-    if (Cesium.defined(value) && value.definitionChanged) {
-      this._gradientSubscription = value.definitionChanged.addEventListener(() =>
-        this._definitionChanged.raiseEvent(this),
-      )
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
+  const type = ParabolaFlyLineMaterialProperty.prototype.getType()
+  addMaterial(type, {
+    translucent: true,
+    fabric: {
+      type,
+      uniforms: {
+        color: Cesium.Color.fromCssColorString(defaultColor),
+        speed: defaultSpeed,
+        percent: defaultPercent,
+        gradient: defaultGradient,
+      },
+      source: ParabolaFlyLineShader,
+    },
+  })
 }

@@ -4,6 +4,8 @@ import { addMaterial } from '../../utils/map'
 
 const defaultImage =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAAgCAYAAABkS8DlAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAADSSURBVHja7NYxEoUgDEDBYM39z2qHtZViwMFxt1FJnF/98ZXWWkRE7LWWOOt5Lsm9q/vsbu9Zdtazs/J19O5bs1XPZrwze/6V31zxbOZs1n905Wt2p3f25GzE7ohv6q3nLQCA3xEAACAAAAABAAAIAABAAAAAAgAAEAAAgAAAAAQAACAAAAABAAAIAABAAAAAAgAAEAAAgAAAAAQAACAAAEAAAAACAAAQAACAAAAABAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAA8g4AAAD//wMA4WEFTJOT5UIAAAAASUVORK5CYII='
+const defaultColor = 'red'
+const defaultSpeed = 6
 
 /**
  * 动态纹理材质属性
@@ -15,23 +17,11 @@ export class DynamicTextureMaterialProperty {
     this._colorSubscription = undefined
     this._speed = undefined
     this._speedSubscription = undefined
+    this.time = performance.now()
 
-    this.color = options.color || new window.Cesium.Color(1.0, 0.6, 0.2, 0.8)
-    this.speed = options.speed || 1.5
+    this.color = window.Cesium.Color.fromCssColorString(options.color || defaultColor)
+    this.speed = options.speed || defaultSpeed
     this.image = options.image || defaultImage
-
-    addMaterial(this.getType(), {
-      translucent: true,
-      fabric: {
-        type: this.getType(),
-        uniforms: {
-          color: this.color,
-          speed: this.speed,
-          image: this.image,
-        },
-        source: DynamicTextureShader,
-      },
-    })
   }
 
   getType() {
@@ -42,19 +32,23 @@ export class DynamicTextureMaterialProperty {
     if (!window.Cesium.defined(result)) {
       result = {}
     }
+    result.image = this.image
+    result.color = Cesium.Property.getValueOrClonedDefault(
+      this._color,
+      time,
+      Cesium.Color.fromCssColorString(defaultColor),
+      result.color,
+    )
+    result.speed = Cesium.Property.getValueOrClonedDefault(
+      this._speed,
+      time,
+      defaultSpeed,
+      result.speed,
+    )
 
-    result.color = this._getPropertyValue(this._color, time, window.Cesium.Color.WHITE)
-    result.speed = this._getPropertyValue(this._speed, time, 1.5)
+    result.time = performance.now() - this.time / 2
 
     return result
-  }
-
-  _getPropertyValue(property, time, defaultValue) {
-    const Cesium = window.Cesium
-    if (Cesium.defined(property) && typeof property.getValue === 'function') {
-      return property.getValue(time) || defaultValue
-    }
-    return property !== undefined ? property : defaultValue
   }
 
   equals(other) {
@@ -93,46 +87,28 @@ export class DynamicTextureMaterialProperty {
       window.Cesium.Property.isConstant(this._speed)
     )
   }
-
-  get color() {
-    return this._color
+}
+export function initDynamicTextureMaterialProperty() {
+  // 检查是否已经定义过属性，避免重复定义
+  if (!DynamicTextureMaterialProperty.prototype.hasOwnProperty('color')) {
+    Object.defineProperties(DynamicTextureMaterialProperty.prototype, {
+      color: Cesium.createPropertyDescriptor('color'),
+      speed: Cesium.createPropertyDescriptor('speed'),
+    })
   }
-
-  set color(value) {
-    if (this._colorSubscription) {
-      this._colorSubscription()
-      this._colorSubscription = undefined
-    }
-
-    this._color = value
-
-    if (window.Cesium.defined(value) && typeof value.definitionChanged !== 'undefined') {
-      this._colorSubscription = value.definitionChanged.addEventListener(() => {
-        this._definitionChanged.raiseEvent(this)
-      })
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
-
-  get speed() {
-    return this._speed
-  }
-
-  set speed(value) {
-    if (this._speedSubscription) {
-      this._speedSubscription()
-      this._speedSubscription = undefined
-    }
-
-    this._speed = value
-
-    if (window.Cesium.defined(value) && typeof value.definitionChanged !== 'undefined') {
-      this._speedSubscription = value.definitionChanged.addEventListener(() => {
-        this._definitionChanged.raiseEvent(this)
-      })
-    }
-
-    this._definitionChanged.raiseEvent(this)
-  }
+  
+  const type = DynamicTextureMaterialProperty.prototype.getType()
+  addMaterial(type, {
+    translucent: true,
+    fabric: {
+      type,
+      uniforms: {
+        color: new Cesium.Color.fromCssColorString(defaultColor),
+        speed: defaultSpeed,
+        image: defaultImage,
+        time: performance.now(),
+      },
+      source: DynamicTextureShader,
+    },
+  })
 }

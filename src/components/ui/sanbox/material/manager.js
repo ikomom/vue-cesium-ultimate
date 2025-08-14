@@ -13,8 +13,8 @@ import {
  */
 export function getMaterialProperty(materialType, options = {}) {
   switch (materialType) {
-    // case MATERIAL_TYPES.PolylineDynamicTexture:
-    //   return new DynamicTextureMaterialProperty(options)
+    case MATERIAL_TYPES.PolylineDynamicTexture:
+      return new DynamicTextureMaterialProperty(options)
 
     case MATERIAL_TYPES.PolylineFlyLine:
       return new ParabolaFlyLineMaterialProperty(options)
@@ -24,13 +24,10 @@ export function getMaterialProperty(materialType, options = {}) {
 
     // Cesium内置材质类型
     case MATERIAL_TYPES.PolylineArrow:
-      return new window.Cesium.PolylineArrowMaterialProperty(options)
     case MATERIAL_TYPES.PolylineDash:
-      return new window.Cesium.PolylineDashMaterialProperty(options)
     case MATERIAL_TYPES.PolylineGlow:
-      return new window.Cesium.PolylineGlowMaterialProperty(options)
     case MATERIAL_TYPES.PolylineOutline:
-      return new window.Cesium.PolylineOutlineMaterialProperty(options)
+      return { fabric: { type: materialType, uniforms: { ...options } } }
     case MATERIAL_TYPES.Color:
       // 这些是Cesium内置类型，不需要自定义属性类
       return options.color
