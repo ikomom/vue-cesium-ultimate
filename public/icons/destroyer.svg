@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="destroyerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5D6D7E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34495E;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E74C3C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C0392B;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#4682B4;stop-opacity:0.6" />
+    </linearGradient>
+  </defs>
+  <g>
+    <!-- 水面背景 -->
+    <rect x="0" y="20" width="32" height="12" fill="url(#waterGrad)"/>
+    <!-- 波浪效果 -->
+    <path d="M0,22 Q8,20 16,22 T32,22" stroke="#45B7D1" stroke-width="1" fill="none" opacity="0.8"/>
+    <path d="M0,24 Q8,22 16,24 T32,24" stroke="#45B7D1" stroke-width="1" fill="none" opacity="0.6"/>
+    
+    <!-- 船体 -->
+    <ellipse cx="16" cy="22" rx="13" ry="2.5" fill="url(#destroyerGrad)"/>
+    
+    <!-- 主甲板 -->
+    <rect x="5" y="17" width="22" height="5" fill="url(#destroyerGrad)" rx="1"/>
+    
+    <!-- 上层建筑 -->
+    <rect x="12" y="12" width="8" height="5" fill="url(#destroyerGrad)" rx="0.5"/>
+    
+    <!-- 舰桥 -->
+    <rect x="14" y="8" width="4" height="4" fill="url(#destroyerGrad)" rx="0.5"/>
+    
+    <!-- 主炮塔 -->
+    <ellipse cx="9" cy="15" rx="2" ry="1.5" fill="url(#destroyerGrad)"/>
+    <rect x="7" y="13" width="4" height="1" fill="#2C3E50"/>
+    
+    <!-- 后炮塔 -->
+    <ellipse cx="23" cy="15" rx="2" ry="1.5" fill="url(#destroyerGrad)"/>
+    <rect x="21" y="13" width="4" height="1" fill="#2C3E50"/>
+    
+    <!-- 导弹发射器 -->
+    <rect x="10" y="10" width="2" height="2" fill="#7F8C8D" rx="0.2"/>
+    <rect x="20" y="10" width="2" height="2" fill="#7F8C8D" rx="0.2"/>
+    
+    <!-- 雷达天线 -->
+    <rect x="15.5" y="4" width="1" height="4" fill="#95A5A6"/>
+    <ellipse cx="16" cy="4" rx="2" ry="0.5" fill="url(#radarGrad)"/>
+    
+    <!-- 通信天线 -->
+    <rect x="13" y="6" width="0.5" height="2" fill="#95A5A6"/>
+    <rect x="18.5" y="6" width="0.5" height="2" fill="#95A5A6"/>
+    
+    <!-- 烟囱 -->
+    <rect x="17" y="6" width="1.5" height="2" fill="#8B4513"/>
+    
+    <!-- 烟雾 -->
+    <circle cx="17.8" cy="5" r="0.6" fill="#D3D3D3" opacity="0.6"/>
+    <circle cx="19" cy="4.5" r="0.4" fill="#D3D3D3" opacity="0.4"/>
+    
+    <!-- 船首 -->
+    <polygon points="3,22 5,19 5,25" fill="url(#destroyerGrad)"/>
+    
+    <!-- 船尾 -->
+    <polygon points="29,22 27,19 27,25" fill="url(#destroyerGrad)"/>
+    
+    <!-- 舰桥窗户 -->
+    <rect x="14.5" y="9" width="0.8" height="0.8" fill="#87CEEB" rx="0.1"/>
+    <rect x="15.7" y="9" width="0.8" height="0.8" fill="#87CEEB" rx="0.1"/>
+    <rect x="16.5" y="9" width="0.8" height="0.8" fill="#87CEEB" rx="0.1"/>
+    
+    <!-- 上层建筑窗户 -->
+    <rect x="13" y="13" width="0.8" height="0.8" fill="#87CEEB" rx="0.1"/>
+    <rect x="14.5" y="13" width="0.8" height="0.8" fill="#87CEEB" rx="0.1"/>
+    <rect x="16.7" y="13" width="0.8" height="0.8" fill="#87CEEB" rx="0.1"/>
+    <rect x="18.2" y="13" width="0.8" height="0.8" fill="#87CEEB" rx="0.1"/>
+    
+    <!-- 舰载直升机平台 -->
+    <rect x="24" y="17" width="3" height="3" fill="#95A5A6" rx="0.2"/>
+    <circle cx="25.5" cy="18.5" r="0.8" fill="none" stroke="#FFFFFF" stroke-width="0.3"/>
+    <text x="25.5" y="19" text-anchor="middle" font-size="1" fill="#FFFFFF" font-weight="bold">H</text>
+    
+    <!-- 国旗 -->
+    <rect x="28" y="8" width="0.3" height="4" fill="#8B4513"/>
+    <rect x="28.3" y="8" width="2" height="1.5" fill="#E74C3C"/>
+    
+    <!-- 武器系统指示灯 -->
+    <circle cx="11" cy="12" r="0.3" fill="#E74C3C"/>
+    <circle cx="21" cy="12" r="0.3" fill="#E74C3C"/>
+    
+    <!-- 甲板细节 -->
+    <line x1="5" y1="19" x2="27" y2="19" stroke="#BDC3C7" stroke-width="0.3" opacity="0.6"/>
+    <line x1="12" y1="14" x2="20" y2="14" stroke="#BDC3C7" stroke-width="0.3" opacity="0.6"/>
+  </g>
+</svg>

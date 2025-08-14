@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="researchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3498DB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2980B9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="equipmentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F39C12;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E67E22;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#4682B4;stop-opacity:0.6" />
+    </linearGradient>
+  </defs>
+  <g>
+    <!-- 水面背景 -->
+    <rect x="0" y="20" width="32" height="12" fill="url(#waterGrad)"/>
+    <!-- 波浪效果 -->
+    <path d="M0,22 Q8,20 16,22 T32,22" stroke="#45B7D1" stroke-width="1" fill="none" opacity="0.8"/>
+    <path d="M0,24 Q8,22 16,24 T32,24" stroke="#45B7D1" stroke-width="1" fill="none" opacity="0.6"/>
+    
+    <!-- 破冰船体（加强型船首） -->
+    <ellipse cx="16" cy="22" rx="13" ry="3" fill="url(#researchGrad)"/>
+    
+    <!-- 主甲板 -->
+    <rect x="5" y="16" width="22" height="6" fill="url(#researchGrad)" rx="1"/>
+    
+    <!-- 实验室建筑 -->
+    <rect x="8" y="12" width="16" height="4" fill="url(#researchGrad)" rx="0.5"/>
+    
+    <!-- 舰桥 -->
+    <rect x="20" y="8" width="6" height="4" fill="url(#researchGrad)" rx="0.5"/>
+    
+    <!-- 科研设备舱 -->
+    <rect x="10" y="8" width="8" height="4" fill="url(#equipmentGrad)" rx="0.5"/>
+    
+    <!-- 大型科研起重机 -->
+    <rect x="6" y="4" width="1.5" height="8" fill="#7F8C8D"/>
+    <rect x="4" y="4" width="5" height="1" fill="#7F8C8D"/>
+    <circle cx="6.8" cy="6" r="0.5" fill="#E74C3C"/>
+    
+    <!-- 海洋取样设备 -->
+    <rect x="26" y="10" width="2" height="6" fill="#95A5A6"/>
+    <circle cx="27" cy="16" r="1" fill="#34495E"/>
+    
+    <!-- 气象观测塔 -->
+    <rect x="15.5" y="2" width="1" height="6" fill="#95A5A6"/>
+    <circle cx="16" cy="2" r="1" fill="url(#equipmentGrad)"/>
+    
+    <!-- 卫星通信天线 -->
+    <ellipse cx="22" cy="6" rx="2" ry="1" fill="#ECF0F1"/>
+    <ellipse cx="22" cy="6" rx="1.5" ry="0.7" fill="#BDC3C7"/>
+    <rect x="21.5" y="6" width="1" height="2" fill="#95A5A6"/>
+    
+    <!-- 雷达系统 -->
+    <rect x="23" y="4" width="0.5" height="2" fill="#95A5A6"/>
+    <ellipse cx="23.25" cy="4" rx="1" ry="0.3" fill="#E74C3C"/>
+    
+    <!-- 烟囱 -->
+    <rect x="24" y="5" width="1.5" height="3" fill="#8B4513"/>
+    
+    <!-- 烟雾 -->
+    <circle cx="24.8" cy="4" r="0.6" fill="#D3D3D3" opacity="0.6"/>
+    <circle cx="26" cy="3.5" r="0.4" fill="#D3D3D3" opacity="0.4"/>
+    
+    <!-- 破冰船首（特殊设计） -->
+    <polygon points="2,22 5,18 5,26" fill="url(#researchGrad)"/>
+    <polygon points="2,22 3,20 3,24" fill="#E8F4FD"/>
+    
+    <!-- 船尾 -->
+    <polygon points="30,22 27,18 27,26" fill="url(#researchGrad)"/>
+    
+    <!-- 实验室窗户 -->
+    <rect x="9" y="13" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="11" y="13" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="13" y="13" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="15" y="13" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="17" y="13" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    
+    <!-- 舰桥窗户 -->
+    <rect x="21" y="9" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="22.5" y="9" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="24" y="9" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    
+    <!-- 科研设备舱窗户 -->
+    <rect x="11" y="9" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="13" y="9" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="15" y="9" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    <rect x="17" y="9" width="1" height="1" fill="#87CEEB" rx="0.1"/>
+    
+    <!-- 直升机平台 -->
+    <rect x="28" y="16" width="3" height="3" fill="#95A5A6" rx="0.2"/>
+    <circle cx="29.5" cy="17.5" r="0.8" fill="none" stroke="#FFFFFF" stroke-width="0.3"/>
+    <text x="29.5" y="18" text-anchor="middle" font-size="1" fill="#FFFFFF" font-weight="bold">H</text>
+    
+    <!-- 科研标识 -->
+    <circle cx="12" cy="10" r="1" fill="#FFFFFF"/>
+    <text x="12" y="10.5" text-anchor="middle" font-size="1.2" fill="#3498DB" font-weight="bold">R</text>
+    
+    <!-- 海洋取样缆绳 -->
+    <line x1="27" y1="16" x2="27" y2="20" stroke="#34495E" stroke-width="0.5" stroke-dasharray="1,1"/>
+    
+    <!-- 甲板设备 -->
+    <rect x="14" y="14" width="2" height="1" fill="#95A5A6" rx="0.2"/>
+    <rect x="18" y="14" width="2" height="1" fill="#95A5A6" rx="0.2"/>
+    
+    <!-- 极地标识旗帜 -->
+    <rect x="29" y="8" width="0.3" height="3" fill="#8B4513"/>
+    <rect x="29.3" y="8" width="1.5" height="1" fill="#FFFFFF"/>
+    <circle cx="30" cy="8.5" r="0.2" fill="#3498DB"/>
+  </g>
+</svg>

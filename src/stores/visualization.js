@@ -5,7 +5,7 @@ export const useVisualizationStore = defineStore('visualization', () => {
   // 显示控制状态
   const showPoints = ref(true)
   const showRelation = ref(true)
-
+  const showTrajectory = ref(true)
   // 材质控制状态
   const useMaterialProperty = ref(true) // MaterialProperty 使用开关
   const materialMode = ref('flyline') // 当前材质模式: 'flyline', 'pulse', 'solid'
@@ -38,6 +38,16 @@ export const useVisualizationStore = defineStore('visualization', () => {
   // 设置关系连线显示状态
   const setShowRelation = (value) => {
     showRelation.value = value
+  }
+
+  // 设置轨迹显示状态
+  const setShowTrajectory = (value) => {
+    showTrajectory.value = value
+  }
+
+  // 切换轨迹显示
+  const toggleTrajectory = () => {
+    showTrajectory.value = !showTrajectory.value
   }
 
   // 切换材质属性模式
@@ -93,10 +103,13 @@ export const useVisualizationStore = defineStore('visualization', () => {
     // 显示控制
     showPoints,
     showRelation,
+    showTrajectory,
     togglePoints,
     toggleRelation,
+    toggleTrajectory,
     setShowPoints,
     setShowRelation,
+    setShowTrajectory,
 
     // 材质控制
     useMaterialProperty,

@@ -3,19 +3,27 @@
  * 提供三个核心数据管理类的统一入口
  */
 
+import BaseManager from './BaseManager.js'
 import TargetBaseManager from './TargetBaseManager.js'
 import TargetLocationManager from './TargetLocationManager.js'
 import RelationManager from './RelationManager.js'
+import TrajectoryManager from './TrajectoryManager.js'
 
 /**
  * 数据管理器工厂类
  * 提供统一的数据管理器创建和初始化方法
  */
 class DataManagerFactory {
-  constructor(targetBaseData = [], targetLocationData = [], relationData = []) {
+  constructor(
+    targetBaseData = [],
+    targetLocationData = [],
+    relationData = [],
+    trajectoryData = [],
+  ) {
     this.targetBaseManager = this.createTargetBaseManager(targetBaseData)
     this.targetLocationManager = this.createTargetLocationManager(targetLocationData)
     this.relationManager = this.createRelationManager(relationData)
+    this.trajectoryManager = this.createTrajectoryManager(trajectoryData)
   }
 
   /**
@@ -58,6 +66,19 @@ class DataManagerFactory {
   }
 
   /**
+   * 创建轨迹数据管理器
+   * @param {Array} initialData - 初始数据
+   * @returns {TrajectoryManager} 管理器实例
+   */
+  createTrajectoryManager(initialData = []) {
+    this.trajectoryManager = new TrajectoryManager()
+    if (initialData.length > 0) {
+      this.trajectoryManager.setInitialData(initialData)
+    }
+    return this.trajectoryManager
+  }
+
+  /**
    * 获取所有管理器实例
    * @returns {Object} 管理器实例对象
    */
@@ -66,6 +87,7 @@ class DataManagerFactory {
       targetBaseManager: this.targetBaseManager,
       targetLocationManager: this.targetLocationManager,
       relationManager: this.relationManager,
+      trajectoryManager: this.trajectoryManager,
     }
   }
 
@@ -76,6 +98,7 @@ class DataManagerFactory {
     if (this.targetBaseManager) this.targetBaseManager.clear()
     if (this.targetLocationManager) this.targetLocationManager.clear()
     if (this.relationManager) this.relationManager.clear()
+    if (this.trajectoryManager) this.trajectoryManager.clear()
   }
 
   /**
@@ -102,6 +125,13 @@ class DataManagerFactory {
           }
         : null,
       relation: this.relationManager ? this.relationManager.getNetworkStats() : null,
+      trajectory: this.trajectoryManager
+        ? {
+            count: this.trajectoryManager.getCount(),
+            targets: this.trajectoryManager.getAllTargets(),
+            timeRange: this.trajectoryManager.getTimeRange(),
+          }
+        : null,
     }
 
     return stats
@@ -112,17 +142,21 @@ class DataManagerFactory {
 const dataManagerFactory = new DataManagerFactory()
 
 export {
+  BaseManager,
   TargetBaseManager,
   TargetLocationManager,
   RelationManager,
+  TrajectoryManager,
   DataManagerFactory,
   dataManagerFactory,
 }
 
 export default {
+  BaseManager,
   TargetBaseManager,
   TargetLocationManager,
   RelationManager,
+  TrajectoryManager,
   DataManagerFactory,
   dataManagerFactory,
 }

@@ -5,37 +5,190 @@
 
 import { MATERIAL_TYPES } from '../constanst'
 
+// 获取距离相关配置
+export function getDistanceConfigs() {
+  return {
+    scaleByDistance: new Cesium.NearFarScalar(1.5e2, 1.5, 1.5e7, 0.2),
+    pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 1.0, 1.5e7, 0.3),
+    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0.0, 2.0e7),
+  }
+}
+
+// 默认标牌配置
+export const defaultLabelConfig = {
+  font: '10pt sans-serif',
+  fillColor: '#fff',
+  outlineColor: '#000000',
+  outlineWidth: 2,
+  pixelOffset: [0, 20],
+}
 // 目标图标配置
 export const targetIcons = {
   机场: {
-    image: '/icons/airport.svg',
-    scale: 1.2,
-    color: '#FF6B35',
+    billboard: {
+      image: '/icons/airport.svg',
+      scale: 1.2,
+      color: '#FF6B35',
+    },
+    label: { ...defaultLabelConfig },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
   },
   雷达站: {
-    image: '/icons/radar.svg',
-    scale: 1.0,
-    color: '#4ECDC4',
+    billboard: {
+      image: '/icons/radar.svg',
+      scale: 1.0,
+      color: '#4ECDC4',
+    },
+    label: { ...defaultLabelConfig },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
   },
   港口: {
-    image: '/icons/port.svg',
-    scale: 1.2,
-    color: '#45B7D1',
+    billboard: {
+      image: '/icons/port.svg',
+      scale: 1.2,
+      color: '#45B7D1',
+    },
+    label: { ...defaultLabelConfig },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
   },
   火车站: {
-    image: '/icons/train.svg',
-    scale: 1.0,
-    color: '#96CEB4',
+    billboard: {
+      image: '/icons/train.svg',
+      scale: 1.0,
+      color: '#96CEB4',
+    },
+    label: { ...defaultLabelConfig },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
   },
   通信站: {
-    image: '/icons/communication.svg',
-    scale: 0.8,
-    color: '#FFEAA7',
+    billboard: {
+      image: '/icons/communication.svg',
+      scale: 0.8,
+      color: '#FFEAA7',
+    },
+    label: { ...defaultLabelConfig },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
   },
   军事基地: {
-    image: '/icons/military.svg',
-    scale: 1.3,
-    color: '#DDA0DD',
+    billboard: {
+      image: '/icons/military.svg',
+      scale: 1.3,
+      color: '#DDA0DD',
+    },
+    label: { ...defaultLabelConfig },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+  },
+  船只: {
+    billboard: {
+      image: '/icons/ship.svg',
+      scale: 1.0,
+      color: '#2E86AB',
+    },
+    label: { ...defaultLabelConfig },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+  },
+}
+// 船只子类型图标配置
+export const shipTypeIcons = {
+  集装箱船: {
+    billboard: {
+      image: '/icons/container-ship.svg',
+      scale: 1.2,
+      color: '#2E86AB',
+    },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+  },
+  油轮: {
+    billboard: {
+      image: '/icons/oil-tanker.svg',
+      scale: 1.3,
+      color: '#2C3E50',
+    },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+  },
+  散货船: {
+    billboard: {
+      image: '/icons/bulk-carrier.svg',
+      scale: 1.2,
+      color: '#8E44AD',
+    },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+  },
+  驱逐舰: {
+    billboard: {
+      image: '/icons/destroyer.svg',
+      scale: 1.1,
+      color: '#5D6D7E',
+    },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+  },
+  科考船: {
+    billboard: {
+      image: '/icons/research-ship.svg',
+      scale: 1.0,
+      color: '#3498DB',
+    },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+  },
+  渔船: {
+    billboard: {
+      image: '/icons/fishing-boat.svg',
+      scale: 0.9,
+      color: '#16A085',
+    },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
   },
 }
 
@@ -131,9 +284,17 @@ export const relationStyles = {
 // 默认配置
 export const defaultConfig = {
   targetIcon: {
-    image: '/icons/default.svg',
-    scale: 1.0,
-    color: '#FFFFFF',
+    billboard: {
+      image: '/icons/default.svg',
+      scale: 1.0,
+      color: '#FFFFFF',
+    },
+    model: {
+      url: null,
+      scale: 1.0,
+      minimumPixelSize: 64,
+    },
+    label: { ...defaultLabelConfig },
   },
   relationStyle: {
     color: '#FFFFFF',

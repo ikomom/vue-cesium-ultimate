@@ -22,3 +22,11 @@ export function getTargetLocationData() {
 export function getRelationData() {
   return fetch('/data/relationData.json').then((res) => res.json())
 }
+
+/**
+ * 获取船舶轨迹数据
+ * @returns {Promise} 返回船舶轨迹数据的Promise对象
+ */
+export function getShipTrajectoryData() {
+  return fetch('/data/shipTrajectoryData.json').then((res) => res.json())
+}

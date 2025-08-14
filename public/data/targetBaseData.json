@@ -498,5 +498,65 @@
         "capacity": "指挥级",
         "operator": "中国人民解放军",
         "createdAt": "2024-01-19T02:19:00.000Z"
+    },
+    {
+        "id": "target_051",
+        "name": "中远海运集装箱船",
+        "type": "船只",
+        "description": "大型集装箱货轮",
+        "status": "航行中",
+        "capacity": "20000TEU",
+        "operator": "中远海运集团",
+        "createdAt": "2024-01-20T08:00:00.000Z"
+    },
+    {
+        "id": "target_052",
+        "name": "招商轮船油轮",
+        "type": "船只",
+        "description": "超大型原油运输船",
+        "status": "航行中",
+        "capacity": "300000DWT",
+        "operator": "招商轮船",
+        "createdAt": "2024-01-20T09:00:00.000Z"
+    },
+    {
+        "id": "target_053",
+        "name": "中海散货船",
+        "type": "船只",
+        "description": "散装货物运输船",
+        "status": "航行中",
+        "capacity": "180000DWT",
+        "operator": "中海发展",
+        "createdAt": "2024-01-20T10:00:00.000Z"
+    },
+    {
+        "id": "target_054",
+        "name": "海军驱逐舰",
+        "type": "船只",
+        "description": "052D型导弹驱逐舰",
+        "status": "巡航中",
+        "capacity": "军用级",
+        "operator": "中国人民解放军海军",
+        "createdAt": "2024-01-20T11:00:00.000Z"
+    },
+    {
+        "id": "target_055",
+        "name": "科考船雪龙2号",
+        "type": "船只",
+        "description": "极地科学考察破冰船",
+        "status": "科考中",
+        "capacity": "科研级",
+        "operator": "中国极地研究中心",
+        "createdAt": "2024-01-20T12:00:00.000Z"
+    },
+    {
+        "id": "target_056",
+        "name": "渔业公司拖网渔船",
+        "type": "船只",
+        "description": "远洋捕捞渔船",
+        "status": "作业中",
+        "capacity": "500吨级",
+        "operator": "中国远洋渔业",
+        "createdAt": "2024-01-20T13:00:00.000Z"
     }
 ]

@@ -1,0 +1,314 @@
+{
+  "target_051": [
+    {
+      "timestamp": "2024-01-20T08:00:00.000Z",
+      "longitude": 121.4737,
+      "latitude": 31.2304,
+      "altitude": 0,
+      "speed": 15.2,
+      "heading": 90,
+      "status": "航行中",
+      "location": "上海港出发"
+    },
+    {
+      "timestamp": "2024-01-20T12:00:00.000Z",
+      "longitude": 125.3245,
+      "latitude": 32.1567,
+      "altitude": 0,
+      "speed": 16.8,
+      "heading": 95,
+      "status": "航行中",
+      "location": "东海航行"
+    },
+    {
+      "timestamp": "2024-01-20T18:00:00.000Z",
+      "longitude": 129.8756,
+      "latitude": 33.4521,
+      "altitude": 0,
+      "speed": 14.5,
+      "heading": 85,
+      "status": "航行中",
+      "location": "接近日本海域"
+    },
+    {
+      "timestamp": "2024-01-21T06:00:00.000Z",
+      "longitude": 135.2341,
+      "latitude": 34.6789,
+      "altitude": 0,
+      "speed": 12.3,
+      "heading": 75,
+      "status": "减速航行",
+      "location": "接近大阪港"
+    },
+    {
+      "timestamp": "2024-01-21T10:00:00.000Z",
+      "longitude": 135.5023,
+      "latitude": 34.6937,
+      "altitude": 0,
+      "speed": 0,
+      "heading": 0,
+      "status": "停泊",
+      "location": "大阪港"
+    }
+  ],
+  "target_052": [
+    {
+      "timestamp": "2024-01-20T09:00:00.000Z",
+      "longitude": 118.7969,
+      "latitude": 32.0603,
+      "altitude": 0,
+      "speed": 13.5,
+      "heading": 180,
+      "status": "航行中",
+      "location": "南京长江段"
+    },
+    {
+      "timestamp": "2024-01-20T15:00:00.000Z",
+      "longitude": 119.2567,
+      "latitude": 30.8934,
+      "altitude": 0,
+      "speed": 14.2,
+      "heading": 165,
+      "status": "航行中",
+      "location": "长江口"
+    },
+    {
+      "timestamp": "2024-01-20T21:00:00.000Z",
+      "longitude": 120.1234,
+      "latitude": 29.5678,
+      "altitude": 0,
+      "speed": 15.8,
+      "heading": 150,
+      "status": "航行中",
+      "location": "东海南部"
+    },
+    {
+      "timestamp": "2024-01-21T08:00:00.000Z",
+      "longitude": 121.5432,
+      "latitude": 27.8901,
+      "altitude": 0,
+      "speed": 16.5,
+      "heading": 135,
+      "status": "航行中",
+      "location": "台湾海峡北部"
+    },
+    {
+      "timestamp": "2024-01-21T16:00:00.000Z",
+      "longitude": 123.2345,
+      "latitude": 25.1234,
+      "altitude": 0,
+      "speed": 17.2,
+      "heading": 120,
+      "status": "航行中",
+      "location": "台湾海峡中部"
+    }
+  ],
+  "target_053": [
+    {
+      "timestamp": "2024-01-20T10:00:00.000Z",
+      "longitude": 113.2644,
+      "latitude": 23.1291,
+      "altitude": 0,
+      "speed": 11.8,
+      "heading": 270,
+      "status": "航行中",
+      "location": "广州港出发"
+    },
+    {
+      "timestamp": "2024-01-20T16:00:00.000Z",
+      "longitude": 110.3456,
+      "latitude": 22.8765,
+      "altitude": 0,
+      "speed": 12.5,
+      "heading": 255,
+      "status": "航行中",
+      "location": "珠江口"
+    },
+    {
+      "timestamp": "2024-01-21T02:00:00.000Z",
+      "longitude": 106.7890,
+      "latitude": 21.5432,
+      "altitude": 0,
+      "speed": 13.2,
+      "heading": 240,
+      "status": "航行中",
+      "location": "南海北部"
+    },
+    {
+      "timestamp": "2024-01-21T12:00:00.000Z",
+      "longitude": 102.1234,
+      "latitude": 19.8765,
+      "altitude": 0,
+      "speed": 14.0,
+      "heading": 225,
+      "status": "航行中",
+      "location": "南海中部"
+    },
+    {
+      "timestamp": "2024-01-21T20:00:00.000Z",
+      "longitude": 98.5678,
+      "latitude": 18.2345,
+      "altitude": 0,
+      "speed": 10.5,
+      "heading": 210,
+      "status": "减速航行",
+      "location": "接近新加坡海域"
+    }
+  ],
+  "target_054": [
+    {
+      "timestamp": "2024-01-20T11:00:00.000Z",
+      "longitude": 120.1611,
+      "latitude": 36.0611,
+      "altitude": 0,
+      "speed": 25.0,
+      "heading": 45,
+      "status": "巡航中",
+      "location": "青岛军港"
+    },
+    {
+      "timestamp": "2024-01-20T14:00:00.000Z",
+      "longitude": 122.3456,
+      "latitude": 37.8901,
+      "altitude": 0,
+      "speed": 28.5,
+      "heading": 60,
+      "status": "高速巡航",
+      "location": "黄海中部"
+    },
+    {
+      "timestamp": "2024-01-20T18:00:00.000Z",
+      "longitude": 125.7890,
+      "latitude": 39.2345,
+      "altitude": 0,
+      "speed": 30.2,
+      "heading": 75,
+      "status": "高速巡航",
+      "location": "黄海北部"
+    },
+    {
+      "timestamp": "2024-01-21T00:00:00.000Z",
+      "longitude": 128.1234,
+      "latitude": 40.5678,
+      "altitude": 0,
+      "speed": 15.0,
+      "heading": 90,
+      "status": "警戒巡逻",
+      "location": "朝鲜半岛西侧海域"
+    },
+    {
+      "timestamp": "2024-01-21T06:00:00.000Z",
+      "longitude": 126.8765,
+      "latitude": 38.9012,
+      "altitude": 0,
+      "speed": 20.0,
+      "heading": 225,
+      "status": "返航",
+      "location": "返回巡逻区域"
+    }
+  ],
+  "target_055": [
+    {
+      "timestamp": "2024-01-20T12:00:00.000Z",
+      "longitude": 121.4737,
+      "latitude": 31.2304,
+      "altitude": 0,
+      "speed": 8.5,
+      "heading": 180,
+      "status": "科考准备",
+      "location": "上海极地基地"
+    },
+    {
+      "timestamp": "2024-01-20T20:00:00.000Z",
+      "longitude": 122.1234,
+      "latitude": 28.5678,
+      "altitude": 0,
+      "speed": 10.2,
+      "heading": 195,
+      "status": "科考航行",
+      "location": "东海南部"
+    },
+    {
+      "timestamp": "2024-01-21T08:00:00.000Z",
+      "longitude": 123.8901,
+      "latitude": 24.3456,
+      "altitude": 0,
+      "speed": 9.8,
+      "heading": 210,
+      "status": "科考航行",
+      "location": "台湾海峡"
+    },
+    {
+      "timestamp": "2024-01-21T18:00:00.000Z",
+      "longitude": 125.2345,
+      "latitude": 20.7890,
+      "altitude": 0,
+      "speed": 8.0,
+      "heading": 225,
+      "status": "科考作业",
+      "location": "南海科考区域"
+    },
+    {
+      "timestamp": "2024-01-22T06:00:00.000Z",
+      "longitude": 126.5678,
+      "latitude": 17.1234,
+      "altitude": 0,
+      "speed": 0,
+      "heading": 0,
+      "status": "科考停泊",
+      "location": "深海科考站点"
+    }
+  ],
+  "target_056": [
+    {
+      "timestamp": "2024-01-20T13:00:00.000Z",
+      "longitude": 109.1192,
+      "latitude": 21.4735,
+      "altitude": 0,
+      "speed": 6.5,
+      "heading": 315,
+      "status": "出港",
+      "location": "湛江渔港"
+    },
+    {
+      "timestamp": "2024-01-20T19:00:00.000Z",
+      "longitude": 107.8901,
+      "latitude": 22.3456,
+      "altitude": 0,
+      "speed": 4.2,
+      "heading": 0,
+      "status": "作业中",
+      "location": "北部湾渔场"
+    },
+    {
+      "timestamp": "2024-01-21T03:00:00.000Z",
+      "longitude": 108.2345,
+      "latitude": 22.7890,
+      "altitude": 0,
+      "speed": 3.8,
+      "heading": 45,
+      "status": "拖网作业",
+      "location": "北部湾中部"
+    },
+    {
+      "timestamp": "2024-01-21T11:00:00.000Z",
+      "longitude": 108.7890,
+      "latitude": 23.1234,
+      "altitude": 0,
+      "speed": 5.5,
+      "heading": 90,
+      "status": "移动作业",
+      "location": "北部湾东部"
+    },
+    {
+      "timestamp": "2024-01-21T17:00:00.000Z",
+      "longitude": 109.3456,
+      "latitude": 22.8765,
+      "altitude": 0,
+      "speed": 7.2,
+      "heading": 135,
+      "status": "返港",
+      "location": "返回湛江港"
+    }
+  ]
+}
