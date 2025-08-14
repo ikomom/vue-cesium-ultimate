@@ -180,5 +180,18 @@
     "capacity": "高带宽",
     "frequency": "实时传输",
     "createdAt": "2024-01-20T04:51:00.000Z"
+  },
+  {
+    "id": "rel_053",
+    "description": "测试链路",
+    "source_id": "target_013",
+    "target_id": "target_055",
+    "type": "数据传输",
+    "status": "正常",
+    "priority": "高",
+    "distance": 1899,
+    "capacity": "高带宽",
+    "frequency": "实时传输",
+    "createdAt": "2024-02-20T04:51:00.000Z"
   }
 ]

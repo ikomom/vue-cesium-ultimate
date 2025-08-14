@@ -4,6 +4,7 @@
     <vc-entity
       v-for="target in renderPoints"
       :key="target.id"
+      :id="target.id"
       :show="visible && showPoints"
       :position="target.position"
       :billboard="target.billboard"
@@ -20,6 +21,7 @@
     <vc-entity
       v-for="relation in renderRelations"
       :key="relation.id"
+      :id="relation.id"
       :show="visible && showRelation"
       @click="onRelationClick(relation)"
       @mouseover="onRelationHover(relation)"
@@ -38,6 +40,7 @@
     <vc-entity
       v-for="trajectory in renderTrajectory"
       :key="trajectory.id"
+      :id="trajectory.id"
       :show="visible && showTrajectory"
       :position="trajectory.position"
       :billboard="trajectory.billboard"
@@ -52,7 +55,7 @@
 </template>
 
 <script setup>
-import { watch, watchEffect, ref, computed, toRaw } from 'vue'
+import { watch, watchEffect, ref, toRefs, computed, toRaw } from 'vue'
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import {
   getRelationStyleConfig,
@@ -113,7 +116,7 @@ const props = defineProps({
     default: true,
   },
 })
-
+const { layerId, layerName } = toRefs(props)
 // Emits定义
 const emit = defineEmits([
   'targetClick',
@@ -167,6 +170,7 @@ watch(
   (newTrajectory) => {
     dataManager.trajectoryManager.updateData(newTrajectory)
     processTrajectory()
+    processRelation()
   },
   { deep: true, immediate: true },
 )
@@ -183,7 +187,7 @@ function processPoint() {
       }
       const iconConfig = getTargetIconConfig(base.type)
       return {
-        id: target.id,
+        id: target.id + '@point@' + layerId.value,
         name: target.name,
         type: target.type,
         position: [target.longitude, target.latitude, target.height],
@@ -206,31 +210,68 @@ function processPoint() {
   console.log('点数据', { renderPoints: toRaw(renderPoints.value) })
 }
 
+function getPosition(source, target, styleConfig, isCartesian3 = false) {
+  return styleConfig.curve.enabled
+    ? generateCurve(
+        isCartesian3
+          ? source
+          : Cesium.Cartesian3.fromDegrees(source.longitude, source.latitude, source.height),
+        isCartesian3
+          ? target
+          : Cesium.Cartesian3.fromDegrees(target.longitude, target.latitude, target.height),
+        styleConfig.curve.height,
+      )
+    : [
+        isCartesian3 ? source : [source.longitude, source.latitude, source.height],
+        isCartesian3 ? target : [target.longitude, target.latitude, target.height],
+      ]
+}
+function getEntityByIds(entityIds = []) {
+  // 遍历实体ID数组,返回第一个找到的实体
+  for (const entityId of entityIds) {
+    const entity = window.viewer.entities.getById(entityId)
+    if (entity) {
+      return entity
+    }
+  }
+  return null
+}
 // 处理关系数据
 function processRelation() {
   const allRelation = dataManager.relationManager.getAll()
   renderRelations.value = allRelation
     .map((relation) => {
+      const linkTrajectorySource = dataManager.trajectoryManager.findById(relation.source_id)
+      const linkTrajectoryTarget = dataManager.trajectoryManager.findById(relation.target_id)
+      const islinkTrajectory = !!(linkTrajectorySource || linkTrajectoryTarget)
       const source = dataManager.targetLocationManager.findById(relation.source_id)
       const target = dataManager.targetLocationManager.findById(relation.target_id)
-      if (!source || !target) {
+      if (!source || (!target && !islinkTrajectory)) {
         console.error('处理关系数据项失败：缺少必要的源或目标点', relation)
         return null
       }
       const styleConfig = getRelationStyleConfig(relation.type)
       const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
-      const positions = styleConfig.curve.enabled
-        ? generateCurve(
-            Cesium.Cartesian3.fromDegrees(source.longitude, source.latitude, source.height),
-            Cesium.Cartesian3.fromDegrees(target.longitude, target.latitude, target.height),
-            styleConfig.curve.height,
-          )
-        : [
-            [source.longitude, source.latitude, source.height],
-            [target.longitude, target.latitude, target.height],
-          ]
+      const positions = islinkTrajectory
+        ? new Cesium.CallbackProperty((time, result) => {
+            const linkSource = getEntityByIds([
+              relation.source_id + '@trajectory@' + layerId.value,
+              relation.source_id + '@point@' + layerId.value,
+            ])?.position?.getValue(time)
+            const linkTarget = getEntityByIds([
+              relation.target_id + '@trajectory@' + layerId.value,
+              relation.target_id + '@point@' + layerId.value,
+            ])?.position?.getValue(time)
+            if (linkSource && linkTarget) {
+              // debugger
+              return getPosition(linkSource, linkTarget, styleConfig, true)
+            }
+            return []
+          }, false)
+        : getPosition(source, target, styleConfig)
+
       return {
-        id: relation.id,
+        id: relation.id + '@relation@' + layerId.value,
         name: relation.name,
         type: relation.type,
         target,
@@ -341,7 +382,7 @@ function processTrajectory() {
       })
 
       return {
-        id: trajectory.target_id,
+        id: trajectory.target_id + '@trajectory@' + layerId.value,
         name: trajectory.target_id,
         // 动态位置属性（随时间变化）
         position: timePositionProperty,

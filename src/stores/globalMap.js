@@ -54,7 +54,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     const targetBaseLayer = globalLayerManager.createLayer({
       name: '数据卡片1',
       zIndex: 1,
-      visible: true,
+      visible: false,
     })
     targetBaseLayer.updateAllData({
       targets: targetBaseData.value,
@@ -66,7 +66,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     const targetLocationLayer = globalLayerManager.createLayer({
       name: '数据卡片2',
       zIndex: 2,
-      visible: true,
+      visible: false,
     })
     targetLocationLayer.updateAllData({
       targets: targetBaseData.value,
@@ -78,11 +78,23 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     const relationLayer = globalLayerManager.createLayer({
       name: '轨迹数据',
       zIndex: 3,
-      visible: true,
+      visible: false,
     })
     relationLayer.updateAllData({
       targets: targetBaseData.value,
       trajectories: trajectoryData.value,
+    })
+    // 全数据图层
+    const allDataLayer = globalLayerManager.createLayer({
+      name: '全数据',
+      zIndex: 4,
+      visible: true,
+    })
+    allDataLayer.updateAllData({
+      targets: targetBaseData.value,
+      trajectories: trajectoryData.value,
+      points: targetLocationData.value,
+      relations: relationData.value,
     })
   }
 
