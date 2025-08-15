@@ -28,25 +28,6 @@ const onRelationClick = (relation) => {
 // 轨迹事件处理函数
 const onTrajectoryClick = (trajectory) => {
   console.log('点击轨迹:', trajectory)
-
-  // 可以在这里添加轨迹点击后的逻辑，比如显示轨迹详情、飞行到轨迹等
-  if (
-    window.viewer &&
-    trajectory.trajectoryData &&
-    trajectory.trajectoryData.trajectory.length > 0
-  ) {
-    const firstPoint = trajectory.trajectoryData.trajectory[0]
-    const destination = window.Cesium.Cartesian3.fromDegrees(
-      firstPoint.longitude,
-      firstPoint.latitude,
-      (firstPoint.height || 0) + 1000,
-    )
-
-    window.viewer.camera.flyTo({
-      destination: destination,
-      duration: 2.0,
-    })
-  }
 }
 
 const onTrajectoryHover = (trajectory) => {
@@ -57,21 +38,21 @@ const onTrajectoryLeave = (trajectory) => {
   console.log('离开轨迹:', trajectory)
 }
 
-const handleFlyToTarget = (target) => {
-  console.log('飞行到目标:', target)
-  if (window.viewer && target.longitude && target.latitude) {
-    const destination = window.Cesium.Cartesian3.fromDegrees(
-      target.longitude,
-      target.latitude,
-      target.height + 1000,
-    )
+// const handleFlyToTarget = (target) => {
+//   console.log('飞行到目标:', target)
+//   if (window.viewer && target.longitude && target.latitude) {
+//     const destination = window.Cesium.Cartesian3.fromDegrees(
+//       target.longitude,
+//       target.latitude,
+//       target.height + 1000,
+//     )
 
-    window.viewer.camera.flyTo({
-      destination: destination,
-      duration: 2.0,
-    })
-  }
-}
+//     window.viewer.camera.flyTo({
+//       destination: destination,
+//       duration: 2.0,
+//     })
+//   }
+// }
 
 function onViewerReady({ viewer, Cesium }) {
   console.log('onViewerReady', viewer)
