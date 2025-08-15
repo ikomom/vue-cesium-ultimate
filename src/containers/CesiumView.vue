@@ -1,24 +1,20 @@
 <script setup>
-import { ref, computed, onMounted, toRaw, watchEffect } from 'vue'
-import { useVisualizationStore } from '@/stores/visualization'
+import { ref, computed, onMounted, toRaw, watchEffect, watch } from 'vue'
 import DataVisualization from '@/components/ui/sanbox/DataVisualization.vue'
 
 import { useGlobalMapStore } from '@/stores/globalMap.js'
 import { storeToRefs } from 'pinia'
 import { initMaterialProperty } from '@/components/ui/sanbox/material'
 
-const visualizationStore = useVisualizationStore()
-
 const globalMapStore = useGlobalMapStore()
-const { globalLayerManager } = globalMapStore
-const {  layers, activeLayerId } =
-  storeToRefs(globalMapStore)
+const { globalLayerManager, initDefaultLayers } = globalMapStore
+const { layers, activeLayerId, loading } = storeToRefs(globalMapStore)
 const ready = ref(false)
 
-watchEffect(() => {
-  console.log('layers', layers.value)
-  console.log('activeLayerId', activeLayerId.value)
-})
+// watchEffect(() => {
+//   console.log('layers', layers.value)
+//   console.log('activeLayerId', activeLayerId.value)
+// })
 
 // 事件处理函数
 const onTargetClick = (target) => {
@@ -79,15 +75,21 @@ const handleFlyToTarget = (target) => {
 
 function onViewerReady({ viewer, Cesium }) {
   console.log('onViewerReady', viewer)
+  globalLayerManager.setViewer(viewer)
   window.viewer = viewer
   window.Cesium = Cesium
   ready.value = true
 
   // 初始化材质属性
   initMaterialProperty()
-
   // viewer.scene.globe.depthTestAgainstTerrain = true
 }
+
+watch([ready, loading], () => {
+  if (ready.value && !loading.value) {
+    initDefaultLayers()
+  }
+})
 </script>
 
 <template>
@@ -109,6 +111,7 @@ function onViewerReady({ viewer, Cesium }) {
         <template v-for="layer in layers" :key="layer.id">
           <!-- 数据可视化组件 - 纯UI组件 -->
           <DataVisualization
+            :data-manager="layer.dataManager"
             :layer-id="layer.id"
             :layer-name="layer.name"
             :targets="layer.data.targets"

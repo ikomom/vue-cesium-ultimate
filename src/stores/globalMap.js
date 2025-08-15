@@ -36,9 +36,6 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
         targetLocationData.value = [...(res[1] || [])]
         relationData.value = [...(res[2] || [])]
         trajectoryData.value = { ...(res[3] || {}) }
-
-        // 初始化默认图层
-        initDefaultLayers()
       })
       .finally(() => {
         loading.value = false
@@ -96,6 +93,8 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       points: targetLocationData.value,
       relations: relationData.value,
     })
+    // 全局时间轴更新
+    globalLayerManager.updateGlobalTimeline()
   }
 
   // 获取图层管理器

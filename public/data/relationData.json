@@ -193,5 +193,18 @@
     "capacity": "高带宽",
     "frequency": "实时传输",
     "createdAt": "2024-02-20T04:51:00.000Z"
+  },
+  {
+    "id": "rel_054",
+    "description": "测试链路2",
+    "source_id": "target_055",
+    "target_id": "target_052",
+    "type": "军事协防",
+    "status": "正常",
+    "priority": "高",
+    "distance": 1899,
+    "capacity": "常态化协作",
+    "frequency": "实时传输",
+    "createdAt": "2024-02-20T03:51:00.000Z"
   }
 ]

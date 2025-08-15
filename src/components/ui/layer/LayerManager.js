@@ -1,6 +1,14 @@
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import { reactive, ref } from 'vue'
 
+export const LAYER_DATA_TYPE = {
+  POINTS: 'points',
+  TARGETS: 'targets',
+  RELATIONS: 'relations',
+  TRAJECTORIES: 'trajectories',
+  EVENTS: 'events',
+}
+
 /**
  * 单个图层类
  */
@@ -20,6 +28,7 @@ export class Layer {
     this.visible = layerState.visible
     this.zIndex = layerState.zIndex
     this._state = layerState
+    this.viewer = options.viewer
 
     // 图层数据
     this.data = reactive({
@@ -83,6 +92,7 @@ export class Layer {
 
     let hasUpdated = false
 
+    console.group(`📊 更新图层 [${this.name}] 数据`)
     // 遍历传入的数据对象
     Object.keys(dataObject).forEach((key) => {
       // 只更新data对象中存在的key
@@ -91,13 +101,12 @@ export class Layer {
         // 同步到数据管理器
         this.syncToDataManager(key, dataObject[key])
         hasUpdated = true
-        console.log(
-          `📊 图层 [${this.name}] 更新 ${this.getDataTypeDisplayName(key)}: ${dataObject[key].length} 项`,
-        )
+        console.log(`${this.getDataTypeDisplayName(key)}: ${dataObject[key].length} 项`)
       } else {
-        console.warn(`⚠️ 图层 [${this.name}] 数据类型 ${key} 不存在，跳过更新`)
+        console.warn(`⚠️ 数据类型 ${key} 不存在，跳过更新`)
       }
     })
+    console.groupEnd()
 
     if (hasUpdated) {
       this.updatedAt = new Date()
@@ -125,20 +134,81 @@ export class Layer {
    */
   syncToDataManager(dataType, data) {
     switch (dataType) {
-      case 'targets':
+      case LAYER_DATA_TYPE.TARGETS:
         this.dataManager.targetBaseManager.updateData(data)
         break
-      case 'points':
+      case LAYER_DATA_TYPE.POINTS:
         this.dataManager.targetLocationManager.updateData(data)
         break
-      case 'relations':
+      case LAYER_DATA_TYPE.RELATIONS:
         this.dataManager.relationManager.updateData(data)
         break
-      case 'trajectories':
+      case LAYER_DATA_TYPE.TRAJECTORIES:
         this.dataManager.trajectoryManager.updateData(data)
+        // 轨迹数据更新时，同时更新时间轴
+        // this.updateTimelineFromTrajectories()
         break
       default:
         console.warn(`⚠️ 图层 [${this.name}] 未知的数据类型: ${dataType}`)
+    }
+  }
+
+  /**
+   * 从轨迹数据更新时间轴
+   * @deprecated 从全局数据管理器获取时间范围
+   */
+  updateTimelineFromTrajectories() {
+    if (!this.viewer) {
+      console.warn('Cesium viewer 未初始化，无法更新时间轴')
+      return
+    }
+
+    // 获取当前图层的时间范围
+    const timeRange = this.dataManager.trajectoryManager.getTimeRange()
+
+    if (!timeRange || !timeRange.start || !timeRange.end) {
+      console.log(`图层 [${this.name}] 没有有效的轨迹时间数据`)
+      return
+    }
+
+    try {
+      // 转换时间格式
+      const startTimeStr =
+        typeof timeRange.start === 'string' ? timeRange.start : String(timeRange.start)
+      const endTimeStr = typeof timeRange.end === 'string' ? timeRange.end : String(timeRange.end)
+
+      const startTime = this.Cesium.JulianDate.fromIso8601(startTimeStr)
+      const endTime = this.Cesium.JulianDate.fromIso8601(endTimeStr)
+      const currentTime = new Date()
+      const cesiumCurrentTime = this.Cesium.JulianDate.fromDate(currentTime)
+
+      // 更新Cesium时间轴
+      this.viewer.clock.startTime = startTime
+      this.viewer.clock.stopTime = endTime
+      // 设置当前时间为实际当前时间，如果在范围内则使用当前时间，否则使用开始时间
+      if (
+        Cesium.JulianDate.greaterThanOrEquals(cesiumCurrentTime, startTime) &&
+        Cesium.JulianDate.lessThanOrEquals(cesiumCurrentTime, endTime)
+      ) {
+        this.viewer.clock.currentTime = cesiumCurrentTime
+      } else {
+        this.viewer.clock.currentTime = startTime
+      }
+      this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP
+      this.viewer.clock.multiplier = 1
+
+      // 设置时间轴范围
+      if (this.viewer.timeline) {
+        this.viewer.timeline.zoomTo(startTime, endTime)
+      }
+
+      console.log(`✅ 图层 [${this.name}] 时间轴更新完成:`, {
+        start: startTimeStr,
+        end: endTimeStr,
+        currentTime: currentTime.toISOString(),
+      })
+    } catch (error) {
+      console.warn(`⚠️ 图层 [${this.name}] 时间轴设置失败:`, error, timeRange)
     }
   }
 
@@ -227,13 +297,23 @@ export class LayerManager {
   constructor() {
     this.layers = reactive(new Map())
     this.activeLayerId = ref(null)
+    this.viewer = null
+  }
+
+  setViewer(viewer) {
+    this.viewer = viewer
   }
 
   /**
    * 创建图层
+   * @param {Object} options 图层选项
+   * @returns {Layer} 图层对象
    */
   createLayer(options = {}) {
-    const layer = new Layer(options)
+    const layer = new Layer({
+      ...options,
+      viewer: this.viewer,
+    })
     this.layers.set(layer.id, layer)
 
     // 如果是第一个图层，设为活动图层
@@ -247,6 +327,8 @@ export class LayerManager {
 
   /**
    * 删除图层
+   * @param {string} layerId 图层ID
+   * @returns {boolean} 是否删除成功
    */
   removeLayer(layerId) {
     const layer = this.layers.get(layerId)
@@ -266,6 +348,8 @@ export class LayerManager {
       const remainingLayers = Array.from(this.layers.keys())
       this.activeLayerId.value = remainingLayers.length > 0 ? remainingLayers[0] : null
     }
+    // 图层删除后，重新计算全局时间轴
+    this.updateGlobalTimeline()
 
     console.log(`🗑️ 图层删除成功: [${layer.name}] ID: ${layerId}`)
     return true
@@ -273,6 +357,8 @@ export class LayerManager {
 
   /**
    * 获取图层
+   * @param {string} layerId 图层ID
+   * @returns {Layer} 图层对象
    */
   getLayer(layerId) {
     return this.layers.get(layerId)
@@ -280,6 +366,10 @@ export class LayerManager {
 
   /**
    * 根据图层ID更新图层数据
+   * @param {string} layerId 图层ID
+   * @param {LAYER_DATA_TYPE} dataType 数据类型
+   * @param {Object} newData 新数据
+   * @returns {boolean} 是否更新成功
    */
   updateLayerData(layerId, dataType, newData) {
     const layer = this.layers.get(layerId)
@@ -287,12 +377,21 @@ export class LayerManager {
       console.warn(`⚠️ 图层不存在: ID ${layerId}`)
       return false
     }
-
-    return layer.updateData(dataType, newData)
+    const success = layer.updateData(dataType, newData)
+    if (success) {
+      if (dataType === LAYER_DATA_TYPE.TRAJECTORIES) {
+        // 轨迹数据更新后，重新计算全局时间轴
+        this.updateGlobalTimeline()
+      }
+    }
+    return
   }
 
   /**
-   * 根据图层ID批量更新图层数据
+   * 批量更新图层数据
+   * @param {string} layerId 图层ID
+   * @param {object} dataUpdates 数据更新对象
+   * @returns {boolean} 是否更新成功
    */
   updateLayerDataBatch(layerId, dataUpdates) {
     const layer = this.layers.get(layerId)
@@ -300,16 +399,7 @@ export class LayerManager {
       console.warn(`⚠️ 图层不存在: ID ${layerId}`)
       return false
     }
-
-    let success = true
-    Object.entries(dataUpdates).forEach(([dataType, newData]) => {
-      const result = layer.updateData(dataType, newData)
-      if (!result) {
-        success = false
-      }
-    })
-
-    return success
+    return layer.updateAllData(dataUpdates)
   }
 
   /**
@@ -335,6 +425,8 @@ export class LayerManager {
 
   /**
    * 设置活动图层
+   * @param {string} layerId 图层ID
+   * @returns {boolean} 是否设置成功
    */
   setActiveLayer(layerId) {
     if (this.layers.has(layerId)) {
@@ -354,6 +446,8 @@ export class LayerManager {
 
   /**
    * 批量设置图层可见性
+   * @param {string[]} layerIds 图层ID数组
+   * @param {boolean} visible 可见性
    */
   setLayersVisible(layerIds, visible) {
     layerIds.forEach((layerId) => {
@@ -362,6 +456,8 @@ export class LayerManager {
         layer.setVisible(visible)
       }
     })
+    // 图层可见性变化后，重新计算全局时间轴
+    this.updateGlobalTimeline()
   }
 
   /**
@@ -437,6 +533,8 @@ export class LayerManager {
 
   /**
    * 导入图层配置
+   * @param {Object} config 图层配置对象
+   * @returns {boolean} 是否导入成功
    */
   importConfig(config) {
     if (!config || !config.layers) {
@@ -454,6 +552,7 @@ export class LayerManager {
         name: layerConfig.name,
         visible: layerConfig.visible,
         zIndex: layerConfig.zIndex,
+        viewer: this.viewer,
       })
 
       // 恢复显示控制
@@ -465,8 +564,92 @@ export class LayerManager {
       this.activeLayerId.value = config.activeLayerId
     }
 
+    // 导入完成后，重新计算全局时间轴
+    this.updateGlobalTimeline()
+
     console.log('图层配置导入成功')
     return true
+  }
+
+  /**
+   * 更新全局时间轴
+   * 统一管理所有图层的时间轴范围
+   */
+  updateGlobalTimeline() {
+    if (!this.viewer) {
+      console.warn('Cesium viewer 未初始化，无法更新全局时间轴')
+      return
+    }
+
+    // 获取所有可见图层的时间范围
+    const visibleLayers = this.getVisibleLayers()
+    const timeRanges = []
+
+    visibleLayers.forEach((layer) => {
+      const timeRange = layer.dataManager.trajectoryManager.getTimeRange()
+      if (timeRange && timeRange.start && timeRange.end) {
+        timeRanges.push(timeRange)
+      }
+    })
+
+    if (timeRanges.length === 0) {
+      console.log('没有可用的轨迹时间数据，跳过全局时间轴更新')
+      return
+    }
+
+    try {
+      // 计算全局时间范围
+      let globalStart = timeRanges[0].start
+      let globalEnd = timeRanges[0].end
+
+      timeRanges.forEach((range) => {
+        if (range.start < globalStart) {
+          globalStart = range.start
+        }
+        if (range.end > globalEnd) {
+          globalEnd = range.end
+        }
+      })
+
+      // 转换时间格式
+      const startTimeStr = typeof globalStart === 'string' ? globalStart : String(globalStart)
+      const endTimeStr = typeof globalEnd === 'string' ? globalEnd : String(globalEnd)
+
+      const startTime = Cesium.JulianDate.fromIso8601(startTimeStr)
+      const endTime = Cesium.JulianDate.fromIso8601(endTimeStr)
+      const currentTime = new Date()
+      const cesiumCurrentTime = Cesium.JulianDate.fromDate(currentTime)
+
+      // 更新Cesium时间轴
+      this.viewer.clock.startTime = startTime
+      this.viewer.clock.stopTime = endTime
+
+      // 设置当前时间
+      if (
+        Cesium.JulianDate.greaterThanOrEquals(cesiumCurrentTime, startTime) &&
+        Cesium.JulianDate.lessThanOrEquals(cesiumCurrentTime, endTime)
+      ) {
+        this.viewer.clock.currentTime = cesiumCurrentTime
+      } else {
+        this.viewer.clock.currentTime = startTime
+      }
+
+      this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP
+      this.viewer.clock.multiplier = 1
+
+      // 设置时间轴范围
+      if (this.viewer.timeline) {
+        this.viewer.timeline.zoomTo(startTime, endTime)
+      }
+
+      console.log(`✅ 全局时间轴更新完成:`, {
+        start: startTimeStr,
+        end: endTimeStr,
+        layerCount: visibleLayers.length,
+      })
+    } catch (error) {
+      console.warn(`⚠️ 全局时间轴设置失败:`, error)
+    }
   }
 }
 
