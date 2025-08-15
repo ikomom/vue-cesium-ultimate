@@ -1,0 +1,167 @@
+[
+    {
+        "id": "event_001",
+        "source_id": "target_001",
+        "target_id": "target_002",
+        "description": "北京首都机场至上海浦东机场航班延误事件",
+        "startTime": "2024-12-19T08:30:00Z",
+        "endTime": "2024-12-19T10:15:00Z",
+        "alertTime": "2024-12-19T08:00:00Z",
+        "duration": 105,
+        "type": "已完成"
+    },
+    {
+        "id": "event_002",
+        "source_id": "target_021",
+        "target_id": "target_022",
+        "description": "北京雷达站A向上海雷达站B传输异常信号",
+        "startTime": "2024-12-19T09:15:00Z",
+        "endTime": null,
+        "alertTime": "2024-12-19T09:10:00Z",
+        "duration": null,
+        "type": "进行中"
+    },
+    {
+        "id": "event_003",
+        "source_id": "target_031",
+        "target_id": "target_032",
+        "description": "上海洋山深水港至深圳盐田港货物运输延迟",
+        "startTime": "2024-12-19T06:00:00Z",
+        "endTime": "2024-12-19T18:30:00Z",
+        "alertTime": "2024-12-19T05:45:00Z",
+        "duration": 750,
+        "type": "已完成"
+    },
+    {
+        "id": "event_004",
+        "source_id": "target_041",
+        "target_id": "target_042",
+        "description": "北京通信中心与上海通信枢纽网络连接中断",
+        "startTime": "2024-12-19T11:20:00Z",
+        "endTime": "2024-12-19T11:45:00Z",
+        "alertTime": "2024-12-19T11:18:00Z",
+        "duration": 25,
+        "type": "已完成"
+    },
+    {
+        "id": "event_005",
+        "source_id": "target_051",
+        "target_id": "target_033",
+        "description": "中远海运集装箱船驶向宁波舟山港遇恶劣天气",
+        "startTime": "2024-12-19T14:00:00Z",
+        "endTime": null,
+        "alertTime": "2024-12-19T13:30:00Z",
+        "duration": null,
+        "type": "进行中"
+    },
+    {
+        "id": "event_006",
+        "source_id": "target_003",
+        "target_id": "target_004",
+        "description": "广州白云机场至深圳宝安机场空域管制",
+        "startTime": "2024-12-19T16:30:00Z",
+        "endTime": "2024-12-19T17:15:00Z",
+        "alertTime": "2024-12-19T16:15:00Z",
+        "duration": 45,
+        "type": "已完成"
+    },
+    {
+        "id": "event_007",
+        "source_id": "target_023",
+        "target_id": "target_024",
+        "description": "广州雷达站C检测到深圳雷达站D信号异常",
+        "startTime": "2024-12-19T12:45:00Z",
+        "endTime": "2024-12-19T13:20:00Z",
+        "alertTime": "2024-12-19T12:40:00Z",
+        "duration": 35,
+        "type": "已完成"
+    },
+    {
+        "id": "event_008",
+        "source_id": "target_036",
+        "target_id": "target_037",
+        "description": "北京南站至上海虹桥站高铁晚点事件",
+        "startTime": "2024-12-19T07:30:00Z",
+        "endTime": "2024-12-19T08:45:00Z",
+        "alertTime": "2024-12-19T07:15:00Z",
+        "duration": 75,
+        "type": "已完成"
+    },
+    {
+        "id": "event_009",
+        "source_id": "target_054",
+        "target_id": "target_035",
+        "description": "海军驱逐舰向天津港发送紧急停靠请求",
+        "startTime": "2024-12-19T15:20:00Z",
+        "endTime": null,
+        "alertTime": "2024-12-19T15:10:00Z",
+        "duration": null,
+        "type": "进行中"
+    },
+    {
+        "id": "event_010",
+        "source_id": "target_005",
+        "target_id": "target_025",
+        "description": "成都双流机场与成都雷达站E协调空域管制",
+        "startTime": "2024-12-19T10:00:00Z",
+        "endTime": "2024-12-19T10:30:00Z",
+        "alertTime": "2024-12-19T09:50:00Z",
+        "duration": 30,
+        "type": "已完成"
+    },
+    {
+        "id": "event_011",
+        "source_id": "target_043",
+        "target_id": "target_044",
+        "description": "广州通信基站向深圳数据中心传输大量数据",
+        "startTime": "2024-12-19T20:00:00Z",
+        "endTime": null,
+        "alertTime": "2024-12-19T19:45:00Z",
+        "duration": null,
+        "type": "进行中"
+    },
+    {
+        "id": "event_012",
+        "source_id": "target_052",
+        "target_id": "target_034",
+        "description": "招商轮船油轮计划停靠青岛港进行补给",
+        "startTime": "2024-12-19T22:00:00Z",
+        "endTime": "2024-12-20T02:30:00Z",
+        "alertTime": "2024-12-19T21:30:00Z",
+        "duration": 270,
+        "type": "已完成"
+    },
+    {
+        "id": "event_013",
+        "source_id": "target_006",
+        "target_id": "target_026",
+        "description": "西安咸阳机场请求西安雷达站F提供导航支持",
+        "startTime": "2024-12-19T13:15:00Z",
+        "endTime": "2024-12-19T13:45:00Z",
+        "alertTime": "2024-12-19T13:00:00Z",
+        "duration": 30,
+        "type": "已完成"
+    },
+    {
+        "id": "event_014",
+        "source_id": "target_055",
+        "target_id": "target_007",
+        "description": "科考船雪龙2号向昆明长水机场报告位置信息",
+        "startTime": "2024-12-19T18:30:00Z",
+        "endTime": "2024-12-19T18:35:00Z",
+        "alertTime": "2024-12-19T18:25:00Z",
+        "duration": 5,
+        "type": "已完成"
+    },
+    {
+        "id": "event_015",
+        "source_id": "target_038",
+        "target_id": "target_039",
+        "description": "广州南站至深圳北站高铁客流量激增预警",
+        "startTime": "2024-12-19T17:00:00Z",
+        "endTime": null,
+        "alertTime": "2024-12-19T16:30:00Z",
+        "duration": null,
+        "type": "进行中"
+    }
+]

@@ -3,6 +3,7 @@ import {
   getTargetBaseData,
   getTargetLocationData,
   getRelationData,
+  getEventData,
   getShipTrajectoryData,
 } from '@/api/index.js'
 import { ref, markRaw, computed } from 'vue'
@@ -18,6 +19,8 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
   const targetLocationData = ref([])
   // 关系数据
   const relationData = ref([])
+  // 事件数据
+  const eventData = ref([])
   // 轨迹数据
   const trajectoryData = ref({})
   const loading = ref(false)
@@ -30,12 +33,14 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       getTargetLocationData(),
       getRelationData(),
       getShipTrajectoryData(),
+      getEventData(),
     ])
       .then((res) => {
         targetBaseData.value = [...(res[0] || [])]
         targetLocationData.value = [...(res[1] || [])]
         relationData.value = [...(res[2] || [])]
         trajectoryData.value = { ...(res[3] || {}) }
+        eventData.value = [...(res[4] || [])]
       })
       .finally(() => {
         loading.value = false
@@ -92,6 +97,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       trajectories: trajectoryData.value,
       points: targetLocationData.value,
       relations: relationData.value,
+      events: eventData.value,
     })
     // 全局时间轴更新
     globalLayerManager.updateGlobalTimeline()
@@ -118,6 +124,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     targetBaseData,
     targetLocationData,
     relationData,
+    eventData,
     trajectoryData,
     loading,
   }

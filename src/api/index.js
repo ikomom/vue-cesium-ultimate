@@ -30,3 +30,11 @@ export function getRelationData() {
 export function getShipTrajectoryData() {
   return fetch('/data/shipTrajectoryData.json').then((res) => res.json())
 }
+
+/**
+ * 获取事件数据
+ * @returns {Promise} 返回事件数据的Promise对象
+ */
+export function getEventData() {
+  return fetch('/data/eventData.json').then((res) => res.json())
+}

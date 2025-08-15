@@ -1,5 +1,6 @@
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import { reactive, ref } from 'vue'
+import { v4 as uuidV4 } from 'uuid'
 
 export const LAYER_DATA_TYPE = {
   POINTS: 'points',
@@ -59,7 +60,7 @@ export class Layer {
    * 生成唯一ID
    */
   generateId() {
-    return `layer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return uuidV4()
   }
 
   /**
@@ -147,6 +148,9 @@ export class Layer {
         this.dataManager.trajectoryManager.updateData(data)
         // 轨迹数据更新时，同时更新时间轴
         // this.updateTimelineFromTrajectories()
+        break
+      case LAYER_DATA_TYPE.EVENTS:
+        this.dataManager.eventManager.updateData(data)
         break
       default:
         console.warn(`⚠️ 图层 [${this.name}] 未知的数据类型: ${dataType}`)

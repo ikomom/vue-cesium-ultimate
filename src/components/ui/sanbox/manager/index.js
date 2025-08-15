@@ -8,6 +8,7 @@ import TargetBaseManager from './TargetBaseManager.js'
 import TargetLocationManager from './TargetLocationManager.js'
 import RelationManager from './RelationManager.js'
 import TrajectoryManager from './TrajectoryManager.js'
+import EventManager from './EventManager.js'
 
 /**
  * 数据管理器工厂类
@@ -19,11 +20,13 @@ class DataManagerFactory {
     targetLocationData = [],
     relationData = [],
     trajectoryData = [],
+    eventData = [],
   ) {
     this.targetBaseManager = this.createTargetBaseManager(targetBaseData)
     this.targetLocationManager = this.createTargetLocationManager(targetLocationData)
     this.relationManager = this.createRelationManager(relationData)
     this.trajectoryManager = this.createTrajectoryManager(trajectoryData)
+    this.eventManager = this.createEventManager(eventData)
   }
 
   /**
@@ -79,6 +82,19 @@ class DataManagerFactory {
   }
 
   /**
+   * 创建事件数据管理器
+   * @param {Array} initialData - 初始数据
+   * @returns {EventManager} 管理器实例
+   */
+  createEventManager(initialData = []) {
+    this.eventManager = new EventManager()
+    if (initialData.length > 0) {
+      this.eventManager.setInitialData(initialData)
+    }
+    return this.eventManager
+  }
+
+  /**
    * 获取所有管理器实例
    * @returns {Object} 管理器实例对象
    */
@@ -88,6 +104,7 @@ class DataManagerFactory {
       targetLocationManager: this.targetLocationManager,
       relationManager: this.relationManager,
       trajectoryManager: this.trajectoryManager,
+      eventManager: this.eventManager,
     }
   }
 
@@ -99,6 +116,7 @@ class DataManagerFactory {
     if (this.targetLocationManager) this.targetLocationManager.clear()
     if (this.relationManager) this.relationManager.clear()
     if (this.trajectoryManager) this.trajectoryManager.clear()
+    if (this.eventManager) this.eventManager.clear()
   }
 
   /**
@@ -132,6 +150,7 @@ class DataManagerFactory {
             timeRange: this.trajectoryManager.getTimeRange(),
           }
         : null,
+      event: this.eventManager ? this.eventManager.getEventStats() : null,
     }
 
     return stats
@@ -147,6 +166,7 @@ export {
   TargetLocationManager,
   RelationManager,
   TrajectoryManager,
+  EventManager,
   DataManagerFactory,
   dataManagerFactory,
 }
@@ -157,6 +177,7 @@ export default {
   TargetLocationManager,
   RelationManager,
   TrajectoryManager,
+  EventManager,
   DataManagerFactory,
   dataManagerFactory,
 }

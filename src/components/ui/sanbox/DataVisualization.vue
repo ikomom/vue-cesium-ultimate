@@ -11,29 +11,28 @@
       :model="target.model"
       :label="target.label"
       :point="target.point"
-      @click="onTargetClick(target)"
-      @mouseover="onTargetHover(target)"
-      @mouseout="onTargetLeave(target)"
+      @click="onTargetClick(target, $event)"
+      @mouseover="onTargetHover(target, $event)"
+      @mouseout="onTargetLeave(target, $event)"
     />
   </template>
   <template>
     <!-- 关系连线 -->
-    <vc-entity
+    <line-with-label
       v-for="relation in renderRelations"
       :key="relation.id"
-      :id="relation.id"
       :show="visible && showRelation"
-      @click="onRelationClick(relation)"
-      @mouseover="onRelationHover(relation)"
-      @mouseout="onRelationLeave(relation)"
-    >
-      <vc-graphics-polyline
-        :positions="relation.polyline.positions"
-        :distance-display-condition="relation.polyline.distanceDisplayCondition"
-        :width="relation.polyline.width"
-        :material="relation.polyline.material"
-      />
-    </vc-entity>
+      :positions="relation.positions"
+      :width="relation.width"
+      :distance-display-condition="relation.distanceDisplayCondition"
+      :material="relation.material"
+      :show-label="true"
+      :label-style="relation.labelStyle"
+      :curve-config="relation.curveConfig"
+      @click="onRelationClick(relation, $event)"
+      @mouseover="onRelationHover(relation, $event)"
+      @mouseout="onRelationLeave(relation, $event)"
+    />
   </template>
   <template>
     <!-- 轨迹实体 -->
@@ -47,9 +46,27 @@
       :model="trajectory.model"
       :label="trajectory.label"
       :path="trajectory.path"
-      @click="onTrajectoryClick(trajectory)"
-      @mouseover="onTrajectoryHover(trajectory)"
-      @mouseout="onTrajectoryLeave(trajectory)"
+      @click="onTrajectoryClick(trajectory, $event)"
+      @mouseover="onTrajectoryHover(trajectory, $event)"
+      @mouseout="onTrajectoryLeave(trajectory, $event)"
+    />
+  </template>
+  <template>
+    <!-- 事件实体 -->
+    <line-with-label
+      v-for="event in renderEvents"
+      :key="event.id"
+      :show="visible && showEvents"
+      :positions="event.positions"
+      :width="event.width"
+      :distance-display-condition="event.distanceDisplayCondition"
+      :material="event.material"
+      :show-label="true"
+      :label-style="event.labelStyle"
+      :curve-config="event.curveConfig"
+      @click="onEventClick(event, $event)"
+      @mouseover="onEventHover(event, $event)"
+      @mouseout="onEventLeave(event, $event)"
     />
   </template>
 </template>
@@ -61,10 +78,15 @@ import {
   getRelationStyleConfig,
   getTargetIconConfig,
   getDistanceConfigs,
+  getEventStatusStyleConfig,
 } from './config/visualConfig'
 import { getMaterialProperty } from './material'
 import { MATERIAL_TYPES } from './constanst'
 import { generateCurve } from './utils/map'
+import { useVueCesium } from 'vue-cesium'
+import LineWithLabel from './LineWithLabel.vue'
+
+const { viewer } = useVueCesium()
 // Props定义
 const props = defineProps({
   dataManager: {
@@ -134,12 +156,16 @@ const emit = defineEmits([
   'trajectoryClick',
   'trajectoryHover',
   'trajectoryLeave',
+  'eventClick',
+  'eventHover',
+  'eventLeave',
 ])
 
 // 使用shallowRef优化性能，避免深度响应式
 const renderPoints = shallowRef([])
 const renderRelations = shallowRef([])
 const renderTrajectory = shallowRef([])
+const renderEvents = shallowRef([])
 
 // 缓存配置对象，避免重复计算
 const distanceConfigs = getDistanceConfigs()
@@ -147,7 +173,7 @@ const distanceConfigs = getDistanceConfigs()
 // 创建日志前缀，统一日志样式
 const createLogPrefix = (type) => {
   const layerInfo = layerName.value ? `[${layerName.value}]` : `[Layer-${layerId.value}]`
-  return `%c🎯 ${layerInfo} - ${type} %c`
+  return `%c🎯 图层 ${layerInfo} - ${type} %c`
 }
 
 const logStyles = {
@@ -181,6 +207,14 @@ const debounceUpdate = (callback, delay = 300) => {
   if (updateTimer) clearTimeout(updateTimer)
   updateTimer = setTimeout(callback, delay)
 }
+/**
+ * 获取两点之间的位置数组
+ * @param {Object|Cesium.Cartesian3} source - 源点位置,可以是经纬度对象或Cartesian3对象
+ * @param {Object|Cesium.Cartesian3} target - 目标点位置,可以是经纬度对象或Cartesian3对象
+ * @param {Object} styleConfig - 样式配置对象,包含curve相关配置
+ * @param {Boolean} isCartesian3 - 输入是否为Cartesian3格式
+ * @returns {Array} 返回位置数组,如果启用曲线则返回曲线点数组,否则返回起终点数组
+ */
 function getPosition(source, target, styleConfig, isCartesian3 = false) {
   return styleConfig.curve.enabled
     ? generateCurve(
@@ -197,15 +231,66 @@ function getPosition(source, target, styleConfig, isCartesian3 = false) {
         isCartesian3 ? target : [target.longitude, target.latitude, target.height],
       ]
 }
+/**
+ * 根据实体ID数组查找第一个匹配的实体
+ * @param {Array<string>} entityIds - 实体ID数组,可以包含多个ID
+ * @returns {Cesium.Entity|null} 返回找到的第一个实体,如果都未找到则返回null
+ * @example
+ * // 查找单个实体
+ * const entity = getEntityByIds(['entityId1'])
+ *
+ * // 查找多个实体中的第一个
+ * const entity = getEntityByIds(['entityId1', 'entityId2'])
+ */
 function getEntityByIds(entityIds = []) {
   // 遍历实体ID数组,返回第一个找到的实体
   for (const entityId of entityIds) {
-    const entity = window.viewer.entities.getById(entityId)
+    const entity = viewer.entities.getById(entityId)
     if (entity) {
       return entity
     }
   }
   return null
+}
+
+function getSourceTarget(data, styleConfig) {
+  const linkTrajectorySource = dataManager.trajectoryManager.findById(data.source_id)
+  const linkTrajectoryTarget = dataManager.trajectoryManager.findById(data.target_id)
+  const islinkTrajectory = !!(linkTrajectorySource || linkTrajectoryTarget)
+
+  const source = dataManager.targetLocationManager.findById(data.source_id)
+  const target = dataManager.targetLocationManager.findById(data.target_id)
+
+  if ((!source || !target) && !islinkTrajectory) {
+    console.warn(`缺少源或目标点`, { data })
+    return null
+  }
+
+  const positions = islinkTrajectory
+    ? new Cesium.CallbackProperty((time, result) => {
+        const linkSource = getEntityByIds([
+          data.source_id + '@trajectory@' + layerId.value,
+          data.source_id + '@point@' + layerId.value,
+        ])?.position?.getValue(time)
+        const linkTarget = getEntityByIds([
+          data.target_id + '@trajectory@' + layerId.value,
+          data.target_id + '@point@' + layerId.value,
+        ])?.position?.getValue(time)
+        if (linkSource && linkTarget) {
+          return getPosition(linkSource, linkTarget, styleConfig, true)
+        }
+        return []
+      }, false)
+    : getPosition(source, target, styleConfig)
+
+  return {
+    source,
+    target,
+    positions,
+    islinkTrajectory,
+    linkTrajectoryTarget,
+    linkTrajectorySource,
+  }
 }
 
 // 处理点数据
@@ -268,52 +353,21 @@ const processRelation = logFuncWrap(() => {
   const allRelation = dataManager.relationManager.getAll()
 
   if (!allRelation || allRelation.length === 0) {
-    console.log(
-      createLogPrefix('关系数据'),
-      logStyles.primary,
-      logStyles.secondary,
-      '没有关系数据需要处理',
-    )
+    console.log('没有关系数据需要处理')
     renderRelations.value = []
     return
   }
 
   renderRelations.value = allRelation
     .map((relation) => {
-      const linkTrajectorySource = dataManager.trajectoryManager.findById(relation.source_id)
-      const linkTrajectoryTarget = dataManager.trajectoryManager.findById(relation.target_id)
-      const islinkTrajectory = !!(linkTrajectorySource || linkTrajectoryTarget)
-
-      const source = dataManager.targetLocationManager.findById(relation.source_id)
-      const target = dataManager.targetLocationManager.findById(relation.target_id)
-
-      if ((!source || !target) && !islinkTrajectory) {
-        console.error(
-          `缺少源或目标点 - 关系ID: ${relation.id}, 源ID: ${relation.source_id}, 目标ID: ${relation.target_id}, 轨迹连接: ${islinkTrajectory}`,
-          { relation },
-        )
-        return null
-      }
-
       const styleConfig = getRelationStyleConfig(relation.type)
-      const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
+      const sourceTarget = getSourceTarget(relation, styleConfig)
+      if (!sourceTarget) return null
+      const { source, target, positions } = sourceTarget
 
-      const positions = islinkTrajectory
-        ? new Cesium.CallbackProperty((time, result) => {
-            const linkSource = getEntityByIds([
-              relation.source_id + '@trajectory@' + layerId.value,
-              relation.source_id + '@point@' + layerId.value,
-            ])?.position?.getValue(time)
-            const linkTarget = getEntityByIds([
-              relation.target_id + '@trajectory@' + layerId.value,
-              relation.target_id + '@point@' + layerId.value,
-            ])?.position?.getValue(time)
-            if (linkSource && linkTarget) {
-              return getPosition(linkSource, linkTarget, styleConfig, true)
-            }
-            return []
-          }, false)
-        : getPosition(source, target, styleConfig)
+      const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
+      // 标签文本优先级：描述 > 名称 > 类型
+      const labelText = relation.description || relation.name || relation.type || '关系线'
 
       return {
         id: relation.id + '@relation@' + layerId.value,
@@ -321,11 +375,26 @@ const processRelation = logFuncWrap(() => {
         type: relation.type,
         target,
         source,
-        polyline: {
+        // RelationLine组件属性
+        positions,
+        width: styleConfig.width,
+        material: material,
+        distanceDisplayCondition: distanceConfigs.distanceDisplayCondition,
+        labelStyle: {
           ...distanceConfigs,
-          positions,
-          width: styleConfig.width,
-          material: material,
+          text: labelText,
+          font: '8pt sans-serif',
+          fillColor: '#fff',
+          outlineColor: '#000000',
+          showBackground: true,
+          backgroundColor: 'rgba(233,211,0,0.3)',
+          outlineWidth: 2,
+          pixelOffset: [0, -20],
+          verticalOrigin: 1,
+        },
+        curveConfig: {
+          enabled: styleConfig.curve?.enabled || false,
+          height: styleConfig.curve?.height || 100000,
         },
         materialType: styleConfig.material,
       }
@@ -429,6 +498,58 @@ const processTrajectory = logFuncWrap(() => {
   console.log('轨迹数据', { renderTrajectory: toRaw(renderTrajectory.value) })
 }, '轨迹数据')
 
+// 处理事件数据
+const processEvent = logFuncWrap(() => {
+  const allEvent = dataManager.eventManager.getAll()
+
+  if (!allEvent || allEvent.length === 0) {
+    console.log('没有事件数据需要处理')
+    renderEvents.value = []
+    return
+  }
+
+  renderEvents.value = allEvent.map((event) => {
+    const styleConfig = getEventStatusStyleConfig(event.type)
+    const sourceTarget = getSourceTarget(event, styleConfig)
+    if (!sourceTarget) return null
+    const { source, target, positions } = sourceTarget
+     const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
+      // 标签文本优先级：描述 > 名称 > 类型
+      const labelText = event.description || '事件'
+
+    return {
+  id: event.id + '@event@' + layerId.value,
+        name: event.name,
+        type: event.type,
+        target,
+        source,
+        // EventLine组件属性
+        positions,
+        width: styleConfig.width,
+        material: material,
+        distanceDisplayCondition: distanceConfigs.distanceDisplayCondition,
+        labelStyle: {
+          ...distanceConfigs,
+          text: labelText,
+          font: '8pt sans-serif',
+          fillColor: '#fff',
+          outlineColor: '#000000',
+          showBackground: true,
+          backgroundColor: 'rgba(113,211,0,0.3)',
+          outlineWidth: 2,
+          pixelOffset: [0, -20],
+          verticalOrigin: 1,
+        },
+        curveConfig: {
+          enabled: styleConfig.curve?.enabled || false,
+          height: styleConfig.curve?.height || 100000,
+        },
+        materialType: styleConfig.material,
+    }
+  })
+  console.log('事件数据', { renderEvents: toRaw(renderEvents.value) })
+}, '事件数据')
+
 // 优化watch监听器，减少不必要的深度监听
 watch(
   () => props.points,
@@ -492,6 +613,20 @@ watch(
   },
   { immediate: false },
 )
+watch(
+  () => props.events,
+  (newEvents) => {
+    // 立即处理初始数据，后续变化使用防抖
+    if (newEvents && newEvents.length > 0) {
+      processEvent()
+    } else {
+      debounceUpdate(() => {
+        processEvent()
+      })
+    }
+  },
+  { immediate: true },
+)
 
 // 防抖函数用于事件处理
 function debounceEvent(fn, delay = 100) {
@@ -503,48 +638,62 @@ function debounceEvent(fn, delay = 100) {
 }
 
 // 事件处理函数
-const onTargetClick = debounceEvent((target) => {
-  emit('targetClick', target)
+const onTargetClick = debounceEvent((target, event) => {
+  emit('targetClick', target, event)
 }, 50)
 
-const onRelationClick = debounceEvent((relation) => {
-  emit('relationClick', relation)
+const onRelationClick = debounceEvent((relation, event) => {
+  emit('relationClick', relation, event)
 }, 50)
 
 // 悬浮事件处理函数
-const onTargetHover = debounceEvent((target) => {
+const onTargetHover = debounceEvent((target, event) => {
   setPointer('pointer')
-  emit('targetHover', target)
+  emit('targetHover', target, event)
 }, 100)
 
-const onTargetLeave = debounceEvent((target) => {
+const onTargetLeave = debounceEvent((target, event) => {
   setPointer('auto')
-  emit('targetLeave', target)
+  emit('targetLeave', target, event)
 }, 100)
 
 // 轨迹事件处理函数
-const onTrajectoryClick = debounceEvent((trajectory) => {
-  emit('trajectoryClick', trajectory)
+const onTrajectoryClick = debounceEvent((trajectory, event) => {
+  emit('trajectoryClick', trajectory, event)
 }, 50)
 
-const onTrajectoryHover = debounceEvent((trajectory) => {
+const onTrajectoryHover = debounceEvent((trajectory, event) => {
   setPointer('pointer')
-  emit('trajectoryHover', trajectory)
+  emit('trajectoryHover', trajectory, event)
 }, 100)
 
-const onTrajectoryLeave = debounceEvent((trajectory) => {
+const onTrajectoryLeave = debounceEvent((trajectory, event) => {
   setPointer('auto')
-  emit('trajectoryLeave', trajectory)
+  emit('trajectoryLeave', trajectory, event)
 }, 100)
 
-const onRelationHover = debounceEvent((relation) => {
+const onRelationHover = debounceEvent((relation, event) => {
   setPointer('pointer')
-  emit('relationHover', relation)
+  emit('relationHover', relation, event)
 }, 100)
 
-const onRelationLeave = debounceEvent((relation) => {
+const onRelationLeave = debounceEvent((relation, event) => {
   setPointer('auto')
-  emit('relationLeave', relation)
+  emit('relationLeave', relation, event)
+}, 100)
+
+const onEventClick = debounceEvent((data, event) => {
+  emit('eventClick', data, event)
+}, 50)
+
+const onEventHover = debounceEvent((data, event) => {
+  setPointer('pointer')
+  emit('eventHover', data, event)
+}, 100)
+
+const onEventLeave = debounceEvent((data, event) => {
+  setPointer('auto')
+  emit('eventLeave', data, event)
 }, 100)
 </script>
 

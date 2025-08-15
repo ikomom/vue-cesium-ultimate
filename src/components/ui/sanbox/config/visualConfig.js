@@ -17,10 +17,17 @@ export function getDistanceConfigs() {
 // 默认标牌配置
 export const defaultLabelConfig = {
   font: '10pt sans-serif',
-  fillColor: '#fff',
+  fillColor: '#FFFFFF',
   outlineColor: '#000000',
   outlineWidth: 2,
-  pixelOffset: [0, 20],
+  style: 3,
+  pixelOffset: [0, 40],
+  showBackground: true,
+  backgroundColor: 'rgba(0,0,0,0.7)',
+  backgroundPadding: [8, 4],
+  distanceDisplayCondition: null,
+  horizontalOrigin: 0,
+  // verticalOrigin: 1,
 }
 // 目标图标配置
 export const targetIcons = {
@@ -281,6 +288,105 @@ export const relationStyles = {
     },
   },
 }
+// 事件状态样式配置
+export const eventStatusStyles = {
+  预警中: {
+    width: 3,
+    curve: {
+      enabled: true,
+      height: 30000,
+    },
+    material: MATERIAL_TYPES.PolylinePulseLine,
+    materialProps: {
+      color: '#FF4444',
+      speed: 3.0,
+      pulseWidth: 0.3,
+    },
+    icon: {
+      billboard: {
+        image: '/icons/alert.svg',
+        scale: 1.5,
+        color: '#FF4444',
+      },
+      label: {
+        ...defaultLabelConfig,
+        fillColor: '#FF4444',
+        font: '12pt sans-serif',
+      },
+    },
+  },
+  进行中: {
+    width: 2,
+    curve: {
+      enabled: true,
+      height: 20000,
+    },
+    material: MATERIAL_TYPES.PolylineFlyLine,
+    materialProps: {
+      color: '#FFA500',
+      speed: 2.0,
+      percent: 0.8,
+      gradient: 0.6,
+    },
+    icon: {
+      billboard: {
+        image: '/icons/active.svg',
+        scale: 1.2,
+        color: '#FFA500',
+      },
+      label: {
+        ...defaultLabelConfig,
+        fillColor: '#FFA500',
+      },
+    },
+  },
+  已完成: {
+    width: 1,
+    curve: {
+      enabled: false,
+      height: 0,
+    },
+    material: MATERIAL_TYPES.Color,
+    materialProps: {
+      color: '#00AA00',
+    },
+    icon: {
+      billboard: {
+        image: '/icons/completed.svg',
+        scale: 1.0,
+        color: '#00AA00',
+      },
+      label: {
+        ...defaultLabelConfig,
+        fillColor: '#00AA00',
+      },
+    },
+  },
+  待处理: {
+    width: 2,
+    curve: {
+      enabled: true,
+      height: 15000,
+    },
+    material: MATERIAL_TYPES.PolylineDash,
+    materialProps: {
+      color: '#888888',
+      speed: 1.5,
+    },
+    icon: {
+      billboard: {
+        image: '/icons/pending.svg',
+        scale: 1.1,
+        color: '#888888',
+      },
+      label: {
+        ...defaultLabelConfig,
+        fillColor: '#888888',
+      },
+    },
+  },
+}
+
 // 默认配置
 export const defaultConfig = {
   targetIcon: {
@@ -336,4 +442,21 @@ export function getAllTargetTypes() {
  */
 export function getAllRelationTypes() {
   return Object.keys(relationStyles)
+}
+
+/**
+ * 根据事件状态获取样式配置
+ * @param {string} status 事件状态
+ * @returns {object} 样式配置
+ */
+export function getEventStatusStyleConfig(status) {
+  return eventStatusStyles[status] || eventStatusStyles['待处理']
+}
+
+/**
+ * 获取所有事件状态类型
+ * @returns {string[]} 事件状态类型数组
+ */
+export function getAllEventStatusTypes() {
+  return Object.keys(eventStatusStyles)
 }
