@@ -504,19 +504,16 @@ function debounceEvent(fn, delay = 100) {
 
 // 事件处理函数
 const onTargetClick = debounceEvent((target) => {
-  console.log(createLogPrefix('目标点击'), logStyles.primary, logStyles.secondary, target)
   emit('targetClick', target)
 }, 50)
 
 const onRelationClick = debounceEvent((relation) => {
-  console.log(createLogPrefix('关系点击'), logStyles.primary, logStyles.secondary, relation)
   emit('relationClick', relation)
 }, 50)
 
 // 悬浮事件处理函数
 const onTargetHover = debounceEvent((target) => {
   setPointer('pointer')
-  console.log(createLogPrefix('目标悬停'), logStyles.primary, logStyles.secondary, target)
   emit('targetHover', target)
 }, 100)
 
