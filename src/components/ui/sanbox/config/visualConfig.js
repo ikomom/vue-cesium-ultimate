@@ -252,15 +252,19 @@ export const relationStyles = {
     },
   },
   通信链路: {
-    width: 2,
+    width: 10,
     curve: {
       enabled: true,
       height: 100000,
     },
-    material: MATERIAL_TYPES.PolylineArrow,
+    // material: MATERIAL_TYPES.PolylineArrow,
+    // materialProps: {
+    //   color: '#FFEAA7',
+    //   gapColor: 'blue',
+    // },
+    material: MATERIAL_TYPES.PolylineTrailLink,
     materialProps: {
-      color: '#FFEAA7',
-      gapColor: 'blue',
+      color: 'yellow',
     },
   },
   军事协防: {

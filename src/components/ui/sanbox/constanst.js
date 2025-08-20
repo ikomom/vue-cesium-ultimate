@@ -9,6 +9,7 @@ export const MATERIAL_TYPES = {
   PolylineFlyLine: 'PolylineFlyLine',
   PolylinePulseLine: 'PolylinePulseLine',
   PolylineDynamicTexture: 'PolylineDynamicTexture',
+  PolylineTrailLink: 'PolylineTrailLink',
   // 基础材质类型
   Color: 'Color',
 }

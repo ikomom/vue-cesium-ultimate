@@ -3,6 +3,7 @@ import {
   DynamicTextureMaterialProperty,
   ParabolaFlyLineMaterialProperty,
   PulseLineMaterialProperty,
+  PolylineTrailLinkMaterialProperty,
 } from './property'
 
 /**
@@ -21,6 +22,9 @@ export function getMaterialProperty(materialType, options = {}) {
 
     case MATERIAL_TYPES.PolylinePulseLine:
       return new PulseLineMaterialProperty(options)
+
+    case MATERIAL_TYPES.PolylineTrailLink:
+      return new PolylineTrailLinkMaterialProperty(options)
 
     // Cesium内置材质类型
     case MATERIAL_TYPES.PolylineArrow:

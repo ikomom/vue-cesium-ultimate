@@ -399,7 +399,7 @@ const processRelation = logFuncWrap(() => {
         materialType: styleConfig.material,
       }
     })
-    .filter(Boolean)
+    .filter(Boolean).filter(i => i.type === '通信链路')
   console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
 }, '关系数据')
 

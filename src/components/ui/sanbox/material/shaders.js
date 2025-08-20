@@ -97,3 +97,16 @@ export const AdvancedPulseLineShader = `
     return material;
   }
 `
+
+export const PolylineTrailLinkShader = `
+czm_material czm_getMaterial(czm_materialInput materialInput){
+    czm_material material = czm_getDefaultMaterial(materialInput);
+    vec2 st = materialInput.st;
+    // 使用repeat参数来控制纹理重复，保持纹理比例不变
+    float adjustedS = fract((st.s * repeat) - time);
+    vec4 colorImage = texture(image, vec2(adjustedS, st.t));
+    material.alpha = colorImage.a * color.a;
+    material.diffuse = (colorImage.rgb+color.rgb)/2.0;
+    return material;
+}
+`
