@@ -7,6 +7,7 @@ class BaseManager {
     this.data = new Map() // 使用Map进行快速查找
     this.indexes = new Map() // 存储所有索引
     this.requiredFields = ['id'] // 子类可以重写此字段
+    this.idField = 'id' // 子类可以重写此字段
   }
 
   /**
@@ -60,7 +61,7 @@ class BaseManager {
     }
 
     const clonedItem = { ...item }
-    this.data.set(item.id, clonedItem)
+    this.data.set(item[this.idField], clonedItem)
 
     // 更新所有索引
     this.updateIndexes(clonedItem)
@@ -96,7 +97,7 @@ class BaseManager {
           return
         }
 
-        const isUpdate = this.data.has(item.id)
+        const isUpdate = this.data.has(item[this.idField])
         const success = this.addItem(item)
 
         if (success) {
@@ -122,7 +123,7 @@ class BaseManager {
   updateData(newData) {
     if (Array.isArray(newData)) {
       this.addItems(newData)
-    } else if (newData && newData.id) {
+    } else if (newData && newData[this.idField]) {
       this.addItem(newData)
     }
   }

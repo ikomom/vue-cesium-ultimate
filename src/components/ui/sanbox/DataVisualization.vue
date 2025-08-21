@@ -11,6 +11,7 @@
       :model="target.model"
       :label="target.label"
       :point="target.point"
+      :ellipse="target.ellipse"
       @click="onTargetClick(target, $event)"
       @mouseover="onTargetHover(target, $event)"
       @mouseout="onTargetLeave(target, $event)"
@@ -79,11 +80,16 @@ import {
   getTargetIconConfig,
   getDistanceConfigs,
   getEventStatusStyleConfig,
+  getTargetStatusStyleConfig,
+  getStatusConfigByPriority,
+  getHealthLevelColor,
+  getAffiliationColor,
 } from './config/visualConfig'
 import { getMaterialProperty } from './material'
 import { MATERIAL_TYPES } from './constanst'
 import { generateCurve } from './utils/map'
 import { useVueCesium } from 'vue-cesium'
+import { animationManager } from './utils/animationEffects'
 import LineWithLabel from './LineWithLabel.vue'
 
 const { viewer } = useVueCesium()
@@ -125,6 +131,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  targetStatus: {
+    type: Array,
+    default: () => [],
+  },
   showPoints: {
     type: Boolean,
     default: true,
@@ -138,6 +148,10 @@ const props = defineProps({
     default: true,
   },
   showEvents: {
+    type: Boolean,
+    default: true,
+  },
+  showTargetStatus: {
     type: Boolean,
     default: true,
   },
@@ -206,6 +220,111 @@ let updateTimer = null
 const debounceUpdate = (callback, delay = 300) => {
   if (updateTimer) clearTimeout(updateTimer)
   updateTimer = setTimeout(callback, delay)
+}
+
+// 图像缓存对象
+const imageCache = new Map()
+
+/**
+ * 使用canvas重绘图像并在右上角添加颜色圆点
+ * @param {string} baseImageUrl - 原始图像URL
+ * @param {string} affiliationColor - affiliation颜色（十六进制）
+ * @returns {Promise<string>} 返回canvas生成的data URL的Promise
+ */
+function createImageWithAffiliationDot(baseImageUrl, affiliationColor) {
+  const cacheKey = `${baseImageUrl}_${affiliationColor}`
+
+  // 检查缓存
+  if (imageCache.has(cacheKey)) {
+    return Promise.resolve(imageCache.get(cacheKey))
+  }
+
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+
+    // 设置跨域属性
+    img.crossOrigin = 'anonymous'
+
+    img.onload = function() {
+      try {
+        // 设置canvas尺寸
+        canvas.width = img.width
+        canvas.height = img.height
+
+        // 绘制原始图像
+        ctx.drawImage(img, 0, 0)
+
+        // 计算圆点位置和大小
+        const dotRadius = Math.max(img.width * 0.12, 6) // 圆点半径为图像宽度的12%，最小6像素
+        const padding = 2 // 边距，确保圆点不会被裁切
+        const dotX = img.width - dotRadius - padding // 右上角位置，确保圆点完全在canvas内
+        const dotY = dotRadius + padding // 上边距，确保圆点完全在canvas内
+
+        // 绘制圆点背景（白色边框）
+        ctx.beginPath()
+        ctx.arc(dotX, dotY, dotRadius + 1, 0, 2 * Math.PI)
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fill()
+
+        // 绘制affiliation颜色圆点
+        ctx.beginPath()
+        ctx.arc(dotX, dotY, dotRadius, 0, 2 * Math.PI)
+        // 确保affiliationColor有效，否则使用默认蓝色
+        ctx.fillStyle = affiliationColor || '#0000FF'
+        ctx.fill()
+
+        // 添加圆点边框（细一点，避免覆盖颜色）
+        ctx.beginPath()
+        ctx.arc(dotX, dotY, dotRadius, 0, 2 * Math.PI)
+        ctx.strokeStyle = '#FFFFFF'
+        ctx.lineWidth = 0.5
+        ctx.stroke()
+
+        // 生成data URL并缓存
+        const dataUrl = canvas.toDataURL('image/png')
+        imageCache.set(cacheKey, dataUrl)
+        resolve(dataUrl)
+      } catch (error) {
+        console.warn('Canvas drawing error:', error)
+        resolve(baseImageUrl)
+      }
+    }
+
+    img.onerror = function() {
+      console.warn('Failed to load image for affiliation dot:', baseImageUrl)
+      resolve(baseImageUrl)
+    }
+
+    // 开始加载图像
+    img.src = baseImageUrl
+  })
+}
+
+/**
+ * 同步版本的图像处理函数，用于CallbackProperty
+ * @param {string} baseImageUrl - 原始图像URL
+ * @param {string} affiliationColor - affiliation颜色（十六进制）
+ * @returns {string} 返回处理后的图像URL或原始URL
+ */
+function getImageWithAffiliationDot(baseImageUrl, affiliationColor) {
+  const cacheKey = `${baseImageUrl}_${affiliationColor}`
+
+  // 如果缓存中有处理好的图像，直接返回
+  if (imageCache.has(cacheKey)) {
+    return imageCache.get(cacheKey)
+  }
+
+  // 如果缓存中没有，启动异步处理，但先返回原始图像
+  createImageWithAffiliationDot(baseImageUrl, affiliationColor).then(() => {
+    // 异步处理完成后，触发场景更新
+    if (viewer.value && viewer.value.scene) {
+      viewer.value.scene.requestRender()
+    }
+  })
+
+  return baseImageUrl
 }
 /**
  * 获取两点之间的位置数组
@@ -309,6 +428,7 @@ const processPoint = logFuncWrap(() => {
   }
 
   renderPoints.value = allPoint
+  // .filter(i => i.id === 'target_003')
     .map((target) => {
       const base = dataManager.targetBaseManager.findById(target.id)
       if (!base) {
@@ -322,26 +442,357 @@ const processPoint = logFuncWrap(() => {
         return null
       }
 
+      // 获取目标的所有状态数据并确保按时间排序（用于二分查找优化）
+      const allTargetStatus = (dataManager.targetStatusManager?.findByTargetId(target.id) || [])
+        .sort((a, b) => a.startTime.localeCompare(b.startTime))
+
+      // 性能优化：状态缓存机制 - 避免重复计算
+      // 由于 CallbackProperty 会频繁调用，缓存可以显著提升性能
+      let statusCache = {
+        lastTime: null,
+        lastTimeStr: null,
+        cachedStatus: null
+      }
+
+      // 根据时间获取当前有效状态的函数（性能优化版本）
+      // 优化策略：
+      // 1. 缓存机制：避免相同时间的重复计算
+      // 2. 二分查找：将时间复杂度从 O(n) 降低到 O(log n)
+      // 3. 数据预排序：确保二分查找的正确性
+      const getCurrentStatus = (currentTime) => {
+        if (!allTargetStatus.length) return null
+
+        // 性能优化1：检查缓存是否有效（时间相同则直接返回缓存结果）
+        if (statusCache.lastTime && Cesium.JulianDate.equals(currentTime, statusCache.lastTime)) {
+          return statusCache.cachedStatus
+        }
+
+        // 将当前时间转换为ISO字符串进行比较
+        const currentTimeStr = Cesium.JulianDate.toIso8601(currentTime)
+
+        // 性能优化2：如果时间字符串相同，也直接返回缓存结果
+        if (statusCache.lastTimeStr === currentTimeStr) {
+          return statusCache.cachedStatus
+        }
+
+        // 性能优化3：使用二分查找替代线性搜索
+        // 原来的 O(n) 线性搜索在状态数据较多时会造成性能瓶颈
+        // 二分查找将复杂度降低到 O(log n)，显著提升性能
+        let validStatus = null
+        let left = 0
+        let right = allTargetStatus.length - 1
+
+        // 二分查找：找到最后一个开始时间 <= 当前时间的状态
+        while (left <= right) {
+          const mid = Math.floor((left + right) / 2)
+          const status = allTargetStatus[mid]
+
+          if (status.startTime <= currentTimeStr) {
+            validStatus = status
+            left = mid + 1 // 继续查找更晚的状态
+          } else {
+            right = mid - 1
+          }
+        }
+
+        const result = validStatus || allTargetStatus[0] // 如果没找到，返回第一个状态
+
+        // 更新缓存
+        statusCache.lastTime = Cesium.JulianDate.clone(currentTime)
+        statusCache.lastTimeStr = currentTimeStr
+        statusCache.cachedStatus = result
+
+        return result
+      }
+
       const iconConfig = getTargetIconConfig(base.type)
+
+      // 创建动态状态配置属性
+      const statusVisualConfigProperty = new Cesium.CallbackProperty((time, result) => {
+        const currentStatus = getCurrentStatus(time)
+
+        if (!currentStatus) return {}
+
+        const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+        const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
+
+        const healthColor = currentStatus.metadata?.healthLevel ?
+          getHealthLevelColor(currentStatus.metadata.healthLevel) : null
+        const affiliationColor = currentStatus.metadata?.affiliation ?
+          getAffiliationColor(currentStatus.metadata.affiliation) : null
+
+        return {
+          statusType: currentStatus.status_type,
+          statusName: currentStatus.status_name,
+          color: currentStatus.colorCode,
+          priority: currentStatus.priority,
+          description: currentStatus.description,
+          animationEffect: currentStatus.animationEffect,
+          iconState: currentStatus.iconState,
+          healthColor: healthColor,
+          affiliationColor: affiliationColor,
+          visualProperties: statusConfig.visualProperties,
+          priorityConfig: priorityConfig,
+          startTime: currentStatus.startTime,
+          metadata: currentStatus.metadata
+        }
+      }, false)
+
+      // 创建动态属性
+      const dynamicBillboard = {
+        ...distanceConfigs,
+        ...iconConfig.billboard,
+        image: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+
+          if (!currentStatus) return iconConfig.billboard.image
+
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          const baseImage = statusConfig.billboard?.image || iconConfig.billboard.image
+
+          // 获取affiliation颜色
+          const affiliationColor = currentStatus.metadata?.affiliation ?
+            getAffiliationColor(currentStatus.metadata.affiliation) : null
+
+          // 如果有affiliation颜色，使用canvas重绘图像添加右上角圆点
+          if (affiliationColor) {
+            return getImageWithAffiliationDot(baseImage, affiliationColor)
+          }
+
+          return baseImage
+        }, false),
+        scale: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus) return iconConfig.billboard.scale || 1.0
+
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
+          let baseScale = (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) * (priorityConfig.scale || 1.0)
+
+          // 应用动画效果
+          if (statusConfig.visualProperties) {
+
+            const animationEffects = animationManager.getAnimationEffects(statusConfig.visualProperties)
+            if (animationEffects.scaleAnimation) {
+              baseScale = animationEffects.scaleAnimation(time, baseScale)
+            }
+          }
+
+          return baseScale
+        }, false),
+        color: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus) return Cesium.Color.fromCssColorString(iconConfig.billboard.color) || Cesium.Color.WHITE
+
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+
+          // 如果使用了affiliation圆点，则使用白色避免颜色混合
+          const affiliationColor = currentStatus.metadata?.affiliation ?
+            getAffiliationColor(currentStatus.metadata.affiliation) : null
+
+          if (affiliationColor) {
+            return Cesium.Color.WHITE
+          }
+
+          let color = currentStatus.colorCode ?
+            Cesium.Color.fromCssColorString(currentStatus.colorCode) :
+            Cesium.Color.fromCssColorString(statusConfig.billboard?.color || iconConfig.billboard.color);
+
+          // 应用视觉属性
+          if (statusConfig.visualProperties) {
+            const visualProps = statusConfig.visualProperties
+
+            // 应用透明度
+            let opacity = visualProps.opacity !== undefined ? visualProps.opacity : color.alpha
+
+            // 应用动画效果
+            const animationEffects = animationManager.getAnimationEffects(visualProps)
+            if (animationEffects.opacityAnimation) {
+              opacity = animationEffects.opacityAnimation(time, opacity)
+            }
+
+            color = color.withAlpha(opacity)
+
+            // 应用亮度调整
+            if (visualProps.brightness !== undefined && visualProps.brightness !== 1.0) {
+              color = new Cesium.Color(
+                Math.min(1.0, color.red * visualProps.brightness),
+                Math.min(1.0, color.green * visualProps.brightness),
+                Math.min(1.0, color.blue * visualProps.brightness),
+                color.alpha
+              )
+            }
+
+            // 应用发光效果
+            if (visualProps.glowEffect) {
+              const glowEffect = animationManager.createGlowEffect(true, 1.0)
+              if (glowEffect) {
+                color = glowEffect(time, color)
+              }
+            }
+          }
+
+          return color
+        }, false),
+        // 添加旋转动画支持
+        rotation: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus) return 0
+
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          if (statusConfig.visualProperties) {
+            const animationEffects = animationManager.getAnimationEffects(statusConfig.visualProperties)
+            if (animationEffects.rotationAnimation) {
+              // console.log('animationEffects.rotationAnimation(time)', animationEffects.rotationAnimation(time));
+
+              return animationEffects.rotationAnimation(time)
+            }
+          }
+          return 0
+        }, false),
+        // 添加像素偏移支持（用于震动效果）
+        pixelOffset: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus) return new Cesium.Cartesian2(0, 0)
+
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          if (statusConfig.visualProperties && statusConfig.visualProperties.shakeIntensity) {
+            const shakeEffect = animationManager.createShakeEffect(statusConfig.visualProperties.shakeIntensity)
+            if (shakeEffect) {
+              return shakeEffect(time)
+            }
+          }
+          return new Cesium.Cartesian2(0, 0)
+        }, false)
+      }
+
+      const dynamicLabel = {
+        ...distanceConfigs,
+        ...iconConfig.label,
+        text: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          return target.name + (currentStatus ? ` [${currentStatus.status_name || currentStatus.statusName}]` : '')
+        }, false),
+        fillColor: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus) return Cesium.Color(iconConfig.label.fillColor || '#FFFFFF')
+
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          const fillColor = statusConfig.label?.fillColor || iconConfig.label.fillColor
+
+          return  fillColor ? Cesium.Color.fromCssColorString(fillColor) : Cesium.Color.WHITE
+        }, false)
+      }
+
+      const dynamicModel = {
+        ...distanceConfigs,
+        ...iconConfig.model,
+        uri: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus) return iconConfig.model.uri
+
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          return statusConfig.model?.uri || iconConfig.model.uri
+        }, false)
+      }
+
+      // 创建基于healthLevel的动态圆圈
+      const dynamicEllipse = {
+        semiMajorAxis: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus || !currentStatus.metadata?.healthLevel) return 0
+
+          // 获取相机高度，用于层级缩放
+          const cameraHeight = viewer.camera.positionCartographic.height
+          const heightFactor = Math.max(0.1, Math.min(10, cameraHeight / 10000)) // 高度因子范围：0.1-10
+
+          // 获取图标的scale配置
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
+          let iconScale = (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) * (priorityConfig.scale || 1.0)
+
+          // 基础图标大小（像素），转换为米
+          const baseIconSizeInMeters = 32 * iconScale * heightFactor
+
+          // 圆圈半径比图标稍大一些（1.5-3倍），根据healthLevel调整
+          const healthLevel = currentStatus.metadata.healthLevel
+          const radiusMultiplier = 1.5 + (healthLevel / 100) * 1.5 // 1.5-3倍范围
+
+          return baseIconSizeInMeters * radiusMultiplier
+        }, false),
+        semiMinorAxis: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus || !currentStatus.metadata?.healthLevel) return 0
+
+          // 获取相机高度，用于层级缩放
+          const cameraHeight = viewer.camera.positionCartographic.height
+          const heightFactor = Math.max(0.1, Math.min(10, cameraHeight / 10000)) // 高度因子范围：0.1-10
+
+          // 获取图标的scale配置
+          const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
+          const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
+          let iconScale = (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) * (priorityConfig.scale || 1.0)
+
+          // 基础图标大小（像素），转换为米
+          const baseIconSizeInMeters = 32 * iconScale * heightFactor
+
+          // 圆圈半径比图标稍大一些（1.5-3倍），根据healthLevel调整
+          const healthLevel = currentStatus.metadata.healthLevel
+          const radiusMultiplier = 1.5 + (healthLevel / 100) * 1.5 // 1.5-3倍范围
+
+          return baseIconSizeInMeters * radiusMultiplier
+        }, false),
+        material: new Cesium.ColorMaterialProperty(
+          new Cesium.CallbackProperty((time) => {
+            const currentStatus = getCurrentStatus(time)
+            if (!currentStatus || !currentStatus.metadata?.healthLevel) {
+              return Cesium.Color.TRANSPARENT
+            }
+
+            const healthColor = getHealthLevelColor(currentStatus.metadata.healthLevel)
+            const color = Cesium.Color.fromCssColorString(healthColor)
+
+            // 设置透明度，使圆圈半透明
+            return color.withAlpha(0.3)
+          }, false)
+        ),
+        outline: true,
+        outlineColor: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          if (!currentStatus || !currentStatus.metadata?.healthLevel) {
+            return Cesium.Color.TRANSPARENT
+          }
+
+          const healthColor = getHealthLevelColor(currentStatus.metadata.healthLevel)
+          return Cesium.Color.fromCssColorString(healthColor)
+        }, false),
+        outlineWidth: 2,
+        height: 0, // 贴地显示
+        show: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          // 只有当存在healthLevel时才显示圆圈
+          return currentStatus && currentStatus.metadata?.healthLevel !== undefined
+        }, false)
+      }
 
       return {
         id: target.id + '@point@' + layerId.value,
+        origin: {...target},
         name: target.name,
         type: target.type,
         position: [target.longitude, target.latitude, target.height],
-        billboard: {
-          ...distanceConfigs,
-          ...iconConfig.billboard,
-        },
-        model: {
-          ...distanceConfigs,
-          ...iconConfig.model,
-        },
-        label: {
-          ...distanceConfigs,
-          ...iconConfig.label,
-          text: target.name,
-        },
+        billboard: dynamicBillboard,
+        model: dynamicModel,
+        label: dynamicLabel,
+        ellipse: dynamicEllipse, // 添加基于healthLevel的圆圈
+        // 状态相关属性（动态）
+        targetStatus: new Cesium.CallbackProperty((time) => getCurrentStatus(time), false),
+        statusVisualConfig: statusVisualConfigProperty,
+        // 动态显示控制
+        show: new Cesium.CallbackProperty((time) => {
+          const currentStatus = getCurrentStatus(time)
+          return currentStatus?.priorityConfig?.forceDisplay !== false
+        }, false),
       }
     })
     .filter(Boolean)
@@ -622,6 +1073,22 @@ watch(
     } else {
       debounceUpdate(() => {
         processEvent()
+      })
+    }
+  },
+  { immediate: true },
+)
+
+// 监听目标状态数据变化
+watch(
+  () => props.targetStatus,
+  (newTargetStatus) => {
+    // 状态数据变化时重新处理点数据
+    if (newTargetStatus && newTargetStatus.length > 0) {
+      processPoint()
+    } else {
+      debounceUpdate(() => {
+        processPoint()
       })
     }
   },

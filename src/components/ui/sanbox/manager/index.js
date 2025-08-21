@@ -6,6 +6,7 @@
 import BaseManager from './BaseManager.js'
 import TargetBaseManager from './TargetBaseManager.js'
 import TargetLocationManager from './TargetLocationManager.js'
+import TargetStatusManager from './TargetStatusManager.js'
 import RelationManager from './RelationManager.js'
 import TrajectoryManager from './TrajectoryManager.js'
 import EventManager from './EventManager.js'
@@ -18,12 +19,14 @@ class DataManagerFactory {
   constructor(
     targetBaseData = [],
     targetLocationData = [],
+    targetStatusData = [],
     relationData = [],
     trajectoryData = [],
     eventData = [],
   ) {
     this.targetBaseManager = this.createTargetBaseManager(targetBaseData)
     this.targetLocationManager = this.createTargetLocationManager(targetLocationData)
+    this.targetStatusManager = this.createTargetStatusManager(targetStatusData)
     this.relationManager = this.createRelationManager(relationData)
     this.trajectoryManager = this.createTrajectoryManager(trajectoryData)
     this.eventManager = this.createEventManager(eventData)
@@ -53,6 +56,19 @@ class DataManagerFactory {
       this.targetLocationManager.setInitialData(initialData)
     }
     return this.targetLocationManager
+  }
+
+  /**
+   * 创建目标状态数据管理器
+   * @param {Array} initialData - 初始数据
+   * @returns {TargetStatusManager} 管理器实例
+   */
+  createTargetStatusManager(initialData = []) {
+    this.targetStatusManager = new TargetStatusManager()
+    if (initialData.length > 0) {
+      this.targetStatusManager.setInitialData(initialData)
+    }
+    return this.targetStatusManager
   }
 
   /**
@@ -102,6 +118,7 @@ class DataManagerFactory {
     return {
       targetBaseManager: this.targetBaseManager,
       targetLocationManager: this.targetLocationManager,
+      targetStatusManager: this.targetStatusManager,
       relationManager: this.relationManager,
       trajectoryManager: this.trajectoryManager,
       eventManager: this.eventManager,
@@ -114,6 +131,7 @@ class DataManagerFactory {
   clearAllData() {
     if (this.targetBaseManager) this.targetBaseManager.clear()
     if (this.targetLocationManager) this.targetLocationManager.clear()
+    if (this.targetStatusManager) this.targetStatusManager.clear()
     if (this.relationManager) this.relationManager.clear()
     if (this.trajectoryManager) this.trajectoryManager.clear()
     if (this.eventManager) this.eventManager.clear()
@@ -142,6 +160,14 @@ class DataManagerFactory {
             bounds: this.targetLocationManager.getBounds(),
           }
         : null,
+      targetStatus: this.targetStatusManager
+        ? {
+            count: this.targetStatusManager.getCount(),
+            uniqueTargets: this.targetStatusManager.getAllTargetIds().length,
+            statusTypes: this.targetStatusManager.getAllStatusTypes(),
+            priorities: this.targetStatusManager.getAllPriorities(),
+          }
+        : null,
       relation: this.relationManager ? this.relationManager.getNetworkStats() : null,
       trajectory: this.trajectoryManager
         ? {
@@ -164,6 +190,7 @@ export {
   BaseManager,
   TargetBaseManager,
   TargetLocationManager,
+  TargetStatusManager,
   RelationManager,
   TrajectoryManager,
   EventManager,
@@ -175,6 +202,7 @@ export default {
   BaseManager,
   TargetBaseManager,
   TargetLocationManager,
+  TargetStatusManager,
   RelationManager,
   TrajectoryManager,
   EventManager,

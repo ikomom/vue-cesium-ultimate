@@ -1,0 +1,294 @@
+{
+  "statusTypes": {
+    "active": {
+      "name": "活跃状态",
+      "description": "目标正常运行，处于活跃工作状态",
+      "colorCode": "#00FF00",
+      "iconStates": [
+        "rotating-arrow",
+        "radar-sweep",
+        "port-active",
+        "ship-moving"
+      ],
+      "animationEffects": [
+        "pulse",
+        "radar-scan",
+        "wave-motion",
+        "wake-trail"
+      ],
+      "priority": "normal",
+      "visualProperties": {
+        "brightness": 1.0,
+        "opacity": 1.0,
+        "glowEffect": true,
+        "particleEffect": false
+      }
+    },
+    "warning": {
+      "name": "警告状态",
+      "description": "目标存在潜在问题或即将达到阈值",
+      "colorCode": "#FFFF00",
+      "iconStates": [
+        "warning-triangle",
+        "alert-exclamation"
+      ],
+      "animationEffects": [
+        "slow-blink",
+        "fast-blink",
+        "gentle-shake"
+      ],
+      "priority": "medium",
+      "visualProperties": {
+        "brightness": 1.2,
+        "opacity": 1.0,
+        "glowEffect": true,
+        "particleEffect": false,
+        "blinkRate": "2Hz"
+      }
+    },
+    "error": {
+      "name": "错误状态",
+      "description": "目标处于故障或错误状态，需要紧急处理",
+      "colorCode": "#FF0000",
+      "iconStates": [
+        "error-cross",
+        "stop-sign",
+        "alert-skull"
+      ],
+      "animationEffects": [
+        "urgent-blink",
+        "strong-shake",
+        "explosion-effect"
+      ],
+      "priority": "critical",
+      "visualProperties": {
+        "brightness": 1.5,
+        "opacity": 1.0,
+        "glowEffect": true,
+        "particleEffect": true,
+        "blinkRate": "5Hz",
+        "shakeIntensity": "high"
+      }
+    },
+    "maintenance": {
+      "name": "维护状态",
+      "description": "目标正在进行维护或保养工作",
+      "colorCode": "#87CEEB",
+      "iconStates": [
+        "wrench-gear",
+        "maintenance-tools"
+      ],
+      "animationEffects": [
+        "slow-rotate",
+        "fade-in-out",
+        "tool-animation"
+      ],
+      "priority": "low",
+      "visualProperties": {
+        "brightness": 0.8,
+        "opacity": 0.9,
+        "glowEffect": false,
+        "particleEffect": false,
+        "rotationSpeed": "slow"
+      }
+    },
+    "standby": {
+      "name": "待命状态",
+      "description": "目标处于待命状态，随时准备启动",
+      "colorCode": "#C0C0C0",
+      "iconStates": [
+        "standby-pointer",
+        "ready-indicator"
+      ],
+      "animationEffects": [
+        "gentle-sway",
+        "breathing-effect",
+        "standby-pulse"
+      ],
+      "priority": "normal",
+      "visualProperties": {
+        "brightness": 0.7,
+        "opacity": 0.8,
+        "glowEffect": false,
+        "particleEffect": false,
+        "swayAmplitude": "small"
+      }
+    },
+    "offline": {
+      "name": "离线状态",
+      "description": "目标已离线或无法连接",
+      "colorCode": "#696969",
+      "iconStates": [
+        "offline-disconnect",
+        "power-off",
+        "connection-lost"
+      ],
+      "animationEffects": [
+        "fade-out",
+        "static-display",
+        "disconnect-effect"
+      ],
+      "priority": "medium",
+      "visualProperties": {
+        "brightness": 0.3,
+        "opacity": 0.5,
+        "glowEffect": false,
+        "particleEffect": false,
+        "fadeSpeed": "slow"
+      }
+    },
+    "upgrade": {
+      "name": "升级状态",
+      "description": "目标正在进行升级或更新",
+      "colorCode": "#4169E1",
+      "iconStates": [
+        "upgrade-arrow",
+        "progress-circle"
+      ],
+      "animationEffects": [
+        "progress-fill",
+        "smooth-ascent",
+        "upgrade-sparkle"
+      ],
+      "priority": "medium",
+      "visualProperties": {
+        "brightness": 1.1,
+        "opacity": 1.0,
+        "glowEffect": true,
+        "particleEffect": true,
+        "progressSpeed": "medium",
+        "sparkleEffect": true
+      }
+    },
+    "patrol": {
+      "name": "巡航状态",
+      "description": "目标正在执行巡航或巡逻任务",
+      "colorCode": "#0000FF",
+      "iconStates": [
+        "warship-patrol",
+        "patrol-route"
+      ],
+      "animationEffects": [
+        "radar-sweep",
+        "patrol-movement"
+      ],
+      "priority": "high",
+      "visualProperties": {
+        "brightness": 1.0,
+        "opacity": 1.0,
+        "glowEffect": true,
+        "particleEffect": false,
+        "sweepSpeed": "medium"
+      }
+    }
+  },
+  "affiliationColors": {
+    "friendly": "#0000FF",
+    "enemy": "#FF0000",
+    "neutral": "#FFFF00",
+    "unknown": "#FFFFFF",
+    "allied": "#00FF00"
+  },
+  "priorityLevels": {
+    "critical": {
+      "level": 5,
+      "alertSound": true,
+      "forceDisplay": true,
+      "blinkRate": "fast"
+    },
+    "high": {
+      "level": 4,
+      "alertSound": false,
+      "forceDisplay": true,
+      "blinkRate": "medium"
+    },
+    "medium": {
+      "level": 3,
+      "alertSound": false,
+      "forceDisplay": false,
+      "blinkRate": "slow"
+    },
+    "normal": {
+      "level": 2,
+      "alertSound": false,
+      "forceDisplay": false,
+      "blinkRate": "none"
+    },
+    "low": {
+      "level": 1,
+      "alertSound": false,
+      "forceDisplay": false,
+      "blinkRate": "none"
+    }
+  },
+  "animationSettings": {
+    "globalSpeed": 1.0,
+    "enableParticles": true,
+    "enableGlow": true,
+    "maxConcurrentAnimations": 50,
+    "lodSettings": {
+      "high": {
+        "distance": 1000,
+        "enableAllEffects": true
+      },
+      "medium": {
+        "distance": 5000,
+        "enableBasicEffects": true
+      },
+      "low": {
+        "distance": 20000,
+        "enableMinimalEffects": true
+      }
+    }
+  },
+  "healthLevels": {
+    "excellent": {
+      "range": [
+        90,
+        100
+      ],
+      "color": "#00FF00",
+      "description": "完好状态"
+    },
+    "good": {
+      "range": [
+        70,
+        89
+      ],
+      "color": "#90EE90",
+      "description": "良好状态"
+    },
+    "fair": {
+      "range": [
+        50,
+        69
+      ],
+      "color": "#FFFF00",
+      "description": "一般状态"
+    },
+    "poor": {
+      "range": [
+        20,
+        49
+      ],
+      "color": "#FFA500",
+      "description": "较差状态"
+    },
+    "critical": {
+      "range": [
+        1,
+        19
+      ],
+      "color": "#FF0000",
+      "description": "危险状态"
+    },
+    "destroyed": {
+      "range": [
+        0,
+        0
+      ],
+      "color": "#696969",
+      "description": "摧毁状态"
+    }
+  }
+}

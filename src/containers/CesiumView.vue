@@ -4,6 +4,7 @@ import DataVisualization from '@/components/ui/sanbox/DataVisualization.vue'
 import MouseTooltip from '@/components/ui/MouseTooltip.vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ContentDisplay from '@/components/ui/ContentDisplay.vue'
+import LayerControlPanel from '@/components/business/LayerControlPanel.vue'
 
 import { useGlobalMapStore } from '@/stores/globalMap.js'
 import { storeToRefs } from 'pinia'
@@ -283,12 +284,14 @@ onMounted(() => {
             :relations="layer.data.relations"
             :trajectories="layer.data.trajectories"
             :points="layer.data.points"
+            :target-status="layer.data.targetStatus"
             :events="layer.data.events"
             :visible="layer.visible"
             :show-points="layer.showControls.showPoints"
             :show-relation="layer.showControls.showRelation"
             :show-trajectory="layer.showControls.showTrajectory"
             :show-events="layer.showControls.showEvents"
+            :show-target-status="layer.showControls.showTargetStatus"
             @target-click="onTargetClick"
             @target-hover="onTargetHover"
             @target-leave="onTargetLeave"
@@ -326,6 +329,9 @@ onMounted(() => {
       :menuItems="contextMenuItems"
       @close="hideContextMenu"
     />
+
+    <!-- 图层控制面板 -->
+    <LayerControlPanel />
   </div>
 </template>
 

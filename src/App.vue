@@ -1,6 +1,4 @@
 <script setup>
-import CesiumView from './containers/CesiumView.vue'
-import LayerControlPanel from '@/components/business/LayerControlPanel.vue'
 import { useGlobalMapStore } from '@/stores/globalMap.js'
 import { onMounted } from 'vue'
 
@@ -12,9 +10,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="app-container">
-    <CesiumView v-loading="globalMapStore.loading" />
-    <LayerControlPanel />
+  <div class="app-container" v-loading="globalMapStore.loading">
+    <router-view  />
   </div>
 </template>
 

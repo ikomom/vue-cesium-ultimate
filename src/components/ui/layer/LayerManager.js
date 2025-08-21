@@ -8,6 +8,7 @@ export const LAYER_DATA_TYPE = {
   RELATIONS: 'relations',
   TRAJECTORIES: 'trajectories',
   EVENTS: 'events',
+  TARGET_STATUS: 'targetStatuses',
 }
 
 /**
@@ -38,14 +39,16 @@ export class Layer {
       relations: [],
       trajectories: {},
       events: [],
+      targetStatuses: [],
     })
 
     // 显示控制
     this.showControls = reactive({
       showPoints: true,
-      showRelation: true,
-      showTrajectory: true,
-      showEvents: true,
+      showRelation: false,
+      showTrajectory: false,
+      showEvents: false,
+      showTargetStatus: true,
     })
 
     // 每个图层都有自己的数据管理器
@@ -151,6 +154,9 @@ export class Layer {
         break
       case LAYER_DATA_TYPE.EVENTS:
         this.dataManager.eventManager.updateData(data)
+        break
+      case LAYER_DATA_TYPE.TARGET_STATUS:
+        this.dataManager.targetStatusManager.updateData(data)
         break
       default:
         console.warn(`⚠️ 图层 [${this.name}] 未知的数据类型: ${dataType}`)
@@ -590,14 +596,28 @@ export class LayerManager {
     const timeRanges = []
 
     visibleLayers.forEach((layer) => {
-      const timeRange = layer.dataManager.trajectoryManager.getTimeRange()
-      if (timeRange && timeRange.start && timeRange.end) {
-        timeRanges.push(timeRange)
+      // 获取轨迹时间范围
+      const trajectoryTimeRange = layer.dataManager.trajectoryManager.getTimeRange()
+      if (trajectoryTimeRange && trajectoryTimeRange.start && trajectoryTimeRange.end) {
+        timeRanges.push(trajectoryTimeRange)
+      }
+
+      // 获取事件时间范围
+      const eventTimeRange = layer.dataManager.eventManager.getTimeRange()
+      if (eventTimeRange && eventTimeRange.start && eventTimeRange.end) {
+        timeRanges.push(eventTimeRange)
+      }
+
+      // 获取目标状态时间范围
+      const targetStatusTimeRange = layer.dataManager.targetStatusManager.getTimeRange()
+
+      if (targetStatusTimeRange && targetStatusTimeRange.start && targetStatusTimeRange.end) {
+        timeRanges.push(targetStatusTimeRange)
       }
     })
 
     if (timeRanges.length === 0) {
-      console.log('没有可用的轨迹时间数据，跳过全局时间轴更新')
+      console.log('没有可用的轨迹、事件或目标状态时间数据，跳过全局时间轴更新')
       return
     }
 

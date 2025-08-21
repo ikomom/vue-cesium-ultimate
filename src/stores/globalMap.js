@@ -5,6 +5,7 @@ import {
   getRelationData,
   getEventData,
   getShipTrajectoryData,
+  getTargetStatusData,
 } from '@/api/index.js'
 import { ref, markRaw, computed } from 'vue'
 import LayerManager from '@/components/ui/layer'
@@ -19,6 +20,8 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
   const targetLocationData = ref([])
   // 关系数据
   const relationData = ref([])
+  // 目标状态数据
+  const targetStatusData = ref([])
   // 事件数据
   const eventData = ref([])
   // 轨迹数据
@@ -34,6 +37,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       getRelationData(),
       getShipTrajectoryData(),
       getEventData(),
+      getTargetStatusData(),
     ])
       .then((res) => {
         targetBaseData.value = [...(res[0] || [])]
@@ -41,6 +45,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
         relationData.value = [...(res[2] || [])]
         trajectoryData.value = { ...(res[3] || {}) }
         eventData.value = [...(res[4] || [])]
+        targetStatusData.value = [...(res[5] || [])]
       })
       .finally(() => {
         loading.value = false
@@ -92,13 +97,16 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       zIndex: 4,
       visible: true,
     })
+
     allDataLayer.updateAllData({
       targets: targetBaseData.value,
       trajectories: trajectoryData.value,
       points: targetLocationData.value,
       relations: relationData.value,
       events: eventData.value,
+      targetStatuses: targetStatusData.value,
     })
+
     // 全局时间轴更新
     globalLayerManager.updateGlobalTimeline()
   }
@@ -124,6 +132,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     targetBaseData,
     targetLocationData,
     relationData,
+    targetStatusData,
     eventData,
     trajectoryData,
     loading,

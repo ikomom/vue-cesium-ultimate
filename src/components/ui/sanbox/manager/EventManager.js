@@ -302,6 +302,48 @@ class EventManager extends BaseManager {
   }
 
   /**
+   * 获取时间范围
+   * @returns {Object|null} 时间范围 {start, end}
+   */
+  getTimeRange() {
+    const allData = this.getAll()
+    if (allData.length === 0) return null
+
+    let minTime = null
+    let maxTime = null
+
+    allData.forEach((event) => {
+      // 检查开始时间
+      if (event.startTime) {
+        const startTime = new Date(event.startTime)
+        if (!minTime || startTime < minTime) minTime = startTime
+        if (!maxTime || startTime > maxTime) maxTime = startTime
+      }
+
+      // 检查结束时间
+      if (event.endTime) {
+        const endTime = new Date(event.endTime)
+        if (!minTime || endTime < minTime) minTime = endTime
+        if (!maxTime || endTime > maxTime) maxTime = endTime
+      }
+
+      // 检查预警时间
+      if (event.alertTime) {
+        const alertTime = new Date(event.alertTime)
+        if (!minTime || alertTime < minTime) minTime = alertTime
+        if (!maxTime || alertTime > maxTime) maxTime = alertTime
+      }
+    })
+
+    return minTime && maxTime
+      ? {
+          start: minTime.toISOString(),
+          end: maxTime.toISOString(),
+        }
+      : null
+  }
+
+  /**
    * 获取事件统计信息
    * @returns {Object} 统计信息
    */
@@ -316,6 +358,7 @@ class EventManager extends BaseManager {
         预警中: this.getAlertEvents().length,
       },
       byType: {},
+      timeRange: this.getTimeRange(),
     }
 
     // 按类型统计

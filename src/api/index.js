@@ -38,3 +38,11 @@ export function getShipTrajectoryData() {
 export function getEventData() {
   return fetch('/data/eventData.json').then((res) => res.json())
 }
+
+/**
+ * 获取目标状态数据
+ * @returns {Promise} 返回目标状态数据的Promise对象
+ */
+export function getTargetStatusData() {
+  return fetch('/data/targetStatusData.json').then((res) => res.json())
+}

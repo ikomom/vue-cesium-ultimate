@@ -3,6 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
+import router from './router'
 import VueCesium from 'vue-cesium'
 import 'vue-cesium/dist/index.css'
 
@@ -21,5 +22,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.use(VueCesium)
 app.use(ElementPlus)
 app.use(createPinia())
+app.use(router)
 
 app.mount('#app')

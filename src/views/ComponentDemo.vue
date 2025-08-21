@@ -473,6 +473,8 @@ function closeDetailPopup() {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  overflow: auto;
+  height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -563,7 +565,7 @@ function closeDetailPopup() {
 
 /* 内容展示演示 */
 .content-demo .demo-content {
-  background: #f9f9f9;
+  background: #1890ff;
   padding: 16px;
   border-radius: 6px;
   margin-bottom: 16px;

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>目标状态数据可视化测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .status-card {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            background: white;
+            min-width: 200px;
+            vertical-align: top;
+        }
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-left: 10px;
+        }
+        .priority-critical { background-color: #ff4444; }
+        .priority-high { background-color: #ff8800; }
+        .priority-medium { background-color: #ffaa00; }
+        .priority-normal { background-color: #00aa00; }
+        .priority-low { background-color: #888888; }
+        .metadata {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .test-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+        .console-output {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 15px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            color: #ff4444;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #00aa00;
+            background-color: #e6ffe6;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>目标状态数据可视化测试</h1>
+            <p>测试 DataVisualization.vue 中的状态处理和图标生成功能</p>
+        </div>
+
+        <div class="test-section">
+            <h3>1. 数据加载测试</h3>
+            <button class="test-button" onclick="loadTargetStatusData()">加载目标状态数据</button>
+            <button class="test-button" onclick="loadStatusDefinitions()">加载状态定义</button>
+            <div id="data-loading-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. 状态数据展示</h3>
+            <div id="status-data-display"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. 状态配置测试</h3>
+            <button class="test-button" onclick="testStatusConfigs()">测试状态配置</button>
+            <button class="test-button" onclick="testPriorityConfigs()">测试优先级配置</button>
+            <button class="test-button" onclick="testHealthColors()">测试健康等级颜色</button>
+            <div class="console-output" id="config-test-output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. 可视化效果预览</h3>
+            <button class="test-button" onclick="previewVisualEffects()">预览视觉效果</button>
+            <div id="visual-effects-preview"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. 动画效果测试</h3>
+            <button class="test-button" onclick="testAnimationEffects()">测试动画效果</button>
+            <div id="animation-test-area"></div>
+        </div>
+    </div>
+
+    <script>
+        let targetStatusData = null;
+        let statusDefinitions = null;
+
+        // 加载目标状态数据
+        async function loadTargetStatusData() {
+            const statusDiv = document.getElementById('data-loading-status');
+            statusDiv.innerHTML = '<div class="loading">正在加载目标状态数据...</div>';
+            
+            try {
+                const response = await fetch('/data/targetStatusData.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                targetStatusData = await response.json();
+                statusDiv.innerHTML = '<div class="success">目标状态数据加载成功！共 ' + targetStatusData.length + ' 条记录</div>';
+                displayStatusData();
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="error">加载目标状态数据失败: ' + error.message + '</div>';
+                console.error('Error loading target status data:', error);
+            }
+        }
+
+        // 加载状态定义
+        async function loadStatusDefinitions() {
+            const statusDiv = document.getElementById('data-loading-status');
+            
+            try {
+                const response = await fetch('/src/components/ui/sanbox/config/statusDefinitions.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                statusDefinitions = await response.json();
+                const existingContent = statusDiv.innerHTML;
+                statusDiv.innerHTML = existingContent + '<div class="success">状态定义加载成功！</div>';
+            } catch (error) {
+                const existingContent = statusDiv.innerHTML;
+                statusDiv.innerHTML = existingContent + '<div class="error">加载状态定义失败: ' + error.message + '</div>';
+                console.error('Error loading status definitions:', error);
+            }
+        }
+
+        // 显示状态数据
+        function displayStatusData() {
+            if (!targetStatusData) {
+                document.getElementById('status-data-display').innerHTML = '<div class="error">请先加载目标状态数据</div>';
+                return;
+            }
+
+            const displayDiv = document.getElementById('status-data-display');
+            let html = '';
+
+            targetStatusData.forEach(status => {
+                const priorityClass = `priority-${status.priority}`;
+                html += `
+                    <div class="status-card">
+                        <div>
+                            <span class="status-indicator" style="background-color: ${status.colorCode}"></span>
+                            <strong>${status.target_name}</strong>
+                            <span class="priority-badge ${priorityClass}">${status.priority}</span>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <div><strong>状态:</strong> ${status.status_name} (${status.status_type})</div>
+                            <div><strong>图标状态:</strong> ${status.iconState}</div>
+                            <div><strong>动画效果:</strong> ${status.animationEffect}</div>
+                            <div><strong>描述:</strong> ${status.description}</div>
+                        </div>
+                        <div class="metadata">
+                            <div><strong>归属:</strong> ${status.metadata.affiliation}</div>
+                            <div><strong>健康等级:</strong> ${status.metadata.healthLevel}%</div>
+                            <div><strong>通信状态:</strong> ${status.metadata.communicationStatus}</div>
+                            <div><strong>运营能力:</strong> ${status.metadata.operationalCapacity}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            displayDiv.innerHTML = html;
+        }
+
+        // 测试状态配置
+        function testStatusConfigs() {
+            const output = document.getElementById('config-test-output');
+            let result = '=== 状态配置测试 ===\n\n';
+
+            if (!targetStatusData) {
+                result += '错误: 请先加载目标状态数据\n';
+                output.textContent = result;
+                return;
+            }
+
+            // 模拟状态配置测试
+            const statusTypes = [...new Set(targetStatusData.map(item => item.status_type))];
+            
+            statusTypes.forEach(statusType => {
+                result += `状态类型: ${statusType}\n`;
+                result += `- 颜色代码: ${targetStatusData.find(item => item.status_type === statusType).colorCode}\n`;
+                result += `- 图标状态: ${targetStatusData.find(item => item.status_type === statusType).iconState}\n`;
+                result += `- 动画效果: ${targetStatusData.find(item => item.status_type === statusType).animationEffect}\n\n`;
+            });
+
+            output.textContent = result;
+        }
+
+        // 测试优先级配置
+        function testPriorityConfigs() {
+            const output = document.getElementById('config-test-output');
+            let result = '=== 优先级配置测试 ===\n\n';
+
+            if (!targetStatusData) {
+                result += '错误: 请先加载目标状态数据\n';
+                output.textContent = result;
+                return;
+            }
+
+            const priorities = [...new Set(targetStatusData.map(item => item.priority))];
+            
+            priorities.forEach(priority => {
+                const items = targetStatusData.filter(item => item.priority === priority);
+                result += `优先级: ${priority} (${items.length} 个目标)\n`;
+                items.forEach(item => {
+                    result += `  - ${item.target_name}: ${item.status_name}\n`;
+                });
+                result += '\n';
+            });
+
+            output.textContent = result;
+        }
+
+        // 测试健康等级颜色
+        function testHealthColors() {
+            const output = document.getElementById('config-test-output');
+            let result = '=== 健康等级颜色测试 ===\n\n';
+
+            if (!targetStatusData) {
+                result += '错误: 请先加载目标状态数据\n';
+                output.textContent = result;
+                return;
+            }
+
+            targetStatusData.forEach(status => {
+                const healthLevel = status.metadata.healthLevel;
+                let healthColor;
+                
+                if (healthLevel >= 90) healthColor = '#00FF00'; // excellent
+                else if (healthLevel >= 70) healthColor = '#90EE90'; // good
+                else if (healthLevel >= 50) healthColor = '#FFFF00'; // fair
+                else if (healthLevel >= 20) healthColor = '#FFA500'; // poor
+                else if (healthLevel >= 1) healthColor = '#FF0000'; // critical
+                else healthColor = '#696969'; // destroyed
+
+                result += `${status.target_name}: ${healthLevel}% -> ${healthColor}\n`;
+            });
+
+            output.textContent = result;
+        }
+
+        // 预览视觉效果
+        function previewVisualEffects() {
+            const previewDiv = document.getElementById('visual-effects-preview');
+            
+            if (!targetStatusData) {
+                previewDiv.innerHTML = '<div class="error">请先加载目标状态数据</div>';
+                return;
+            }
+
+            let html = '<h4>视觉效果预览</h4>';
+            
+            targetStatusData.forEach(status => {
+                html += `
+                    <div class="status-card" style="border-color: ${status.colorCode}; box-shadow: 0 0 10px ${status.colorCode}33;">
+                        <div style="color: ${status.colorCode}; font-weight: bold;">
+                            ${status.target_name}
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px;">
+                            <div>状态颜色: <span style="background-color: ${status.colorCode}; color: white; padding: 2px 6px; border-radius: 3px;">${status.colorCode}</span></div>
+                            <div>动画效果: ${status.animationEffect}</div>
+                            <div>优先级: ${status.priority}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            previewDiv.innerHTML = html;
+        }
+
+        // 测试动画效果
+        function testAnimationEffects() {
+            const testArea = document.getElementById('animation-test-area');
+            
+            if (!targetStatusData) {
+                testArea.innerHTML = '<div class="error">请先加载目标状态数据</div>';
+                return;
+            }
+
+            let html = '<h4>动画效果测试</h4>';
+            
+            const animations = [...new Set(targetStatusData.map(item => item.animationEffect))];
+            
+            animations.forEach(animation => {
+                html += `
+                    <div class="status-card" style="text-align: center;">
+                        <div class="status-indicator" 
+                             style="background-color: #007bff; margin: 0 auto 10px auto; animation: ${getAnimationCSS(animation)};">
+                        </div>
+                        <div><strong>${animation}</strong></div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            ${getAnimationDescription(animation)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            testArea.innerHTML = html;
+        }
+
+        // 获取动画CSS
+        function getAnimationCSS(animationType) {
+            const animations = {
+                'pulse': 'pulse 1s infinite',
+                'slow-blink': 'blink 2s infinite',
+                'urgent-blink': 'blink 0.2s infinite',
+                'slow-rotate': 'rotate 5s linear infinite',
+                'radar-sweep': 'sweep 3s linear infinite',
+                'fade-out': 'fadeOut 3s infinite',
+                'progress-fill': 'progress 2s infinite',
+                'gentle-sway': 'sway 4s ease-in-out infinite'
+            };
+            return animations[animationType] || 'none';
+        }
+
+        // 获取动画描述
+        function getAnimationDescription(animationType) {
+            const descriptions = {
+                'pulse': '脉冲效果 - 缩放变化',
+                'slow-blink': '慢速闪烁 - 透明度变化',
+                'urgent-blink': '紧急闪烁 - 快速透明度变化',
+                'slow-rotate': '慢速旋转 - 360度旋转',
+                'radar-sweep': '雷达扫描 - 扇形扫描',
+                'fade-out': '淡出效果 - 逐渐透明',
+                'progress-fill': '进度填充 - 进度条效果',
+                'gentle-sway': '轻柔摆动 - 位置摆动'
+            };
+            return descriptions[animationType] || '未定义动画';
+        }
+
+        // 页面加载完成后自动加载数据
+        window.addEventListener('load', function() {
+            console.log('目标状态数据可视化测试页面已加载');
+            loadTargetStatusData();
+            loadStatusDefinitions();
+        });
+    </script>
+
+    <style>
+        /* 动画定义 */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes sweep {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes sway {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+    </style>
+</body>
+</html>

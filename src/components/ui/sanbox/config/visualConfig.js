@@ -20,7 +20,7 @@ export const defaultLabelConfig = {
   fillColor: '#FFFFFF',
   outlineColor: '#000000',
   outlineWidth: 2,
-  style: 3,
+  // style: 3,
   pixelOffset: [0, 40],
   showBackground: true,
   backgroundColor: 'rgba(0,0,0,0.7)',
@@ -395,7 +395,7 @@ export const eventStatusStyles = {
 export const defaultConfig = {
   targetIcon: {
     billboard: {
-      image: '/icons/default.svg',
+      image: '/icons/radar.svg', // 使用存在的雷达图标作为默认图标
       scale: 1.0,
       color: '#FFFFFF',
     },
@@ -463,4 +463,384 @@ export function getEventStatusStyleConfig(status) {
  */
 export function getAllEventStatusTypes() {
   return Object.keys(eventStatusStyles)
+}
+
+// 目标状态图标配置
+/**
+ * 目标状态样式配置
+ * 定义不同目标状态在地图上的视觉表现，包括图标、标签和动画效果
+ *
+ * 配置结构说明：
+ * - billboard: 广告牌图标配置
+ *   - image: 图标文件路径
+ *   - scale: 图标缩放比例
+ *   - color: 图标颜色
+ * - label: 标签文本配置
+ * - model: 3D模型配置（可选）
+ * - visualProperties: 视觉效果属性
+ *   - brightness: 亮度 (0.0-2.0)
+ *   - opacity: 透明度 (0.0-1.0)
+ *   - glowEffect: 是否启用发光效果
+ *   - particleEffect: 是否启用粒子效果
+ *   - animationEffect: 动画效果类型
+ */
+export const targetStatusStyles = {
+  // 活跃状态 - 目标正常运行
+  active: {
+    billboard: {
+      image: '/icons/active.svg', // 活跃状态图标
+      scale: 0.2, // 较小的图标尺寸
+      color: '#00FF00', // 绿色表示正常状态
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#00FF00', // 绿色文字
+      font: '10pt sans-serif', // 标准字体大小
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准模型缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 1.0, // 标准亮度
+      opacity: 1.0, // 完全不透明
+      glowEffect: true, // 启用发光效果
+      particleEffect: false, // 不使用粒子效果
+      animationEffect: 'pulse', // 脉冲动画
+      swayAmplitude: 0, // 不摆动
+      pulseRate: 2.0, // 脉冲频率
+      pulseIntensity: 0.3, // 脉冲强度
+    },
+  },
+  // 警告状态 - 需要注意的异常情况
+  warning: {
+    billboard: {
+      image: '/icons/warning.svg', // 警告图标
+      scale: 0.2, // 较小的图标尺寸
+      color: '#FFA500', // 橙色表示警告
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#FFA500', // 橙色文字
+      font: '10pt sans-serif', // 标准字体
+      outlineColor: '#000000', // 黑色轮廓
+      outlineWidth: 2, // 轮廓宽度
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 1.2, // 稍高亮度突出警告
+      opacity: 1.0, // 完全不透明
+      glowEffect: true, // 启用发光效果
+      particleEffect: false, // 不使用粒子效果
+      animationEffect: 'slow-blink', // 慢速闪烁动画
+      blinkRate: '2Hz', // 闪烁频率
+      swayAmplitude: 0, // 不摆动
+      blinkIntensity: 0.4, // 闪烁强度
+    },
+  },
+  // 错误状态 - 严重故障或异常
+  error: {
+    billboard: {
+      image: '/icons/error.svg', // 错误图标
+      scale: 0.6, // 适中的图标尺寸，避免过大
+      color: '#FF0000', // 红色表示错误
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#FF0000', // 红色文字
+      font: '11pt sans-serif', // 稍大字体突出重要性
+      outlineColor: '#FFFFFF', // 白色轮廓增强对比
+      outlineWidth: 2, // 轮廓宽度
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 1.5, // 高亮度突出错误
+      opacity: 1.0, // 完全不透明
+      glowEffect: true, // 启用发光效果
+      particleEffect: true, // 启用粒子效果增强视觉冲击
+      animationEffect: 'urgent-blink', // 紧急闪烁动画
+      blinkRate: '5Hz', // 快速闪烁频率
+      shakeIntensity: 'high', // 高强度震动
+      swayAmplitude: 2, // 摆动幅度
+      pulseRate: 3.0, // 快速脉冲
+      pulseIntensity: 0.5, // 脉冲强度
+    },
+  },
+  // 维护状态 - 正在进行维护或升级
+  maintenance: {
+    billboard: {
+      image: '/icons/maintenance.svg', // 维护图标
+      scale: 2.0, // 较大图标尺寸
+      color: '#87CEEB', // 天蓝色表示维护
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: 'red', // 红色文字提醒维护状态
+      font: '9pt sans-serif', // 较小字体
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 0.8, // 较低亮度表示非活跃
+      opacity: 0.9, // 稍微透明
+      glowEffect: false, // 不使用发光效果
+      particleEffect: false, // 不使用粒子效果
+      animationEffect: 'slow-rotate', // 慢速旋转动画
+      rotationSpeed: 'slow', // 慢速旋转
+      swayAmplitude: 0, // 不摆动
+      fadeRate: 1.0, // 淡化速率
+      fadeIntensity: 0.3, // 淡化强度
+    },
+  },
+  // 待机状态 - 目标处于待机模式
+  standby: {
+    billboard: {
+      image: '/icons/standby.svg', // 待机图标
+      scale: 0.9, // 稍小的图标尺寸
+      color: '#C0C0C0', // 银灰色表示待机
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#C0C0C0', // 银灰色文字
+      font: '9pt sans-serif', // 较小字体
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 0.7, // 较低亮度表示非活跃
+      opacity: 0.8, // 半透明效果
+      glowEffect: false, // 不使用发光效果
+      particleEffect: false, // 不使用粒子效果
+      animationEffect: 'gentle-sway', // 轻柔摆动动画
+      swayAmplitude: 1, // 摆动幅度
+      swayRate: 0.5, // 摆动频率
+      swayIntensity: 0.2, // 摆动强度
+    },
+  },
+  // 离线状态 - 目标失去连接或不可用
+  offline: {
+    billboard: {
+      image: '/icons/offline.svg', // 离线图标
+      scale: 0.8, // 较小图标尺寸
+      color: '#696969', // 暗灰色表示离线
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#696969', // 暗灰色文字
+      font: '8pt sans-serif', // 最小字体
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 0.3, // 很低的亮度
+      opacity: 0.5, // 半透明效果突出离线状态
+      glowEffect: false, // 不使用发光效果
+      particleEffect: false, // 不使用粒子效果
+      animationEffect: 'fade-out', // 淡出动画
+      fadeSpeed: 'slow', // 慢速淡化
+      swayAmplitude: 0, // 不摆动
+      fadeRate: 0.8, // 淡化速率
+      fadeIntensity: 0.5, // 淡化强度
+    },
+  },
+  // 升级状态 - 正在进行系统升级
+  upgrade: {
+    billboard: {
+      image: '/icons/upgrade.svg', // 升级图标
+      scale: 1.1, // 稍大的图标尺寸
+      color: '#4169E1', // 皇家蓝表示升级
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#4169E1', // 皇家蓝文字
+      font: '10pt sans-serif', // 标准字体
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 1.1, // 稍高亮度
+      opacity: 1.0, // 完全不透明
+      glowEffect: true, // 启用发光效果
+      particleEffect: true, // 启用粒子效果表示进度
+      animationEffect: 'progress-fill', // 进度填充动画
+      progressSpeed: 'medium', // 中等进度速度
+      sparkleEffect: true, // 闪烁效果
+      swayAmplitude: 0, // 不摆动
+      progressRate: 1.2, // 进度速率
+      progressIntensity: 0.4, // 进度强度
+      particleCount: 10, // 粒子数量
+    },
+  },
+  // 巡逻状态 - 目标正在执行巡逻任务
+  patrol: {
+    billboard: {
+      image: '/icons/patrol.svg', // 巡逻图标
+      scale: 1.0, // 标准图标尺寸
+      color: '#0000FF', // 蓝色表示巡逻
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#0000FF', // 蓝色文字
+      font: '10pt sans-serif', // 标准字体
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 1.0, // 标准亮度
+      opacity: 1.0, // 完全不透明
+      glowEffect: true, // 启用发光效果
+      particleEffect: false, // 不使用粒子效果
+      animationEffect: 'radar-sweep', // 雷达扫描动画
+      sweepSpeed: 'medium', // 中等扫描速度
+      swayAmplitude: 0, // 不摆动
+      sweepRate: 2.0, // 扫描频率
+      sweepIntensity: 0.6, // 扫描强度
+      rotationSpeed: 1.5, // 旋转速度
+    },
+  },
+  // 警报状态 - 紧急警报或高优先级事件
+  alert: {
+    billboard: {
+      image: '/icons/alert.svg', // 警报图标
+      scale: 0.2, // 较小的图标尺寸
+      color: '#FF4500', // 橙红色表示警报
+    },
+    label: {
+      ...defaultLabelConfig,
+      fillColor: '#FF4500', // 橙红色文字
+      font: '11pt sans-serif', // 较大字体突出重要性
+      outlineColor: '#FFFFFF', // 白色轮廓增强对比
+      outlineWidth: 2, // 轮廓宽度
+    },
+    model: {
+      url: null, // 不使用3D模型
+      scale: 1.0, // 标准缩放
+      minimumPixelSize: 48, // 最小像素尺寸
+    },
+    visualProperties: {
+      brightness: 1.3, // 高亮度突出警报
+      opacity: 1.0, // 完全不透明
+      glowEffect: true, // 启用发光效果
+      particleEffect: true, // 启用粒子效果增强视觉冲击
+      animationEffect: 'urgent-pulse', // 紧急脉冲动画
+      pulseRate: 4.0, // 快速脉冲频率
+      pulseIntensity: 0.7, // 高脉冲强度
+      shakeIntensity: 2.0, // 震动强度
+      swayAmplitude: 0, // 不摆动
+    },
+  },
+}
+
+// 获取目标状态图标配置
+export function getTargetStatusStyleConfig(statusType) {
+  return (
+    targetStatusStyles[statusType] || {
+      billboard: {
+        image: '/icons/radar.svg', // 使用存在的雷达图标作为默认图标
+        scale: 1.0,
+        color: '#FFFFFF',
+      },
+      label: { ...defaultLabelConfig },
+      model: {
+        url: null,
+        scale: 1.0,
+        minimumPixelSize: 64,
+      },
+      visualProperties: {
+        brightness: 1.0,
+        opacity: 1.0,
+        glowEffect: false,
+        particleEffect: false,
+        animationEffect: 'none',
+      },
+    }
+  )
+}
+
+// 获取所有目标状态类型
+export function getAllTargetStatusTypes() {
+  return Object.keys(targetStatusStyles)
+}
+
+// 根据优先级获取状态配置
+export function getStatusConfigByPriority(priority) {
+  const priorityConfigs = {
+    critical: {
+      scale: 1.8,
+      blinkRate: 'fast',
+      forceDisplay: true,
+      alertSound: true,
+    },
+    high: {
+      scale: 1.5,
+      blinkRate: 'medium',
+      forceDisplay: true,
+      alertSound: false,
+    },
+    medium: {
+      scale: 1.2,
+      blinkRate: 'slow',
+      forceDisplay: false,
+      alertSound: false,
+    },
+    normal: {
+      scale: 1.0,
+      blinkRate: 'none',
+      forceDisplay: false,
+      alertSound: false,
+    },
+    low: {
+      scale: 0.8,
+      blinkRate: 'none',
+      forceDisplay: false,
+      alertSound: false,
+    },
+  }
+  return priorityConfigs[priority] || priorityConfigs.normal
+}
+
+// 根据健康等级获取颜色
+export function getHealthLevelColor(healthLevel) {
+  if (healthLevel >= 90) return '#00FF00' // excellent
+  if (healthLevel >= 70) return '#90EE90' // good
+  if (healthLevel >= 50) return '#FFFF00' // fair
+  if (healthLevel >= 20) return '#FFA500' // poor
+  if (healthLevel >= 1) return '#FF0000' // critical
+  return '#696969' // destroyed
+}
+
+// 根据归属获取颜色
+export function getAffiliationColor(affiliation) {
+  const affiliationColors = {
+    friendly: '#0000FF',
+    enemy: '#FF0000',
+    neutral: '#FFFF00',
+    unknown: '#FFFFFF',
+    allied: '#00FF00',
+  }
+  return affiliationColors[affiliation] || affiliationColors.unknown
 }
