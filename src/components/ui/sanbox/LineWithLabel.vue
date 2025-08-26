@@ -265,7 +265,7 @@ function getOptimalPosition() {
 
 // 检查位置是否可见
 function isPositionVisible(position) {
-  if (!viewer.value || !viewer.value.camera || !viewer.value.scene || !position) {
+  if (!viewer || !viewer.camera || !viewer.scene || !position) {
     return false
   }
 
@@ -273,23 +273,23 @@ function isPositionVisible(position) {
     // 使用Cesium的可见性检测
     const occluder = new window.Cesium.EllipsoidalOccluder(
       window.Cesium.Ellipsoid.WGS84,
-      viewer.value.camera.position,
+      viewer.camera.position,
     )
     const isVisible = occluder.isPointVisible(position)
 
     if (!isVisible) return false
 
     // 检查是否在视锥体内
-    const windowPosition = viewer.value.scene.cartesianToCanvasCoordinates(position)
+    const windowPosition = viewer.scene.cartesianToCanvasCoordinates(position)
     if (!windowPosition) return false
 
     // 检查是否在屏幕范围内
-    const margin = 50
+    const margin = 20
     return (
       windowPosition.x >= margin &&
-      windowPosition.x <= viewer.value.canvas.clientWidth - margin &&
+      windowPosition.x <= viewer.canvas.clientWidth - margin &&
       windowPosition.y >= margin &&
-      windowPosition.y <= viewer.value.canvas.clientHeight - margin
+      windowPosition.y <= viewer.canvas.clientHeight - margin
     )
   } catch (error) {
     console.warn('Position visibility check failed:', error)

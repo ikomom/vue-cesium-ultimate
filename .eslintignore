@@ -6,6 +6,8 @@ coverage/
 # 依赖目录
 node_modules/
 
+backend/
+
 # 配置文件
 *.config.js
 vite.config.js
