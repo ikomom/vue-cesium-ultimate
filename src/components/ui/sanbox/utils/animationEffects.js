@@ -228,7 +228,11 @@ class AnimationEffectManager {
         if (visualProperties.pulseRate || visualProperties.pulseIntensity) {
           const pulseRate = this.parseRate(visualProperties.pulseRate, 3)
           const pulseIntensity = visualProperties.pulseIntensity || 0.5
-          effects.scaleAnimation = this.createPulseAnimation(pulseRate, 1.0 - pulseIntensity * 0.3, 1.0 + pulseIntensity * 0.3)
+          effects.scaleAnimation = this.createPulseAnimation(
+            pulseRate,
+            1.0 - pulseIntensity * 0.3,
+            1.0 + pulseIntensity * 0.3,
+          )
         }
         break
 
