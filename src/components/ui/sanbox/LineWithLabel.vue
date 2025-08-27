@@ -21,6 +21,7 @@
 
 <script setup>
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { debounce } from 'lodash-es'
 import { generateCurve } from './utils/map'
 import { useVueCesium } from 'vue-cesium'
 
@@ -505,23 +506,17 @@ const handleMouseout = (event) => {
 
 // 视角变化监听器
 let cameraChangeListener = null
-let debounceTimer = null
 
 // 防抖函数，避免频繁更新
-function debounceUpdate() {
-  if (debounceTimer) {
-    clearTimeout(debounceTimer)
-  }
-  debounceTimer = setTimeout(() => {
-    // 清除所有缓存的位置，强制重新计算
-    lastVisiblePosition.value = null
-    isLabelVisible.value = false
-    lastDynamicPosition.value = null
-    lastDynamicTime.value = null
+const debounceUpdate = debounce(() => {
+  // 清除所有缓存的位置，强制重新计算
+  lastVisiblePosition.value = null
+  isLabelVisible.value = false
+  lastDynamicPosition.value = null
+  lastDynamicTime.value = null
 
-    viewerUpdateTrigger.value++
-  }, 50) // 50ms防抖延迟
-}
+  viewerUpdateTrigger.value++
+}, 50) // 50ms防抖延迟
 
 // 组件挂载时添加视角变化监听
 onMounted(() => {
@@ -541,12 +536,6 @@ onUnmounted(() => {
   if (cameraChangeListener && viewer && viewer.camera) {
     cameraChangeListener()
     cameraChangeListener = null
-  }
-
-  // 清理防抖定时器
-  if (debounceTimer) {
-    clearTimeout(debounceTimer)
-    debounceTimer = null
   }
 })
 </script>

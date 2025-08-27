@@ -118,7 +118,72 @@
 
 ---
 
+## 版本 1.1.0 - 组件化重构 (2024-01-17)
+
+### 🔄 重构优化
+
+#### TestMap 组件化重构
+
+- **逻辑分离**: 将 TestMap.vue 中的地图逻辑抽取到独立的 composable 函数中
+- **可组合函数创建**:
+  - `useBasicTest.js`: 基础测试功能（添加随机点/线、清除测试实体）
+  - `useShipTrajectory.js`: 舰船轨迹功能（轨迹生成、动画控制、时间轴管理）
+  - `useViewControl.js`: 视角控制功能（飞往指定城市）
+  - `useMapInfo.js`: 地图信息功能（实时地图状态监听）
+
+#### 组件架构优化
+
+- **面板组件独立化**: 每个面板组件现在拥有独立的地图逻辑
+  - `BasicTestPanel.vue`: 使用 `useBasicTest` composable
+  - `ShipTrajectoryPanel.vue`: 使用 `useShipTrajectory` composable
+  - `ViewControlPanel.vue`: 使用 `useViewControl` composable
+  - `MapInfoPanel.vue`: 使用 `useMapInfo` composable
+
+- **Props 和 Events 简化**: 移除了复杂的 props 传递和事件监听
+- **生命周期管理**: 各组件独立管理自己的生命周期和资源
+
+#### 代码质量提升
+
+- **关注点分离**: 地图逻辑与 UI 逻辑完全分离
+- **可复用性**: composable 函数可在其他组件中复用
+- **可维护性**: 每个功能模块独立，便于维护和测试
+- **类型安全**: 保持 TypeScript 类型安全
+
+### 📁 新增文件
+
+- `src/composables/useBasicTest.js`: 基础测试功能 composable
+- `src/composables/useShipTrajectory.js`: 舰船轨迹功能 composable
+- `src/composables/useViewControl.js`: 视角控制功能 composable
+- `src/composables/useMapInfo.js`: 地图信息功能 composable
+- `docs/test-components-refactor.md`: 组件化重构详细文档
+
+### 🔧 修改文件
+
+- `src/views/TestMap.vue`: 移除地图逻辑，简化为容器组件
+- `src/components/test-components/TestControlPanel.vue`: 简化 props 和事件处理
+- `src/components/test-components/BasicTestPanel.vue`: 集成 useBasicTest
+- `src/components/test-components/ShipTrajectoryPanel.vue`: 集成 useShipTrajectory
+- `src/components/test-components/ViewControlPanel.vue`: 集成 useViewControl
+- `src/components/test-components/MapInfoPanel.vue`: 集成 useMapInfo
+
+### 🎯 优势
+
+- **更好的代码组织**: 功能模块化，职责清晰
+- **提高可复用性**: composable 函数可在多个组件中使用
+- **简化组件通信**: 减少 props 和 events 的复杂性
+- **便于测试**: 独立的功能模块更容易进行单元测试
+- **易于扩展**: 新功能可以独立开发和集成
+
+---
+
 ## 版本历史
+
+### 版本 1.1.0 (2024-01-17)
+
+- TestMap 组件化重构
+- 创建 composable 函数
+- 优化组件架构
+- 提升代码质量
 
 ### 版本 1.0.0 (2024-01-16)
 

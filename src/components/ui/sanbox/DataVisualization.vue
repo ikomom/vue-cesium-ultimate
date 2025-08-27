@@ -74,6 +74,7 @@
 
 <script setup>
 import { watch, watchEffect, ref, shallowRef, toRefs, computed, toRaw, nextTick } from 'vue'
+import { debounce } from 'lodash-es'
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import {
   getRelationStyleConfig,
@@ -216,11 +217,9 @@ function setPointer(cursor = 'auto') {
 }
 
 // 防抖处理，避免频繁更新
-let updateTimer = null
-const debounceUpdate = (callback, delay = 300) => {
-  if (updateTimer) clearTimeout(updateTimer)
-  updateTimer = setTimeout(callback, delay)
-}
+const debounceUpdate = debounce((callback) => {
+  callback()
+}, 300)
 
 // 图像缓存对象
 const imageCache = new Map()
@@ -1096,13 +1095,7 @@ watch(
 )
 
 // 防抖函数用于事件处理
-function debounceEvent(fn, delay = 100) {
-  let timeoutId
-  return function (...args) {
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => fn.apply(this, args), delay)
-  }
-}
+const debounceEvent = (fn, delay = 100) => debounce(fn, delay)
 
 // 事件处理函数
 const onTargetClick = debounceEvent((target, event) => {
