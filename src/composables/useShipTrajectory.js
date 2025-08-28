@@ -49,7 +49,7 @@ export function useShipTrajectory() {
   // 生成舰船轨迹数据
   const generateTrajectoryData = () => {
     if (!viewer) return []
-    
+
     const trajectoryPoints = []
     const startTime = viewer.clock.startTime
     const stopTime = viewer.clock.stopTime
@@ -216,6 +216,6 @@ export function useShipTrajectory() {
     generateShipTrajectory,
     startAnimation,
     pauseAnimation,
-    clearShips
+    clearShips,
   }
 }

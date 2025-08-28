@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CesiumView from '@/containers/CesiumView.vue'
 import ComponentDemo from '@/views/ComponentDemo.vue'
+import CesiumRenderDemo from '@/views/CesiumRenderDemo.vue'
 
 const routes = [
   {
@@ -33,6 +34,14 @@ const routes = [
     component: () => import('@/views/TestMap.vue'),
     meta: {
       title: '测试地图页面',
+    },
+  },
+  {
+    path: '/render-demo',
+    name: 'RenderDemo',
+    component: CesiumRenderDemo,
+    meta: {
+      title: 'Cesium 原生渲染引擎演示',
     },
   },
 ]

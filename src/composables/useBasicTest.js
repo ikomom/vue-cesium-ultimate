@@ -73,6 +73,6 @@ export function useBasicTest() {
     testLines,
     addRandomPoint,
     addRandomLine,
-    clearAllBasicTest
+    clearAllBasicTest,
   }
 }

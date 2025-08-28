@@ -52,6 +52,6 @@ export function useViewControl() {
     setViewer,
     flyToBeijing,
     flyToShanghai,
-    flyToGuangzhou
+    flyToGuangzhou,
   }
 }

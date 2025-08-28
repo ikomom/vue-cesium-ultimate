@@ -23,6 +23,12 @@
         <h3>演示页面</h3>
         <p>功能演示和示例展示</p>
       </router-link>
+
+      <router-link to="/render-demo" class="nav-card">
+        <div class="card-icon">🚀</div>
+        <h3>渲染引擎演示</h3>
+        <p>Cesium 原生渲染引擎功能展示，支持大数据可视化和性能优化</p>
+      </router-link>
     </div>
 
     <div class="footer">

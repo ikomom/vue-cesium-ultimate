@@ -22,13 +22,13 @@ export function useMapInfo() {
 
     const camera = viewer.camera
     const cartographic = camera.positionCartographic
-    
+
     if (cartographic) {
       mapInfo.value = {
         level: Math.round(Math.log2(40075017 / (camera.positionCartographic.height / 1000)) - 8),
         height: Math.round(cartographic.height),
-        longitude: parseFloat((cartographic.longitude * 180 / Math.PI).toFixed(6)),
-        latitude: parseFloat((cartographic.latitude * 180 / Math.PI).toFixed(6)),
+        longitude: parseFloat(((cartographic.longitude * 180) / Math.PI).toFixed(6)),
+        latitude: parseFloat(((cartographic.latitude * 180) / Math.PI).toFixed(6)),
       }
     }
   }
@@ -40,7 +40,7 @@ export function useMapInfo() {
     // 监听相机移动事件
     viewer.camera.moveEnd.addEventListener(updateMapInfo)
     viewer.camera.changed.addEventListener(updateMapInfo)
-    
+
     // 初始更新
     updateMapInfo()
   }
@@ -58,6 +58,6 @@ export function useMapInfo() {
     setViewer,
     updateMapInfo,
     startMapInfoUpdates,
-    stopMapInfoUpdates
+    stopMapInfoUpdates,
   }
 }
