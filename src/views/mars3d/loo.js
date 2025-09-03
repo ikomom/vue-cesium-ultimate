@@ -3,7 +3,7 @@ import * as mars3d from "mars3d"
 export let map // mars3d.Map三维地图对象
 export let graphicLayer
 
-// 需要覆盖config.json中地图属性参数（当前示例框架中自动处理合并）
+// 需要覆盖config.json中地图属性参数（当前示例框架中自动处理合并）测试
 export const mapOptions = {
   scene: {
     shadows: true,
