@@ -1,5 +1,6 @@
-import VueCesium from "vue-cesium";
+import VueCesium from 'vue-cesium'
 import * as mars3d from 'mars3d'
+// 额外任务
 import './extends/CameraList.js'
 import './extends/CameraView.js'
 import './extends/CreateTarget.js'
@@ -7,19 +8,19 @@ import './extends/GraphicStyle.js'
 import './extends/MapRotate.js'
 import './extends/PointRotate.js'
 import './extends/RouteLine.js'
-import  './extends/SceneOptions.js'
+import './extends/SceneOptions.js'
 import './extends/ZoomIn.js'
 import './extends/ZoomOut.js'
 
 window.mars3d = mars3d
 
-import "vue-cesium/dist/index.css";
+import 'vue-cesium/dist/index.css'
 // 引入css
-import "mars3d-cesium/Build/Cesium/Widgets/widgets.css"
-import "mars3d/mars3d.css" // v3.8.6及之前版本使用 import "mars3d/dist/mars3d.css";
+import 'mars3d-cesium/Build/Cesium/Widgets/widgets.css'
+import 'mars3d/mars3d.css' // v3.8.6及之前版本使用 import "mars3d/dist/mars3d.css";
 
-import "mars3d-space" // 导入mars3d插件，导入即可，自动注册（按需使用，需要先npm install mars3d-space）
-import "mars3d-heatmap"; // 其他插件类型，自行修改名称
+import 'mars3d-space' // 导入mars3d插件，导入即可，自动注册（按需使用，需要先npm install mars3d-space）
+import 'mars3d-heatmap' // 其他插件类型，自行修改名称
 
 // 导入所有需要的URL
 import fontAwesomeUrl from 'font-awesome/css/font-awesome.min.css?url'
@@ -45,19 +46,19 @@ import mars3dJsUrl from 'mars3d/mars3d.js?url'
 // Vue-Cesium配置
 export const vueCesiumConfig = {
   mars3dConfig: {
-    include: "mars3d",
+    include: 'mars3d',
     libs: {
       'font-awesome': [
         // libpath + 'fonts/font-awesome/css/font-awesome.min.css'
-        fontAwesomeUrl
+        fontAwesomeUrl,
       ],
       haoutil: [
         // libpath + 'hao/haoutil.js'
-        haoutilUrl
+        haoutilUrl,
       ],
       turf: [
         // libpath + 'turf/turf.min.js'
-        turfUrl
+        turfUrl,
       ],
       // 'mars3d-space': [
       //   //卫星插件
@@ -105,12 +106,12 @@ export const vueCesiumConfig = {
         // libpath + 'mars3d/mars3d.css', //mars3d
         mars3dCssUrl,
         // libpath + 'mars3d/mars3d.js'
-        mars3dJsUrl
-      ]
+        mars3dJsUrl,
+      ],
     },
   },
   // cesiumPath: '/cesium'
-};
+}
 
 // 导出VueCesium插件
-export { VueCesium };
+export { VueCesium }
