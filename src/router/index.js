@@ -44,6 +44,14 @@ const routes = [
       title: 'Cesium 原生渲染引擎演示',
     },
   },
+  {
+    path: '/mars3d',
+    name: 'Mars3d',
+    component: () => import('@/views/mars3d/MapView.vue'),
+    meta: {
+      title: 'Mars3d地图页面',
+    },
+  },
 ]
 
 const router = createRouter({

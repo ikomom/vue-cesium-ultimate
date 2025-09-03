@@ -15,6 +15,23 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@turf/turf": "^7.2.0",
+    "echarts": "^5.0.0",
+    "echarts-gl": "^2.0.9",
+    "font-awesome": "^4.7.0",
+    "haoutil": "^2.6.0",
+    "heatmapjs": "^2.0.2",
+    "mapv": "^2.0.62",
+    "mars3d": "^3.10.3",
+    "mars3d-cesium": "^1.132.1",
+    "mars3d-echarts": "^3.10.3",
+    "mars3d-heatmap": "^3.10.3",
+    "mars3d-mapv": "^3.10.3",
+    "mars3d-space": "^3.10.3",
+    "mars3d-tdt": "^3.10.3",
+    "mars3d-widget": "^3.6.5",
+    "mars3d-wind": "^3.10.3",
+    "netcdfjs": "^3.0.0",
     "axios": "^1.11.0",
     "element-plus": "^2.10.7",
     "lodash-es": "^4.17.21",
@@ -37,6 +54,7 @@
     "prettier": "3.6.2",
     "vite": "^7.0.6",
     "vite-plugin-cesium": "^1.2.23",
+    "vite-plugin-mars3d": "^4.2.2",
     "vite-plugin-vue-devtools": "^8.0.0"
   }
 }
