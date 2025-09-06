@@ -452,7 +452,7 @@ class RendererFactory {
     if (className) {
       // 动态导入实例化渲染器
       try {
-        return require(`./instanced/${className}.js`).default
+        // return require(`./instanced/${className}.js`).default
       } catch (error) {
         console.warn(`Instanced renderer not found: ${className}`)
         return null
