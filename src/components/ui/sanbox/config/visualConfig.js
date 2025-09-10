@@ -298,6 +298,19 @@ export const relationStyles = {
       speed: 1,
     },
   },
+   圆环连接: {
+    width: 1,
+    curve: {
+      enabled: true,
+      height: 50000,
+    },
+    material: MATERIAL_TYPES.PolylinePulseLine,
+    materialProps: {
+      color: '#96CEB4',
+      speed: 2.5,
+      pulseWidth: 0.2,
+    },
+  },
 }
 // 事件状态样式配置
 export const eventStatusStyles = {

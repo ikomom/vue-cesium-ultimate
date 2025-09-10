@@ -57,6 +57,13 @@
           显示虚拟节点连线
         </label>
       </div>
+
+      <div class="control-group">
+        <label>快速定位:</label>
+        <button @click="focusOnPoint('A')" class="location-button">定位通信站A</button>
+        <button @click="focusOnPoint('B')" class="location-button">定位雷达站B</button>
+        <button @click="focusOnPoint('C')" class="location-button">定位雷达站C</button>
+      </div>
     </div>
 
     <!-- Cesium 视图容器 -->
@@ -133,12 +140,47 @@
           />
         </vc-entity>
 
-        <!-- 直接连线 -->
-        <vc-entity v-if="showDirectConnection" id="direct-connection" :selectable="false">
+        <!-- 雷达站C -->
+        <vc-entity
+          v-if="showPoints"
+          id="point-c"
+          :position="demoPoints[2].position"
+          @click="onPointClick(demoPoints[2])"
+        >
+          <vc-graphics-billboard
+            :image="demoPoints[2].billboard.image"
+            :scale="demoPoints[2].billboard.scale"
+            :vertical-origin="demoPoints[2].billboard.verticalOrigin"
+            :height-reference="demoPoints[2].billboard.heightReference"
+          />
+          <vc-graphics-label
+            :text="demoPoints[2].label.text"
+            :font="demoPoints[2].label.font"
+            :fill-color="demoPoints[2].label.fillColor"
+            :outline-color="demoPoints[2].label.outlineColor"
+            :outline-width="demoPoints[2].label.outlineWidth"
+            :pixel-offset="demoPoints[2].label.pixelOffset"
+            :show-background="demoPoints[2].label.showBackground"
+            :background-color="demoPoints[2].label.backgroundColor"
+          />
+        </vc-entity>
+
+        <!-- 直接连线 A到B -->
+        <vc-entity v-if="showDirectConnection" id="direct-connection-ab" :selectable="false">
           <vc-graphics-polyline
             :positions="[demoPoints[0].position, demoPoints[1].position]"
             :width="lineWidth"
             :material="lineColor"
+            :clamp-to-ground="false"
+          />
+        </vc-entity>
+
+        <!-- 直接连线 A到C -->
+        <vc-entity v-if="showDirectConnection" id="direct-connection-ac" :selectable="false">
+          <vc-graphics-polyline
+            :positions="[demoPoints[0].position, demoPoints[2].position]"
+            :width="lineWidth"
+            :material="'#00ff00'"
             :clamp-to-ground="false"
           />
         </vc-entity>
@@ -207,18 +249,18 @@
           </vc-entity>
         </template>
 
-        <!-- 虚拟节点到雷达站B的连线 -->
+        <!-- 虚拟节点连线 -->
         <template v-if="showVirtualConnections && showVirtualNodes">
           <vc-entity
-            v-for="node in virtualNodes"
+            v-for="(node, index) in virtualNodes"
             :key="`connection-${node.id}`"
             :id="`connection-${node.id}`"
             :selectable="false"
           >
             <vc-graphics-polyline
-              :positions="[node.position, demoPoints[1].position]"
+              :positions="[node.position, index % 2 === 0 ? demoPoints[2].position : demoPoints[1].position]"
               :width="2"
-              :material="'#ff6b35'"
+              :material="index % 2 === 0 ? '#00ff00' : '#ff6b35'"
               :clamp-to-ground="false"
             />
           </vc-entity>
@@ -346,6 +388,31 @@ const demoPoints = ref([
       backgroundColor: 'rgba(0,0,0,0.5)',
     },
   },
+  {
+    id: 'point_c',
+    name: '目标点C',
+    type: 'radar',
+    longitude: 113.2644,
+    latitude: 23.1291,
+    altitude: 0,
+    position: [113.2644, 23.1291, 0],
+    billboard: {
+      image: '/icons/radar.svg',
+      scale: 1.2,
+      verticalOrigin: 1,
+      heightReference: 0,
+    },
+    label: {
+      text: '雷达站C',
+      font: '12pt sans-serif',
+      fillColor: '#ffffff',
+      outlineColor: '#000000',
+      outlineWidth: 2,
+      pixelOffset: [0, -40],
+      showBackground: true,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+  },
 ])
 
 // 事件处理函数
@@ -362,9 +429,9 @@ function onViewerReady(cesiumInstance) {
     viewer.value.scene.screenSpaceCameraController.enableTilt = true
     viewer.value.scene.screenSpaceCameraController.enableLook = true
     
-    // 设置初始视角
+    // 设置初始视角以显示所有节点
     viewer.value.camera.setView({
-      destination: window.Cesium.Cartesian3.fromDegrees(118.9, 35.6, 1000000),
+      destination: window.Cesium.Cartesian3.fromDegrees(117.0, 31.0, 2000000),
       orientation: {
         heading: 0.0,
         pitch: -window.Cesium.Math.PI_OVER_TWO,
@@ -409,6 +476,28 @@ function onPointClick(point) {
 function onVirtualNodeClick(node) {
   console.log('点击虚拟节点:', node.name, '位置:', node.position)
   // 可以在这里添加点击虚拟节点的处理逻辑
+}
+
+// 快速定位功能
+function focusOnPoint(pointId) {
+  let targetPoint = null
+  
+  switch(pointId) {
+    case 'A':
+      targetPoint = demoPoints.value[0]
+      break
+    case 'B':
+      targetPoint = demoPoints.value[1]
+      break
+    case 'C':
+      targetPoint = demoPoints.value[2]
+      break
+  }
+  
+  if (targetPoint && viewer.value) {
+    console.log(`快速定位到${targetPoint.name}`)
+    onPointClick(targetPoint)
+  }
 }
 
 // 双击事件处理
@@ -556,6 +645,21 @@ onMounted(() => {
   font-size: 12px;
   color: #00ffff;
   min-width: 50px;
+}
+
+.location-button {
+  padding: 4px 8px;
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.location-button:hover {
+  background: #0088ff;
 }
 
 .cesium-container {

@@ -70,38 +70,7 @@
       @mouseout="onEventLeave(event, $event)"
     />
   </template>
-  <template>
-    <!-- 圆环节点连接器 -->
-    <circle-node-connector
-      v-for="connector in renderCircleConnectors"
-      :key="connector.id"
-      :viewer="viewer"
-      :visible="visible && showCircleConnectors"
-      :source-point="connector.sourcePoint"
-      :target-point="connector.targetPoint"
-      :ring-radius="connector.ringRadius"
-      :node-count="connector.nodeCount"
-      :ring-material="connector.ringMaterial"
-      :ring-outline-color="connector.ringOutlineColor"
-      :show-center-label="connector.showCenterLabel"
-      :center-point-size="connector.centerPointSize"
-      :center-point-color="connector.centerPointColor"
-      :center-point-outline-color="connector.centerPointOutlineColor"
-      :node-color="connector.nodeColor"
-      :connection-material="connector.connectionMaterial"
-      :show-node-labels="connector.showNodeLabels"
-      :show-connections="connector.showConnections"
-      @center-point-click="onCenterPointClick"
-      @center-point-hover="onCenterPointHover"
-      @center-point-leave="onCenterPointLeave"
-      @node-click="onCircleNodeClick"
-      @node-hover="onCircleNodeHover"
-      @node-leave="onCircleNodeLeave"
-      @connection-click="onCircleConnectionClick"
-      @connection-hover="onCircleConnectionHover"
-      @connection-leave="onCircleConnectionLeave"
-    />
-  </template>
+
 </template>
 
 <script setup>
@@ -124,7 +93,6 @@ import { generateCurve } from './utils/map'
 import { useVueCesium } from 'vue-cesium'
 import { animationManager } from './utils/animationEffects'
 import LineWithLabel from './LineWithLabel.vue'
-import CircleNodeConnector from './CircleNodeConnector.vue'
 
 // Props定义
 const props = defineProps({
@@ -192,15 +160,6 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  // 圆环连接器相关属性
-  circleConnectors: {
-    type: Array,
-    default: () => [],
-  },
-  showCircleConnectors: {
-    type: Boolean,
-    default: true,
-  },
 })
 
 // 使用传入的viewer或者useVueCesium的viewer作为备选
@@ -223,16 +182,6 @@ const emit = defineEmits([
   'eventClick',
   'eventHover',
   'eventLeave',
-  // 圆环连接器事件
-  'centerPointClick',
-  'centerPointHover',
-  'centerPointLeave',
-  'circleNodeClick',
-  'circleNodeHover',
-  'circleNodeLeave',
-  'circleConnectionClick',
-  'circleConnectionHover',
-  'circleConnectionLeave',
 ])
 
 // 使用shallowRef优化性能，避免深度响应式
@@ -240,7 +189,6 @@ const renderPoints = shallowRef([])
 const renderRelations = shallowRef([])
 const renderTrajectory = shallowRef([])
 const renderEvents = shallowRef([])
-const renderCircleConnectors = shallowRef([])
 
 // 缓存配置对象，避免重复计算
 const distanceConfigs = getDistanceConfigs()
@@ -259,9 +207,9 @@ const logStyles = {
 
 function logFuncWrap(func, type) {
   return (...args) => {
-    console.group(createLogPrefix(type), logStyles.primary, logStyles.secondary, ...args)
+    // console.group(createLogPrefix(type), logStyles.primary, logStyles.secondary, ...args)
     func(...args)
-    console.groupEnd()
+    // console.groupEnd()
   }
 }
 
@@ -436,6 +384,7 @@ function getSourceTarget(data, styleConfig) {
   const linkTrajectoryTarget = dataManager.trajectoryManager.findById(data.target_id)
   const islinkTrajectory = !!(linkTrajectorySource || linkTrajectoryTarget)
 
+
   const source = dataManager.targetLocationManager.findById(data.source_id)
   const target = dataManager.targetLocationManager.findById(data.target_id)
 
@@ -483,8 +432,8 @@ const processPoint = logFuncWrap(() => {
 
   // 首先处理props.points数据，将其添加到dataManager
   if (props.points && props.points.length > 0) {
-    console.log('🎯 DataVisualization - 处理props.points数据:', props.points.length, '个点')
-    console.log('🎯 props.points详细内容:', JSON.stringify(props.points, null, 2))
+    // console.log('🎯 DataVisualization - 处理props.points数据:', props.points.length, '个点')
+    // console.log('🎯 props.points详细内容:', JSON.stringify(props.points, null, 2))
     props.points.forEach(point => {
       // 检查是否已存在，避免重复添加
       const existingLocation = dataManager.targetLocationManager.findById(point.id)
@@ -512,22 +461,22 @@ const processPoint = logFuncWrap(() => {
   }
 
   const allPoint = dataManager.targetLocationManager.getAll()
-  console.log('🎯 从targetLocationManager获取的所有点数据:', allPoint)
-  console.log('🎯 targetLocationManager内部状态:', dataManager.targetLocationManager)
+  // console.log('🎯 从targetLocationManager获取的所有点数据:', allPoint)
+  // console.log('🎯 targetLocationManager内部状态:', dataManager.targetLocationManager)
 
   if (!allPoint || allPoint.length === 0) {
-    console.log(
-      createLogPrefix('点数据'),
-      logStyles.primary,
-      logStyles.secondary,
-      '没有点数据需要处理',
-    )
+    // console.log(
+    //   createLogPrefix('点数据'),
+    //   logStyles.primary,
+    //   logStyles.secondary,
+    //   '没有点数据需要处理',
+    // )
     renderPoints.value = []
     return
   }
 
-  console.log('🎯 DataVisualization - 从dataManager获取到的点数据:', allPoint.length, '个点')
-  console.log('🎯 allPoint详细内容:', JSON.stringify(allPoint, null, 2))
+  // console.log('🎯 DataVisualization - 从dataManager获取到的点数据:', allPoint.length, '个点')
+  // console.log('🎯 allPoint详细内容:', JSON.stringify(allPoint, null, 2))
   // 注意：不再过滤圆环连接器的中心点，因为CircleNodeConnector中的中心点现在始终显示
   // 这样可以确保源点在所有模式下都能正确显示
 
@@ -902,7 +851,7 @@ const processPoint = logFuncWrap(() => {
       }
     })
     .filter(Boolean)
-  console.log('点数据', { renderPoints: toRaw(renderPoints.value) })
+  // console.log('点数据', { renderPoints: toRaw(renderPoints.value) })
 }, '点位数据')
 
 // 处理关系数据
@@ -957,7 +906,7 @@ const processRelation = logFuncWrap(() => {
       }
     })
     .filter(Boolean).filter(i => i.type === '通信链路')
-  console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
+  // console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
 }, '关系数据')
 
 // 处理轨迹数据
@@ -1052,7 +1001,7 @@ const processTrajectory = logFuncWrap(() => {
       }
     })
     .filter(Boolean)
-  console.log('轨迹数据', { renderTrajectory: toRaw(renderTrajectory.value) })
+  // console.log('轨迹数据', { renderTrajectory: toRaw(renderTrajectory.value) })
 }, '轨迹数据')
 
 // 处理事件数据
@@ -1104,7 +1053,7 @@ const processEvent = logFuncWrap(() => {
         materialType: styleConfig.material,
     }
   })
-  console.log('事件数据', { renderEvents: toRaw(renderEvents.value) })
+  // console.log('事件数据', { renderEvents: toRaw(renderEvents.value) })
 }, '事件数据')
 
 // 优化watch监听器，减少不必要的深度监听
@@ -1206,10 +1155,10 @@ const debounceEvent = (fn, delay = 100) => debounce(fn, delay)
 
 // 事件处理函数
 const onTargetClick = (target, event) => {
-  console.log('🎯 DataVisualization - onTargetClick 被触发:', target.id, target)
-  console.log('🎯 DataVisualization - 事件对象:', event)
+  // console.log('🎯 DataVisualization - onTargetClick 被触发:', target.id, target)
+  // console.log('🎯 DataVisualization - 事件对象:', event)
   emit('targetClick', target, event)
-  console.log('🎯 DataVisualization - targetClick 事件已发射')
+  // console.log('🎯 DataVisualization - targetClick 事件已发射')
 }
 
 const onRelationClick = debounceEvent((relation, event) => {
@@ -1266,109 +1215,7 @@ const onEventLeave = debounceEvent((data, event) => {
   emit('eventLeave', data, event)
 }, 100)
 
-// 圆环连接器事件处理函数
-// 中心点事件处理
-const onCenterPointClick = debounceEvent((data) => {
-  console.log('🎯 DataVisualization - onCenterPointClick 被触发:', data)
-  // 发射centerPointClick事件
-  emit('centerPointClick', data)
-  // 同时发射targetClick事件，以便双击逻辑能够正常工作
-  if (data.centerPoint) {
-    console.log('🎯 DataVisualization - 转发为targetClick事件:', data.centerPoint)
-    emit('targetClick', data.centerPoint, data.event)
-  }
-}, 50)
-
-const onCenterPointHover = debounceEvent((data) => {
-  setPointer('pointer')
-  emit('centerPointHover', data)
-}, 100)
-
-const onCenterPointLeave = debounceEvent((data) => {
-  setPointer('auto')
-  emit('centerPointLeave', data)
-}, 100)
-
-// 虚拟节点事件处理
-const onCircleNodeClick = debounceEvent((data) => {
-  emit('circleNodeClick', data)
-}, 50)
-
-const onCircleNodeHover = debounceEvent((data) => {
-  setPointer('pointer')
-  emit('circleNodeHover', data)
-}, 100)
-
-const onCircleNodeLeave = debounceEvent((data) => {
-  setPointer('auto')
-  emit('circleNodeLeave', data)
-}, 100)
-
-const onCircleConnectionClick = debounceEvent((data) => {
-  emit('circleConnectionClick', data)
-}, 50)
-
-const onCircleConnectionHover = debounceEvent((data) => {
-  setPointer('pointer')
-  emit('circleConnectionHover', data)
-}, 100)
-
-const onCircleConnectionLeave = debounceEvent((data) => {
-  setPointer('auto')
-  emit('circleConnectionLeave', data)
-}, 100)
-
-// 处理圆环连接器数据
-const processCircleConnectors = logFuncWrap(() => {
-  if (!props.circleConnectors || props.circleConnectors.length === 0) {
-    console.log('没有圆环连接器数据需要处理')
-    renderCircleConnectors.value = []
-    return
-  }
-
-  renderCircleConnectors.value = props.circleConnectors
-    .map((connector) => {
-      // 验证必要的数据
-      if (!connector.sourcePoint || !connector.targetPoint) {
-        console.warn('圆环连接器缺少必要的源点或目标点数据:', connector)
-        return null
-      }
-
-      return {
-        id: connector.id || `circle-connector-${connector.sourcePoint.id}-${connector.targetPoint.id}`,
-        sourcePoint: connector.sourcePoint,
-        targetPoint: connector.targetPoint,
-        ringRadius: connector.ringRadius || 50000, // 默认50km
-        nodeCount: connector.nodeCount || 6, // 默认6个节点
-        ringMaterial: connector.ringMaterial || 'rgba(0, 255, 255, 0.3)',
-        ringOutlineColor: connector.ringOutlineColor || '#00ffff',
-        nodeColor: connector.nodeColor || '#ff6b35',
-        connectionMaterial: connector.connectionMaterial || MATERIAL_TYPES.POLYLINE_DYNAMIC_TEXTURE,
-        showNodeLabels: connector.showNodeLabels !== false, // 默认显示
-        showConnections: connector.showConnections !== false, // 默认显示
-        enableAnimation: connector.enableAnimation !== false, // 默认启用动画
-        animationSpeed: connector.animationSpeed || 1.0
-      }
-    })
-    .filter(Boolean)
-
-  console.log('圆环连接器数据', { renderCircleConnectors: toRaw(renderCircleConnectors.value) })
-}, '圆环连接器数据')
-
-// 监听圆环连接器数据变化
-watch(
-  () => props.circleConnectors,
-  (newConnectors) => {
-    if (newConnectors && newConnectors.length > 0) {
-      processCircleConnectors()
-    } else {
-      debounceUpdate(() => {
-        processCircleConnectors()
-      })
-    }
-  },
-  { immediate: true, deep: true }
-)
+// 处理目标点位数据
 
 // 组件挂载时确保处理初始数据
 onMounted(() => {
@@ -1376,7 +1223,7 @@ onMounted(() => {
   // 确保在组件挂载后处理所有初始数据
   nextTick(() => {
     if (props.points && props.points.length > 0) {
-      console.log('🎯 DataVisualization - onMounted处理points数据:', props.points.length, '个点')
+      // console.log('🎯 DataVisualization - onMounted处理points数据:', props.points.length, '个点')
       processPoint()
     }
     if (props.relations && props.relations.length > 0) {
@@ -1384,9 +1231,6 @@ onMounted(() => {
     }
     if (props.trajectories && Object.keys(props.trajectories).length > 0) {
       processTrajectory()
-    }
-    if (props.circleConnectors && props.circleConnectors.length > 0) {
-      processCircleConnectors()
     }
   })
 })

@@ -6,6 +6,7 @@ import {
   getEventData,
   getShipTrajectoryData,
   getTargetStatusData,
+  getCircleConnectorData,
 } from '@/api/index.js'
 import { ref, markRaw, computed } from 'vue'
 import LayerManager from '@/components/ui/layer'
@@ -26,6 +27,8 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
   const eventData = ref([])
   // 轨迹数据
   const trajectoryData = ref({})
+  // 圆环连接器数据
+  const circleConnectorData = ref({})
   const loading = ref(false)
 
   function init() {
@@ -38,14 +41,17 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       getShipTrajectoryData(),
       getEventData(),
       getTargetStatusData(),
+      getCircleConnectorData(),
     ])
       .then((res) => {
+        console.log('????????????????????????????????',res[6])
         targetBaseData.value = [...(res[0] || [])]
         targetLocationData.value = [...(res[1] || [])]
         relationData.value = [...(res[2] || [])]
         trajectoryData.value = { ...(res[3] || {}) }
         eventData.value = [...(res[4] || [])]
         targetStatusData.value = [...(res[5] || [])]
+        circleConnectorData.value = {...res[6]}
       })
       .finally(() => {
         loading.value = false
@@ -91,11 +97,25 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       targets: targetBaseData.value,
       trajectories: trajectoryData.value,
     })
+    // 创建圆环连接器数据图层
+    const circleConnectorLayer = globalLayerManager.createLayer({
+      name: '圆环连接器',
+      zIndex: 4,
+      visible: true,
+    })
+
+    console.log(circleConnectorData.value)
+    circleConnectorLayer.updateAllData({
+      targets: circleConnectorData.value.targets || [],
+      points: circleConnectorData.value.points || [],
+      relations: circleConnectorData.value.relations || [],
+    })
+
     // 全数据图层
     const allDataLayer = globalLayerManager.createLayer({
       name: '全数据',
-      zIndex: 4,
-      visible: true,
+      zIndex: 5,
+      visible: false,
     })
 
     allDataLayer.updateAllData({
@@ -135,6 +155,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     targetStatusData,
     eventData,
     trajectoryData,
+    circleConnectorData,
     loading,
   }
 })
