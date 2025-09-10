@@ -858,16 +858,21 @@ const processPoint = logFuncWrap(() => {
 const processRelation = logFuncWrap(() => {
   const allRelation = dataManager.relationManager.getAll()
 
+  console.log('关系数据1111111111111111', allRelation)
+
   if (!allRelation || allRelation.length === 0) {
     console.log('没有关系数据需要处理')
     renderRelations.value = []
     return
   }
 
+
   renderRelations.value = allRelation
     .map((relation) => {
       const styleConfig = getRelationStyleConfig(relation.type)
+      console.log('关系样式', styleConfig)
       const sourceTarget = getSourceTarget(relation, styleConfig)
+      console.log('关系数据2222222222222222', sourceTarget)
       if (!sourceTarget) return null
       const { source, target, positions } = sourceTarget
 
@@ -905,8 +910,8 @@ const processRelation = logFuncWrap(() => {
         materialType: styleConfig.material,
       }
     })
-    .filter(Boolean).filter(i => i.type === '通信链路')
-  // console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
+    .filter(Boolean)
+  console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
 }, '关系数据')
 
 // 处理轨迹数据

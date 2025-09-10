@@ -104,6 +104,9 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       visible: true,
     })
 
+    // 设置显示控制 - 启用关系连线显示
+    circleConnectorLayer.setShowControl('showRelation', true)
+
     console.log(circleConnectorData.value)
     circleConnectorLayer.updateAllData({
       targets: circleConnectorData.value.targets || [],
