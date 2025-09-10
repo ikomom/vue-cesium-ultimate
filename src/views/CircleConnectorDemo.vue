@@ -134,7 +134,7 @@
         </vc-entity>
 
         <!-- 直接连线 -->
-        <vc-entity v-if="showDirectConnection" id="direct-connection">
+        <vc-entity v-if="showDirectConnection" id="direct-connection" :selectable="false">
           <vc-graphics-polyline
             :positions="[demoPoints[0].position, demoPoints[1].position]"
             :width="lineWidth"
@@ -147,6 +147,7 @@
         <vc-entity
           v-if="showDirectConnection && showConnectionLabel"
           id="connection-label"
+          :selectable="false"
           :position="[
             (demoPoints[0].position[0] + demoPoints[1].position[0]) / 2,
             (demoPoints[0].position[1] + demoPoints[1].position[1]) / 2,
@@ -165,7 +166,7 @@
         </vc-entity>
 
         <!-- 源点A周围的圆环 -->
-        <vc-entity v-if="showCircleRing" id="circle-ring" :position="demoPoints[0].position">
+        <vc-entity v-if="showCircleRing" id="circle-ring" :position="demoPoints[0].position" :selectable="false">
           <vc-graphics-ellipse
             :semi-major-axis="ringRadius * 1000"
             :semi-minor-axis="ringRadius * 1000"
@@ -212,6 +213,7 @@
             v-for="node in virtualNodes"
             :key="`connection-${node.id}`"
             :id="`connection-${node.id}`"
+            :selectable="false"
           >
             <vc-graphics-polyline
               :positions="[node.position, demoPoints[1].position]"
@@ -351,8 +353,16 @@ function onViewerReady(cesiumInstance) {
   console.log('Cesium viewer ready:', cesiumInstance)
   viewer.value = cesiumInstance.viewer
 
-  // 设置初始视角
+  // 确保相机控制启用
   if (viewer.value) {
+    // 启用相机控制
+    viewer.value.scene.screenSpaceCameraController.enableRotate = true
+    viewer.value.scene.screenSpaceCameraController.enableTranslate = true
+    viewer.value.scene.screenSpaceCameraController.enableZoom = true
+    viewer.value.scene.screenSpaceCameraController.enableTilt = true
+    viewer.value.scene.screenSpaceCameraController.enableLook = true
+    
+    // 设置初始视角
     viewer.value.camera.setView({
       destination: window.Cesium.Cartesian3.fromDegrees(118.9, 35.6, 1000000),
       orientation: {
@@ -361,13 +371,38 @@ function onViewerReady(cesiumInstance) {
         roll: 0.0,
       },
     })
+    
+    console.log('相机控制已启用')
   }
 }
 
 // 点击事件处理
 function onPointClick(point) {
+  console.log('=== 点击事件触发 ===')
   console.log('点击点位:', point.name)
-  // 可以在这里添加点击点位的处理逻辑
+  console.log('点位坐标:', point.position)
+  console.log('当前相机位置:', viewer.value?.camera.position)
+
+  // 相机聚焦到点击的点位
+  if (viewer.value && point.position) {
+    const targetPosition = window.Cesium.Cartesian3.fromDegrees(
+      point.position[0], // 经度
+      point.position[1], // 纬度
+      300000 // 高度300km，适合查看点位
+    )
+    console.log('目标位置:', targetPosition)
+
+    viewer.value.camera.flyTo({
+      destination: targetPosition,
+      duration: 2.0, // 飞行时间2秒
+      complete: () => {
+        console.log(`相机已聚焦到${point.name}`)
+        console.log('飞行后相机位置:', viewer.value.camera.position)
+      }
+    })
+  } else {
+    console.log('聚焦失败 - viewer存在:', !!viewer.value, 'position存在:', !!point.position)
+  }
 }
 
 // 虚拟节点点击事件处理
@@ -396,9 +431,52 @@ function handlePointDoubleClick(point) {
       showVirtualNodes.value = true
       showVirtualConnections.value = true
       showDirectConnection.value = false
+
+      // 相机视角移动并放大
+      if (viewer.value) {
+        const pointAPosition = window.Cesium.Cartesian3.fromDegrees(118.8, 35.5, 0)
+        viewer.value.camera.flyTo({
+          destination: window.Cesium.Cartesian3.fromDegrees(116.3974, 39.9093, 500000), // 放大到50万米高度
+          duration: 2.0, // 飞行时间2秒
+          complete: () => {
+            // 飞行完成后开始圆环半径动画
+            animateCircleRadius()
+          }
+        })
+      }
     }
   }
 }
+
+// 圆环半径动画函数
+function animateCircleRadius() {
+  const startRadius = 50 // 起始半径50km
+  const endRadius = ringRadius.value // 目标半径
+  const duration = 3000 // 动画持续时间3秒
+  const startTime = Date.now()
+
+  // 临时设置较小的起始半径
+  ringRadius.value = startRadius
+
+  function animate() {
+    const elapsed = Date.now() - startTime
+    const progress = Math.min(elapsed / duration, 1)
+
+    // 使用缓动函数（ease-out）
+    const easeProgress = 1 - Math.pow(1 - progress, 3)
+
+    // 计算当前半径
+    const currentRadius = startRadius + (endRadius - startRadius) * easeProgress
+    ringRadius.value = currentRadius
+
+    if (progress < 1) {
+      requestAnimationFrame(animate)
+    }
+  }
+
+  requestAnimationFrame(animate)
+}
+
 
 onMounted(() => {
   console.log('源点A、B直接连接演示页面加载完成')
