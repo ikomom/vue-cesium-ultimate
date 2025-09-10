@@ -7,10 +7,17 @@ import { MATERIAL_TYPES } from '../constanst'
 
 // 获取距离相关配置
 export function getDistanceConfigs() {
+  if (!window.Cesium) {
+    return {
+      scaleByDistance: null,
+      pixelOffsetScaleByDistance: null,
+      distanceDisplayCondition: null,
+    }
+  }
   return {
-    scaleByDistance: new Cesium.NearFarScalar(1.5e2, 1.5, 1.5e7, 0.2),
-    pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 1.0, 1.5e7, 0.3),
-    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0.0, 2.0e7),
+    scaleByDistance: new window.Cesium.NearFarScalar(1.5e2, 1.5, 1.5e7, 0.2),
+    pixelOffsetScaleByDistance: new window.Cesium.NearFarScalar(1.5e2, 1.0, 1.5e7, 0.3),
+    distanceDisplayCondition: new window.Cesium.DistanceDisplayCondition(0.0, 2.0e7),
   }
 }
 

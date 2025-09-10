@@ -272,9 +272,12 @@ function isPositionVisible(position) {
 
   try {
     // 使用Cesium的可见性检测
+    const cameraPosition = viewer?.camera?.position
+    if (!cameraPosition) return false
+    
     const occluder = new window.Cesium.EllipsoidalOccluder(
       window.Cesium.Ellipsoid.WGS84,
-      viewer.camera.position,
+      cameraPosition,
     )
     const isVisible = occluder.isPointVisible(position)
 
@@ -304,8 +307,8 @@ function isPositionVisible(position) {
  * @returns {Cesium.Cartesian3} 中点位置
  */
 function calculateMidPosition(positions) {
-  if (!positions || positions.length === 0) {
-    return window.Cesium.Cartesian3.ZERO
+  if (!positions || positions.length === 0 || !window.Cesium) {
+    return null
   }
 
   // 如果是经纬度数组格式，转换为Cartesian3

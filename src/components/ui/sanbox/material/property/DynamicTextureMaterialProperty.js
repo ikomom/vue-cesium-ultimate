@@ -33,13 +33,13 @@ export class DynamicTextureMaterialProperty {
       result = {}
     }
     result.image = this.image
-    result.color = Cesium.Property.getValueOrClonedDefault(
-      this._color,
-      time,
-      Cesium.Color.fromCssColorString(defaultColor),
+    result.color = window.Cesium.Property.getValueOrClonedDefault(
+        this._color,
+        time,
+        window.Cesium.Color.fromCssColorString(defaultColor),
       result.color,
     )
-    result.speed = Cesium.Property.getValueOrClonedDefault(
+    result.speed = window.Cesium.Property.getValueOrClonedDefault(
       this._speed,
       time,
       defaultSpeed,
@@ -67,12 +67,12 @@ export class DynamicTextureMaterialProperty {
   _compareProperty(a, b) {
     const Cesium = window.Cesium
     if (
-      Cesium.defined(a) &&
-      Cesium.defined(a.equals) &&
-      Cesium.defined(b) &&
-      Cesium.defined(b.equals)
+      window.Cesium.defined(a) &&
+    window.Cesium.defined(a.equals) &&
+    window.Cesium.defined(b) &&
+    window.Cesium.defined(b.equals)
     ) {
-      return Cesium.Property.equals(a, b)
+      return window.Cesium.Property.equals(a, b)
     }
     return a === b
   }
@@ -92,8 +92,8 @@ export function initDynamicTextureMaterialProperty() {
   // 检查是否已经定义过属性，避免重复定义
   if (!DynamicTextureMaterialProperty.prototype.hasOwnProperty('color')) {
     Object.defineProperties(DynamicTextureMaterialProperty.prototype, {
-      color: Cesium.createPropertyDescriptor('color'),
-      speed: Cesium.createPropertyDescriptor('speed'),
+      color: window.Cesium.createPropertyDescriptor('color'),
+    speed: window.Cesium.createPropertyDescriptor('speed'),
     })
   }
   
@@ -103,7 +103,7 @@ export function initDynamicTextureMaterialProperty() {
     fabric: {
       type,
       uniforms: {
-        color: new Cesium.Color.fromCssColorString(defaultColor),
+        color: new window.Cesium.Color.fromCssColorString(defaultColor),
         speed: defaultSpeed,
         image: defaultImage,
         time: performance.now(),

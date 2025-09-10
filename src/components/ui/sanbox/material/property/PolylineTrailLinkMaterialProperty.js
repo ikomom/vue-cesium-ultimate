@@ -37,10 +37,10 @@ export class PolylineTrailLinkMaterialProperty {
       result = {}
     }
     result.image = this.image
-    result.color = Cesium.Property.getValueOrClonedDefault(
-      this._color,
-      time,
-      Cesium.Color.fromCssColorString(defaultColor),
+    result.color = window.Cesium.Property.getValueOrClonedDefault(
+        this._color,
+        time,
+        window.Cesium.Color.fromCssColorString(defaultColor),
       result.color,
     )
 
@@ -100,12 +100,12 @@ export class PolylineTrailLinkMaterialProperty {
   _compareProperty(a, b) {
     const Cesium = window.Cesium
     if (
-      Cesium.defined(a) &&
-      Cesium.defined(a.equals) &&
-      Cesium.defined(b) &&
-      Cesium.defined(b.equals)
+      window.Cesium.defined(a) &&
+    window.Cesium.defined(a.equals) &&
+    window.Cesium.defined(b) &&
+    window.Cesium.defined(b.equals)
     ) {
-      return Cesium.Property.equals(a, b)
+      return window.Cesium.Property.equals(a, b)
     }
     return a === b
   }
@@ -122,7 +122,7 @@ export function initPolylineTrailLinkMaterialProperty() {
   // 检查是否已经定义过属性，避免重复定义
   if (!PolylineTrailLinkMaterialProperty.prototype.hasOwnProperty('color')) {
     Object.defineProperties(PolylineTrailLinkMaterialProperty.prototype, {
-      color: Cesium.createPropertyDescriptor('color'),
+      color: window.Cesium.createPropertyDescriptor('color'),
     })
   }
 
@@ -133,7 +133,7 @@ export function initPolylineTrailLinkMaterialProperty() {
       type,
       uniforms: {
         image: defaultImage,
-        color: new Cesium.Color.fromCssColorString(defaultColor),
+        color: new window.Cesium.Color.fromCssColorString(defaultColor),
         time: 0,
         repeat: defaultRepeat,
         // speed: 1,

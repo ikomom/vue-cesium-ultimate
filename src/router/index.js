@@ -52,6 +52,14 @@ const routes = [
       title: 'Mars3d地图页面',
     },
   },
+  {
+    path: '/circle-connector-demo',
+    name: 'CircleConnectorDemo',
+    component: () => import('@/views/CircleConnectorDemo.vue'),
+    meta: {
+      title: '圆环节点连接器演示',
+    },
+  },
 ]
 
 const router = createRouter({

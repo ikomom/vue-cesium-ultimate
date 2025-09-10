@@ -70,10 +70,42 @@
       @mouseout="onEventLeave(event, $event)"
     />
   </template>
+  <template>
+    <!-- 圆环节点连接器 -->
+    <circle-node-connector
+      v-for="connector in renderCircleConnectors"
+      :key="connector.id"
+      :viewer="viewer"
+      :visible="visible && showCircleConnectors"
+      :source-point="connector.sourcePoint"
+      :target-point="connector.targetPoint"
+      :ring-radius="connector.ringRadius"
+      :node-count="connector.nodeCount"
+      :ring-material="connector.ringMaterial"
+      :ring-outline-color="connector.ringOutlineColor"
+      :show-center-label="connector.showCenterLabel"
+      :center-point-size="connector.centerPointSize"
+      :center-point-color="connector.centerPointColor"
+      :center-point-outline-color="connector.centerPointOutlineColor"
+      :node-color="connector.nodeColor"
+      :connection-material="connector.connectionMaterial"
+      :show-node-labels="connector.showNodeLabels"
+      :show-connections="connector.showConnections"
+      @center-point-click="onCenterPointClick"
+      @center-point-hover="onCenterPointHover"
+      @center-point-leave="onCenterPointLeave"
+      @node-click="onCircleNodeClick"
+      @node-hover="onCircleNodeHover"
+      @node-leave="onCircleNodeLeave"
+      @connection-click="onCircleConnectionClick"
+      @connection-hover="onCircleConnectionHover"
+      @connection-leave="onCircleConnectionLeave"
+    />
+  </template>
 </template>
 
 <script setup>
-import { watch, watchEffect, ref, shallowRef, toRefs, computed, toRaw, nextTick } from 'vue'
+import { watch, watchEffect, ref, shallowRef, toRefs, computed, toRaw, nextTick, onMounted } from 'vue'
 import { debounce } from 'lodash-es'
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import {
@@ -92,10 +124,14 @@ import { generateCurve } from './utils/map'
 import { useVueCesium } from 'vue-cesium'
 import { animationManager } from './utils/animationEffects'
 import LineWithLabel from './LineWithLabel.vue'
+import CircleNodeConnector from './CircleNodeConnector.vue'
 
-const { viewer } = useVueCesium()
 // Props定义
 const props = defineProps({
+  viewer: {
+    type: Object,
+    default: null,
+  },
   dataManager: {
     type: DataManagerFactory,
     default: () => new DataManagerFactory(),
@@ -156,7 +192,20 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // 圆环连接器相关属性
+  circleConnectors: {
+    type: Array,
+    default: () => [],
+  },
+  showCircleConnectors: {
+    type: Boolean,
+    default: true,
+  },
 })
+
+// 使用传入的viewer或者useVueCesium的viewer作为备选
+const { viewer: vueCesiumViewer } = useVueCesium()
+const viewer = computed(() => props.viewer || (vueCesiumViewer && vueCesiumViewer.value))
 const { layerId, layerName } = toRefs(props)
 const { dataManager } = props
 
@@ -174,6 +223,16 @@ const emit = defineEmits([
   'eventClick',
   'eventHover',
   'eventLeave',
+  // 圆环连接器事件
+  'centerPointClick',
+  'centerPointHover',
+  'centerPointLeave',
+  'circleNodeClick',
+  'circleNodeHover',
+  'circleNodeLeave',
+  'circleConnectionClick',
+  'circleConnectionHover',
+  'circleConnectionLeave',
 ])
 
 // 使用shallowRef优化性能，避免深度响应式
@@ -181,6 +240,7 @@ const renderPoints = shallowRef([])
 const renderRelations = shallowRef([])
 const renderTrajectory = shallowRef([])
 const renderEvents = shallowRef([])
+const renderCircleConnectors = shallowRef([])
 
 // 缓存配置对象，避免重复计算
 const distanceConfigs = getDistanceConfigs()
@@ -363,7 +423,7 @@ function getPosition(source, target, styleConfig, isCartesian3 = false) {
 function getEntityByIds(entityIds = []) {
   // 遍历实体ID数组,返回第一个找到的实体
   for (const entityId of entityIds) {
-    const entity = viewer.entities.getById(entityId)
+    const entity = viewer.value?.entities?.getById(entityId)
     if (entity) {
       return entity
     }
@@ -413,7 +473,47 @@ function getSourceTarget(data, styleConfig) {
 
 // 处理点数据
 const processPoint = logFuncWrap(() => {
+  console.log('🎯 processPoint被调用 - props.points:', props.points)
+
+  // 检查Cesium是否可用
+  if (!window.Cesium) {
+    console.warn('Cesium is not available yet, skipping processPoint')
+    return
+  }
+
+  // 首先处理props.points数据，将其添加到dataManager
+  if (props.points && props.points.length > 0) {
+    console.log('🎯 DataVisualization - 处理props.points数据:', props.points.length, '个点')
+    console.log('🎯 props.points详细内容:', JSON.stringify(props.points, null, 2))
+    props.points.forEach(point => {
+      // 检查是否已存在，避免重复添加
+      const existingLocation = dataManager.targetLocationManager.findById(point.id)
+      const existingBase = dataManager.targetBaseManager.findById(point.id)
+
+      if (!existingLocation) {
+        // 将点数据添加到位置管理器
+        dataManager.targetLocationManager.addItem(point)
+        console.log('🎯 添加位置数据:', point.id, point.name)
+      }
+
+      if (!existingBase) {
+        // 同时将基础信息添加到基础管理器
+        const baseInfo = {
+          id: point.id,
+          name: point.name || point.id,
+          type: point.type || 'unknown',
+          description: point.description || '',
+          status: point.status || 'active'
+        }
+        dataManager.targetBaseManager.addItem(baseInfo)
+        console.log('🎯 添加基础数据:', baseInfo.id, baseInfo.name)
+      }
+    })
+  }
+
   const allPoint = dataManager.targetLocationManager.getAll()
+  console.log('🎯 从targetLocationManager获取的所有点数据:', allPoint)
+  console.log('🎯 targetLocationManager内部状态:', dataManager.targetLocationManager)
 
   if (!allPoint || allPoint.length === 0) {
     console.log(
@@ -426,8 +526,12 @@ const processPoint = logFuncWrap(() => {
     return
   }
 
+  console.log('🎯 DataVisualization - 从dataManager获取到的点数据:', allPoint.length, '个点')
+  console.log('🎯 allPoint详细内容:', JSON.stringify(allPoint, null, 2))
+  // 注意：不再过滤圆环连接器的中心点，因为CircleNodeConnector中的中心点现在始终显示
+  // 这样可以确保源点在所有模式下都能正确显示
+
   renderPoints.value = allPoint
-  // .filter(i => i.id === 'target_003')
     .map((target) => {
       const base = dataManager.targetBaseManager.findById(target.id)
       if (!base) {
@@ -462,12 +566,12 @@ const processPoint = logFuncWrap(() => {
         if (!allTargetStatus.length) return null
 
         // 性能优化1：检查缓存是否有效（时间相同则直接返回缓存结果）
-        if (statusCache.lastTime && Cesium.JulianDate.equals(currentTime, statusCache.lastTime)) {
+        if (statusCache.lastTime && window.Cesium.JulianDate.equals(currentTime, statusCache.lastTime)) {
           return statusCache.cachedStatus
         }
 
         // 将当前时间转换为ISO字符串进行比较
-        const currentTimeStr = Cesium.JulianDate.toIso8601(currentTime)
+        const currentTimeStr = window.Cesium.JulianDate.toIso8601(currentTime)
 
         // 性能优化2：如果时间字符串相同，也直接返回缓存结果
         if (statusCache.lastTimeStr === currentTimeStr) {
@@ -497,7 +601,7 @@ const processPoint = logFuncWrap(() => {
         const result = validStatus || allTargetStatus[0] // 如果没找到，返回第一个状态
 
         // 更新缓存
-        statusCache.lastTime = Cesium.JulianDate.clone(currentTime)
+        statusCache.lastTime = window.Cesium.JulianDate.clone(currentTime)
         statusCache.lastTimeStr = currentTimeStr
         statusCache.cachedStatus = result
 
@@ -507,7 +611,7 @@ const processPoint = logFuncWrap(() => {
       const iconConfig = getTargetIconConfig(base.type)
 
       // 创建动态状态配置属性
-      const statusVisualConfigProperty = new Cesium.CallbackProperty((time, result) => {
+      const statusVisualConfigProperty = new window.Cesium.CallbackProperty((time, result) => {
         const currentStatus = getCurrentStatus(time)
 
         if (!currentStatus) return {}
@@ -541,7 +645,7 @@ const processPoint = logFuncWrap(() => {
       const dynamicBillboard = {
         ...distanceConfigs,
         ...iconConfig.billboard,
-        image: new Cesium.CallbackProperty((time) => {
+        image: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
 
           if (!currentStatus) return iconConfig.billboard.image
@@ -560,7 +664,7 @@ const processPoint = logFuncWrap(() => {
 
           return baseImage
         }, false),
-        scale: new Cesium.CallbackProperty((time) => {
+        scale: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           if (!currentStatus) return iconConfig.billboard.scale || 1.0
 
@@ -579,9 +683,9 @@ const processPoint = logFuncWrap(() => {
 
           return baseScale
         }, false),
-        color: new Cesium.CallbackProperty((time) => {
+        color: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
-          if (!currentStatus) return Cesium.Color.fromCssColorString(iconConfig.billboard.color) || Cesium.Color.WHITE
+          if (!currentStatus) return window.Cesium.Color.fromCssColorString(iconConfig.billboard.color) || window.Cesium.Color.WHITE
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
 
@@ -590,12 +694,12 @@ const processPoint = logFuncWrap(() => {
             getAffiliationColor(currentStatus.metadata.affiliation) : null
 
           if (affiliationColor) {
-            return Cesium.Color.WHITE
+            return window.Cesium.Color.WHITE
           }
 
           let color = currentStatus.colorCode ?
-            Cesium.Color.fromCssColorString(currentStatus.colorCode) :
-            Cesium.Color.fromCssColorString(statusConfig.billboard?.color || iconConfig.billboard.color);
+            window.Cesium.Color.fromCssColorString(currentStatus.colorCode) :
+            window.Cesium.Color.fromCssColorString(statusConfig.billboard?.color || iconConfig.billboard.color);
 
           // 应用视觉属性
           if (statusConfig.visualProperties) {
@@ -614,7 +718,7 @@ const processPoint = logFuncWrap(() => {
 
             // 应用亮度调整
             if (visualProps.brightness !== undefined && visualProps.brightness !== 1.0) {
-              color = new Cesium.Color(
+              color = new window.Cesium.Color(
                 Math.min(1.0, color.red * visualProps.brightness),
                 Math.min(1.0, color.green * visualProps.brightness),
                 Math.min(1.0, color.blue * visualProps.brightness),
@@ -634,7 +738,7 @@ const processPoint = logFuncWrap(() => {
           return color
         }, false),
         // 添加旋转动画支持
-        rotation: new Cesium.CallbackProperty((time) => {
+        rotation: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           if (!currentStatus) return 0
 
@@ -650,9 +754,9 @@ const processPoint = logFuncWrap(() => {
           return 0
         }, false),
         // 添加像素偏移支持（用于震动效果）
-        pixelOffset: new Cesium.CallbackProperty((time) => {
+        pixelOffset: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
-          if (!currentStatus) return new Cesium.Cartesian2(0, 0)
+          if (!currentStatus) return new window.Cesium.Cartesian2(0, 0)
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           if (statusConfig.visualProperties && statusConfig.visualProperties.shakeIntensity) {
@@ -661,32 +765,32 @@ const processPoint = logFuncWrap(() => {
               return shakeEffect(time)
             }
           }
-          return new Cesium.Cartesian2(0, 0)
+          return new window.Cesium.Cartesian2(0, 0)
         }, false)
       }
 
       const dynamicLabel = {
         ...distanceConfigs,
         ...iconConfig.label,
-        text: new Cesium.CallbackProperty((time) => {
+        text: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           return target.name + (currentStatus ? ` [${currentStatus.status_name || currentStatus.statusName}]` : '')
         }, false),
-        fillColor: new Cesium.CallbackProperty((time) => {
+        fillColor: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
-          if (!currentStatus) return Cesium.Color(iconConfig.label.fillColor || '#FFFFFF')
+          if (!currentStatus) return window.Cesium.Color(iconConfig.label.fillColor || '#FFFFFF')
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           const fillColor = statusConfig.label?.fillColor || iconConfig.label.fillColor
 
-          return  fillColor ? Cesium.Color.fromCssColorString(fillColor) : Cesium.Color.WHITE
+          return  fillColor ? window.Cesium.Color.fromCssColorString(fillColor) : window.Cesium.Color.WHITE
         }, false)
       }
 
       const dynamicModel = {
         ...distanceConfigs,
         ...iconConfig.model,
-        uri: new Cesium.CallbackProperty((time) => {
+        uri: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           if (!currentStatus) return iconConfig.model.uri
 
@@ -697,12 +801,12 @@ const processPoint = logFuncWrap(() => {
 
       // 创建基于healthLevel的动态圆圈
       const dynamicEllipse = {
-        semiMajorAxis: new Cesium.CallbackProperty((time) => {
+        semiMajorAxis: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           if (!currentStatus || !currentStatus.metadata?.healthLevel) return 0
 
           // 获取相机高度，用于层级缩放
-          const cameraHeight = viewer.camera.positionCartographic.height
+          const cameraHeight = viewer.value?.camera?.positionCartographic?.height || 10000
           const heightFactor = Math.max(0.1, Math.min(10, cameraHeight / 10000)) // 高度因子范围：0.1-10
 
           // 获取图标的scale配置
@@ -719,12 +823,12 @@ const processPoint = logFuncWrap(() => {
 
           return baseIconSizeInMeters * radiusMultiplier
         }, false),
-        semiMinorAxis: new Cesium.CallbackProperty((time) => {
+        semiMinorAxis: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           if (!currentStatus || !currentStatus.metadata?.healthLevel) return 0
 
           // 获取相机高度，用于层级缩放
-          const cameraHeight = viewer.camera.positionCartographic.height
+          const cameraHeight = viewer.value?.camera?.positionCartographic?.height || 10000
           const heightFactor = Math.max(0.1, Math.min(10, cameraHeight / 10000)) // 高度因子范围：0.1-10
 
           // 获取图标的scale配置
@@ -741,33 +845,33 @@ const processPoint = logFuncWrap(() => {
 
           return baseIconSizeInMeters * radiusMultiplier
         }, false),
-        material: new Cesium.ColorMaterialProperty(
-          new Cesium.CallbackProperty((time) => {
+        material: new window.Cesium.ColorMaterialProperty(
+          new window.Cesium.CallbackProperty((time) => {
             const currentStatus = getCurrentStatus(time)
             if (!currentStatus || !currentStatus.metadata?.healthLevel) {
-              return Cesium.Color.TRANSPARENT
+              return window.Cesium.Color.TRANSPARENT
             }
 
             const healthColor = getHealthLevelColor(currentStatus.metadata.healthLevel)
-            const color = Cesium.Color.fromCssColorString(healthColor)
+            const color = window.Cesium.Color.fromCssColorString(healthColor)
 
             // 设置透明度，使圆圈半透明
             return color.withAlpha(0.3)
           }, false)
         ),
         outline: true,
-        outlineColor: new Cesium.CallbackProperty((time) => {
+        outlineColor: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           if (!currentStatus || !currentStatus.metadata?.healthLevel) {
-            return Cesium.Color.TRANSPARENT
+            return window.Cesium.Color.TRANSPARENT
           }
 
           const healthColor = getHealthLevelColor(currentStatus.metadata.healthLevel)
-          return Cesium.Color.fromCssColorString(healthColor)
+          return window.Cesium.Color.fromCssColorString(healthColor)
         }, false),
         outlineWidth: 2,
         height: 0, // 贴地显示
-        show: new Cesium.CallbackProperty((time) => {
+        show: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
           // 只有当存在healthLevel时才显示圆圈
           return currentStatus && currentStatus.metadata?.healthLevel !== undefined
@@ -785,11 +889,14 @@ const processPoint = logFuncWrap(() => {
         label: dynamicLabel,
         ellipse: dynamicEllipse, // 添加基于healthLevel的圆圈
         // 状态相关属性（动态）
-        targetStatus: new Cesium.CallbackProperty((time) => getCurrentStatus(time), false),
+        targetStatus: new window.Cesium.CallbackProperty((time) => getCurrentStatus(time), false),
         statusVisualConfig: statusVisualConfigProperty,
-        // 动态显示控制
-        show: new Cesium.CallbackProperty((time) => {
+        // 动态显示控制 - 默认显示，只有明确设置forceDisplay为false时才隐藏
+        show: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
+          // 如果没有状态数据，默认显示
+          if (!currentStatus) return true
+          // 如果有状态数据，检查forceDisplay设置
           return currentStatus?.priorityConfig?.forceDisplay !== false
         }, false),
       }
@@ -1098,9 +1205,12 @@ watch(
 const debounceEvent = (fn, delay = 100) => debounce(fn, delay)
 
 // 事件处理函数
-const onTargetClick = debounceEvent((target, event) => {
+const onTargetClick = (target, event) => {
+  console.log('🎯 DataVisualization - onTargetClick 被触发:', target.id, target)
+  console.log('🎯 DataVisualization - 事件对象:', event)
   emit('targetClick', target, event)
-}, 50)
+  console.log('🎯 DataVisualization - targetClick 事件已发射')
+}
 
 const onRelationClick = debounceEvent((relation, event) => {
   emit('relationClick', relation, event)
@@ -1155,6 +1265,131 @@ const onEventLeave = debounceEvent((data, event) => {
   setPointer('auto')
   emit('eventLeave', data, event)
 }, 100)
+
+// 圆环连接器事件处理函数
+// 中心点事件处理
+const onCenterPointClick = debounceEvent((data) => {
+  console.log('🎯 DataVisualization - onCenterPointClick 被触发:', data)
+  // 发射centerPointClick事件
+  emit('centerPointClick', data)
+  // 同时发射targetClick事件，以便双击逻辑能够正常工作
+  if (data.centerPoint) {
+    console.log('🎯 DataVisualization - 转发为targetClick事件:', data.centerPoint)
+    emit('targetClick', data.centerPoint, data.event)
+  }
+}, 50)
+
+const onCenterPointHover = debounceEvent((data) => {
+  setPointer('pointer')
+  emit('centerPointHover', data)
+}, 100)
+
+const onCenterPointLeave = debounceEvent((data) => {
+  setPointer('auto')
+  emit('centerPointLeave', data)
+}, 100)
+
+// 虚拟节点事件处理
+const onCircleNodeClick = debounceEvent((data) => {
+  emit('circleNodeClick', data)
+}, 50)
+
+const onCircleNodeHover = debounceEvent((data) => {
+  setPointer('pointer')
+  emit('circleNodeHover', data)
+}, 100)
+
+const onCircleNodeLeave = debounceEvent((data) => {
+  setPointer('auto')
+  emit('circleNodeLeave', data)
+}, 100)
+
+const onCircleConnectionClick = debounceEvent((data) => {
+  emit('circleConnectionClick', data)
+}, 50)
+
+const onCircleConnectionHover = debounceEvent((data) => {
+  setPointer('pointer')
+  emit('circleConnectionHover', data)
+}, 100)
+
+const onCircleConnectionLeave = debounceEvent((data) => {
+  setPointer('auto')
+  emit('circleConnectionLeave', data)
+}, 100)
+
+// 处理圆环连接器数据
+const processCircleConnectors = logFuncWrap(() => {
+  if (!props.circleConnectors || props.circleConnectors.length === 0) {
+    console.log('没有圆环连接器数据需要处理')
+    renderCircleConnectors.value = []
+    return
+  }
+
+  renderCircleConnectors.value = props.circleConnectors
+    .map((connector) => {
+      // 验证必要的数据
+      if (!connector.sourcePoint || !connector.targetPoint) {
+        console.warn('圆环连接器缺少必要的源点或目标点数据:', connector)
+        return null
+      }
+
+      return {
+        id: connector.id || `circle-connector-${connector.sourcePoint.id}-${connector.targetPoint.id}`,
+        sourcePoint: connector.sourcePoint,
+        targetPoint: connector.targetPoint,
+        ringRadius: connector.ringRadius || 50000, // 默认50km
+        nodeCount: connector.nodeCount || 6, // 默认6个节点
+        ringMaterial: connector.ringMaterial || 'rgba(0, 255, 255, 0.3)',
+        ringOutlineColor: connector.ringOutlineColor || '#00ffff',
+        nodeColor: connector.nodeColor || '#ff6b35',
+        connectionMaterial: connector.connectionMaterial || MATERIAL_TYPES.POLYLINE_DYNAMIC_TEXTURE,
+        showNodeLabels: connector.showNodeLabels !== false, // 默认显示
+        showConnections: connector.showConnections !== false, // 默认显示
+        enableAnimation: connector.enableAnimation !== false, // 默认启用动画
+        animationSpeed: connector.animationSpeed || 1.0
+      }
+    })
+    .filter(Boolean)
+
+  console.log('圆环连接器数据', { renderCircleConnectors: toRaw(renderCircleConnectors.value) })
+}, '圆环连接器数据')
+
+// 监听圆环连接器数据变化
+watch(
+  () => props.circleConnectors,
+  (newConnectors) => {
+    if (newConnectors && newConnectors.length > 0) {
+      processCircleConnectors()
+    } else {
+      debounceUpdate(() => {
+        processCircleConnectors()
+      })
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+// 组件挂载时确保处理初始数据
+onMounted(() => {
+  console.log('🎯 DataVisualization - 组件已挂载，开始处理初始数据')
+  // 确保在组件挂载后处理所有初始数据
+  nextTick(() => {
+    if (props.points && props.points.length > 0) {
+      console.log('🎯 DataVisualization - onMounted处理points数据:', props.points.length, '个点')
+      processPoint()
+    }
+    if (props.relations && props.relations.length > 0) {
+      processRelation()
+    }
+    if (props.trajectories && Object.keys(props.trajectories).length > 0) {
+      processTrajectory()
+    }
+    if (props.circleConnectors && props.circleConnectors.length > 0) {
+      processCircleConnectors()
+    }
+  })
+})
 </script>
 
 <style scoped>

@@ -14,24 +14,33 @@ import {
  */
 export function getMaterialProperty(materialType, options = {}) {
   switch (materialType) {
+    case MATERIAL_TYPES.POLYLINE_DYNAMIC_TEXTURE:
     case MATERIAL_TYPES.PolylineDynamicTexture:
       return new DynamicTextureMaterialProperty(options)
 
+    case MATERIAL_TYPES.POLYLINE_FLY_LINE:
     case MATERIAL_TYPES.PolylineFlyLine:
       return new ParabolaFlyLineMaterialProperty(options)
 
+    case MATERIAL_TYPES.POLYLINE_PULSE_LINE:
     case MATERIAL_TYPES.PolylinePulseLine:
       return new PulseLineMaterialProperty(options)
 
+    case MATERIAL_TYPES.POLYLINE_TRAIL_LINK:
     case MATERIAL_TYPES.PolylineTrailLink:
       return new PolylineTrailLinkMaterialProperty(options)
 
     // Cesium内置材质类型
+    case MATERIAL_TYPES.POLYLINE_ARROW:
     case MATERIAL_TYPES.PolylineArrow:
+    case MATERIAL_TYPES.POLYLINE_DASH:
     case MATERIAL_TYPES.PolylineDash:
+    case MATERIAL_TYPES.POLYLINE_GLOW:
     case MATERIAL_TYPES.PolylineGlow:
+    case MATERIAL_TYPES.POLYLINE_OUTLINE:
     case MATERIAL_TYPES.PolylineOutline:
       return { fabric: { type: materialType, uniforms: { ...options } } }
+    case MATERIAL_TYPES.COLOR:
     case MATERIAL_TYPES.Color:
       // 这些是Cesium内置类型，不需要自定义属性类
       return options.color
@@ -47,9 +56,10 @@ export function getMaterialProperty(materialType, options = {}) {
  */
 export function getSupportedCustomMaterialTypes() {
   return [
-    MATERIAL_TYPES.PolylineDynamicTexture,
-    MATERIAL_TYPES.PolylineFlyLine,
-    MATERIAL_TYPES.PolylinePulseLine,
+    MATERIAL_TYPES.POLYLINE_DYNAMIC_TEXTURE,
+    MATERIAL_TYPES.POLYLINE_FLY_LINE,
+    MATERIAL_TYPES.POLYLINE_PULSE_LINE,
+    MATERIAL_TYPES.POLYLINE_TRAIL_LINK,
   ]
 }
 
@@ -69,12 +79,14 @@ export function isCustomMaterialType(materialType) {
  */
 export function getDefaultMaterialOptions(materialType) {
   switch (materialType) {
+    case MATERIAL_TYPES.POLYLINE_DYNAMIC_TEXTURE:
     case MATERIAL_TYPES.PolylineDynamicTexture:
       return {
         color: new window.Cesium.Color(1.0, 0.6, 0.2, 0.8),
         speed: 1.5,
       }
 
+    case MATERIAL_TYPES.POLYLINE_FLY_LINE:
     case MATERIAL_TYPES.PolylineFlyLine:
       return {
         color: new window.Cesium.Color(0.0, 1.0, 1.0, 0.8),
@@ -83,11 +95,21 @@ export function getDefaultMaterialOptions(materialType) {
         gradient: 0.1,
       }
 
+    case MATERIAL_TYPES.POLYLINE_PULSE_LINE:
     case MATERIAL_TYPES.PolylinePulseLine:
       return {
         color: new window.Cesium.Color(1.0, 0.5, 0.0, 0.9),
         speed: 1.5,
         pulseWidth: 0.2,
+      }
+
+    case MATERIAL_TYPES.POLYLINE_TRAIL_LINK:
+    case MATERIAL_TYPES.PolylineTrailLink:
+      return {
+        color: new window.Cesium.Color(0.0, 1.0, 0.0, 0.8),
+        speed: 1.0,
+        percent: 0.3,
+        alpha: 0.8,
       }
 
     default:

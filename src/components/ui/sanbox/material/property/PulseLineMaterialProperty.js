@@ -19,7 +19,7 @@ export class PulseLineMaterialProperty {
     this._pulseWidth = undefined
     this._pulseWidthSubscription = undefined
 
-    this.color = new Cesium.Color.fromCssColorString(options.color || defaultColor)
+    this.color = new window.Cesium.Color.fromCssColorString(options.color || defaultColor)
     this.speed = options.speed || defaultSpeed
     this.pulseWidth = options.pulseWidth || defaultPulseWidth
   }
@@ -30,14 +30,14 @@ export class PulseLineMaterialProperty {
 
   getValue(time, result) {
     const Cesium = window.Cesium
-    if (!Cesium.defined(result)) {
+    if (!window.Cesium.defined(result)) {
       result = {}
     }
 
     result.color = this._getPropertyValue(
       this._color,
       time,
-      Cesium.Color.fromCssColorString(defaultColor),
+      window.Cesium.Color.fromCssColorString(defaultColor),
     )
     result.speed = this._getPropertyValue(this._speed, time, defaultSpeed)
     result.pulseWidth = this._getPropertyValue(this._pulseWidth, time, defaultPulseWidth)
@@ -47,7 +47,7 @@ export class PulseLineMaterialProperty {
 
   _getPropertyValue(property, time, defaultValue) {
     const Cesium = window.Cesium
-    if (Cesium.defined(property) && typeof property.getValue === 'function') {
+    if (window.Cesium.defined(property) && typeof property.getValue === 'function') {
       return property.getValue(time) || defaultValue
     }
     return property !== undefined ? property : defaultValue
@@ -71,12 +71,12 @@ export class PulseLineMaterialProperty {
     const Cesium = window.Cesium
     // 如果两个都是 Property 对象，使用 Cesium.Property.equals
     if (
-      Cesium.defined(a) &&
-      Cesium.defined(a.equals) &&
-      Cesium.defined(b) &&
-      Cesium.defined(b.equals)
+      window.Cesium.defined(a) &&
+    window.Cesium.defined(a.equals) &&
+    window.Cesium.defined(b) &&
+    window.Cesium.defined(b.equals)
     ) {
-      return Cesium.Property.equals(a, b)
+      return window.Cesium.Property.equals(a, b)
     }
     // 否则直接比较值
     return a === b
@@ -88,9 +88,9 @@ export class PulseLineMaterialProperty {
 
   get isConstant() {
     return (
-      Cesium.Property.isConstant(this._color) &&
-      Cesium.Property.isConstant(this._speed) &&
-      Cesium.Property.isConstant(this._pulseWidth)
+      window.Cesium.Property.isConstant(this._color) &&
+    window.Cesium.Property.isConstant(this._speed) &&
+    window.Cesium.Property.isConstant(this._pulseWidth)
     )
   }
 }
@@ -111,7 +111,7 @@ export function initPulseLineMaterialProperty() {
     fabric: {
       type,
       uniforms: {
-        color: Cesium.Color.fromCssColorString(defaultColor),
+        color: window.Cesium.Color.fromCssColorString(defaultColor),
         speed: defaultSpeed,
         pulseWidth: defaultPulseWidth,
       },
