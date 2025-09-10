@@ -13,6 +13,7 @@
       :point="target.point"
       :ellipse="target.ellipse"
       @click="onTargetClick(target, $event)"
+      @dblclick="onTargetDblClick(target, $event)"
       @mouseover="onTargetHover(target, $event)"
       @mouseout="onTargetLeave(target, $event)"
     />
@@ -171,6 +172,7 @@ const { dataManager } = props
 // Emits定义
 const emit = defineEmits([
   'targetClick',
+  'targetDblClick',
   'relationClick',
   'targetHover',
   'targetLeave',
@@ -477,7 +479,6 @@ const processPoint = logFuncWrap(() => {
 
   // console.log('🎯 DataVisualization - 从dataManager获取到的点数据:', allPoint.length, '个点')
   // console.log('🎯 allPoint详细内容:', JSON.stringify(allPoint, null, 2))
-  // 注意：不再过滤圆环连接器的中心点，因为CircleNodeConnector中的中心点现在始终显示
   // 这样可以确保源点在所有模式下都能正确显示
 
   renderPoints.value = allPoint
@@ -832,6 +833,12 @@ const processPoint = logFuncWrap(() => {
         origin: {...target},
         name: target.name,
         type: target.type,
+        ringRadius: target.ringRadius || '',
+        nodeCount: target.nodeCount || '',
+        ringMaterial: target.ringMaterial || '',
+        ringOutlineColor: target.ringOutlineColor || '',
+        // virtualNodes: target.virtualNodes || [],
+        nodeConnections: target.nodeConnections || [],
         position: [target.longitude, target.latitude, target.height],
         billboard: dynamicBillboard,
         model: dynamicModel,
@@ -1164,6 +1171,13 @@ const onTargetClick = (target, event) => {
   // console.log('🎯 DataVisualization - 事件对象:', event)
   emit('targetClick', target, event)
   // console.log('🎯 DataVisualization - targetClick 事件已发射')
+}
+
+const onTargetDblClick = (target, event) => {
+  console.log('🎯 DataVisualization - onTargetDblClick 被触发:', target.id, target)
+  console.log('🎯 DataVisualization - 双击事件对象:', event)
+  emit('targetDblClick', target, event)
+  console.log('🎯 DataVisualization - targetDblClick 事件已发射')
 }
 
 const onRelationClick = debounceEvent((relation, event) => {
