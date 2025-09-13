@@ -618,6 +618,15 @@
       "city": "厦门市",
       "address": "台湾海峡中部海域",
       "createdAt": "2024-01-22T10:30:00.000Z",
+      "ringRadius": 25000,
+      "nodeCount": 6,
+      "ringMaterial": "rgba(0, 191, 255, 0.3)",
+      "ringOutlineColor": "#00bfff",
+      "nodeColor": "#32cd32",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 1.0,
       "virtualNodes": [
         {
           "id": "node_047_001",
