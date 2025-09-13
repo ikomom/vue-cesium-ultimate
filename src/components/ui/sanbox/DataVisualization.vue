@@ -1071,10 +1071,27 @@ const processTrajectory = logFuncWrap(() => {
         interpolationAlgorithm: window.Cesium.LagrangePolynomialApproximation,
       })
 
+      // 计算轨迹的时间范围
+      const trajectoryTimes = positionSamples.map(sample => sample.time).sort((a, b) => 
+        window.Cesium.JulianDate.compare(a, b)
+      )
+      const startTime = trajectoryTimes[0]
+      const endTime = trajectoryTimes[trajectoryTimes.length - 1]
+      
+      // 创建时间可用性区间
+      const availability = new window.Cesium.TimeIntervalCollection([
+        new window.Cesium.TimeInterval({
+          start: startTime,
+          stop: endTime
+        })
+      ])
+
       return {
         id: trajectory.target_id + '@trajectory@' + layerId.value,
         name: trajectory.target_id,
         originTarget: base, // 源target
+        // 设置时间可用性
+        availability: availability,
         // 动态位置属性（随时间变化）
         position: timePositionProperty,
         // 轨迹路径
@@ -1626,11 +1643,22 @@ const generateTrajectoryVirtualRelations = (trajectory, nodes) => {
           try {
             const viewer = window.viewer || window.cesiumViewer
             if (viewer) {
-              const trajectoryEntity = viewer.entities.getById(connection.target)
+              // 使用正确的轨迹实体ID格式
+              const trajectoryEntityId = connection.target + '@trajectory@' + layerId.value
+              const trajectoryEntity = viewer.entities.getById(trajectoryEntityId)
 
               let targetPosition
               if (trajectoryEntity && trajectoryEntity.position) {
                 targetPosition = trajectoryEntity.position.getValue(time)
+              }
+
+              // 如果轨迹实体没有找到或没有位置，尝试查找点实体
+              if (!targetPosition) {
+                const pointEntityId = connection.target + '@point@' + layerId.value
+                const pointEntity = viewer.entities.getById(pointEntityId)
+                if (pointEntity && pointEntity.position) {
+                  targetPosition = pointEntity.position.getValue(time)
+                }
               }
 
               // 获取源节点的动态位置
@@ -1703,9 +1731,18 @@ const generateTrajectoryVirtualRelations = (trajectory, nodes) => {
                 try {
                   const viewer = window.viewer || window.cesiumViewer
                   if (viewer) {
-                    const trajectoryEntity = viewer.entities.getById(connection.target)
+                    // 使用正确的轨迹实体ID格式
+                    const trajectoryEntityId = connection.target + '@trajectory@' + layerId.value
+                    const trajectoryEntity = viewer.entities.getById(trajectoryEntityId)
                     if (trajectoryEntity && trajectoryEntity.position) {
                       return trajectoryEntity.position.getValue(time)
+                    }
+                    
+                    // 如果轨迹实体没有找到，尝试查找点实体
+                    const pointEntityId = connection.target + '@point@' + layerId.value
+                    const pointEntity = viewer.entities.getById(pointEntityId)
+                    if (pointEntity && pointEntity.position) {
+                      return pointEntity.position.getValue(time)
                     }
                   }
                 } catch (error) {
