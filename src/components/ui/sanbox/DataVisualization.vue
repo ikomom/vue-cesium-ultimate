@@ -49,6 +49,7 @@
       :label="trajectory.label"
       :path="trajectory.path"
       @click="onTrajectoryClick(trajectory, $event)"
+      @dblclick="onTrajectoryDblClick(trajectory, $event)"
       @mouseover="onTrajectoryHover(trajectory, $event)"
       @mouseout="onTrajectoryLeave(trajectory, $event)"
     />
@@ -1073,6 +1074,7 @@ const processTrajectory = logFuncWrap(() => {
       return {
         id: trajectory.target_id + '@trajectory@' + layerId.value,
         name: trajectory.target_id,
+        originTarget: base, // 源target
         // 动态位置属性（随时间变化）
         position: timePositionProperty,
         // 轨迹路径
@@ -1265,9 +1267,138 @@ const onTargetClick = (target, event) => {
   // console.log('🎯 DataVisualization - targetClick 事件已发射')
 }
 
+// 生成轨迹动态虚拟节点函数
+const generateTrajectoryVirtualNodes = (trajectory) => {
+  const { originTarget } = trajectory
+  console.log('轨迹虚拟节点 - originTarget:', originTarget)
+
+  const nodes = []
+  const nodeCount = originTarget.nodeConnections
+    ? originTarget.nodeConnections.length
+    : originTarget.nodeCount || 4
+  const radius = originTarget.ringRadius || 50000
+
+  for (let i = 0; i < nodeCount; i++) {
+    const angle = (i * 360) / nodeCount
+    const radian = (angle * Math.PI) / 180
+
+    // 为轨迹虚拟节点创建动态位置
+    const dynamicNodePosition = new window.Cesium.CallbackProperty((time) => {
+      try {
+        const viewer = window.viewer || window.cesiumViewer
+        if (viewer) {
+          const trajectoryEntity = viewer.entities.getById(trajectory.id)
+
+          if (trajectoryEntity && trajectoryEntity.position) {
+            const realTimePosition = trajectoryEntity.position.getValue(time)
+            if (realTimePosition) {
+              // 将Cartesian3转换为经纬度作为中心点
+              const cartographic = window.Cesium.Cartographic.fromCartesian(realTimePosition)
+              const centerLng = window.Cesium.Math.toDegrees(cartographic.longitude)
+              const centerLat = window.Cesium.Math.toDegrees(cartographic.latitude)
+              const centerHeight = cartographic.height
+
+              // 使用球面几何学计算虚拟节点位置
+              const earthRadius = 6371000 // 地球半径(米)
+              const latRad = (centerLat * Math.PI) / 180
+              const lonRad = (centerLng * Math.PI) / 180
+
+              // 计算新的纬度
+              const newLatRad = Math.asin(
+                Math.sin(latRad) * Math.cos(radius / earthRadius) +
+                  Math.cos(latRad) * Math.sin(radius / earthRadius) * Math.cos(radian),
+              )
+
+              // 计算新的经度
+              const newLonRad =
+                lonRad +
+                Math.atan2(
+                  Math.sin(radian) * Math.sin(radius / earthRadius) * Math.cos(latRad),
+                  Math.cos(radius / earthRadius) - Math.sin(latRad) * Math.sin(newLatRad),
+                )
+
+              const nodeLng = (newLonRad * 180) / Math.PI
+              const nodeLat = (newLatRad * 180) / Math.PI
+
+              return window.Cesium.Cartesian3.fromDegrees(nodeLng, nodeLat, centerHeight)
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('获取轨迹虚拟节点位置失败:', error)
+      }
+      // 如果获取失败，返回默认位置的Cartesian3
+      const defaultPos = trajectory.position || [121.774, 24.5674, 0]
+      return window.Cesium.Cartesian3.fromDegrees(defaultPos[0], defaultPos[1], defaultPos[2] || 0)
+    }, false)
+
+    // 获取对应的virtualNode配置数据
+    const virtualNodeData =
+      trajectory.virtualNodes && trajectory.virtualNodes[i] ? trajectory.virtualNodes[i] : null
+    const nodeName = virtualNodeData ? virtualNodeData.name : `轨迹节点${i + 1}`
+    const nodeIcon = virtualNodeData ? virtualNodeData.icon : '/icons/communication.svg'
+    const nodeColor = virtualNodeData ? virtualNodeData.color : '#ff6b35'
+
+    // 获取当前节点对应的连接目标
+    const connectionTarget =
+      trajectory.nodeConnections && trajectory.nodeConnections[i]
+        ? trajectory.nodeConnections[i].target
+        : trajectory.id
+    console.log(`轨迹节点${i}: 原trajectory.id=${trajectory.id}, 连接目标=${connectionTarget}`)
+
+    // 创建轨迹虚拟节点配置
+    const node = {
+      id: `${trajectory.id}-trajectory-node-${i}`,
+      name: nodeName,
+      type: virtualNodeData ? virtualNodeData.type : 'trajectory_virtual_node',
+      position: dynamicNodePosition, // 使用动态位置
+      targetId: connectionTarget,
+      angle: angle,
+      virtualNodeData: virtualNodeData,
+      originNode: originTarget.virtualNodes ? originTarget.virtualNodes[i] : null,
+      // 添加billboard配置
+      billboard: {
+        image: nodeIcon,
+        scale: 0.8,
+        verticalOrigin: window.Cesium?.VerticalOrigin?.BOTTOM || 0,
+        horizontalOrigin: window.Cesium?.HorizontalOrigin?.CENTER || 0,
+        pixelOffset: new (window.Cesium?.Cartesian2 || Object)(0, 0),
+        heightReference: window.Cesium?.HeightReference?.NONE || 0,
+        ...distanceConfigs,
+      },
+      // 添加label配置
+      label: {
+        text: nodeName,
+        font: '10pt sans-serif',
+        fillColor: window.Cesium?.Color?.WHITE || '#ffffff',
+        outlineColor: window.Cesium?.Color?.BLACK || '#000000',
+        outlineWidth: 1,
+        style: window.Cesium?.LabelStyle?.FILL_AND_OUTLINE || 0,
+        pixelOffset: new (window.Cesium?.Cartesian2 || Object)(0, -30),
+        heightReference: window.Cesium?.HeightReference?.NONE || 0,
+        ...distanceConfigs,
+      },
+      // 添加point配置作为备选显示方式
+      point: {
+        pixelSize: 8,
+        color: window.Cesium?.Color?.fromCssColorString?.(nodeColor) || nodeColor,
+        outlineColor: window.Cesium?.Color?.WHITE || '#ffffff',
+        outlineWidth: 2,
+        heightReference: window.Cesium?.HeightReference?.NONE || 0,
+        ...distanceConfigs,
+      },
+    }
+
+    nodes.push(node)
+  }
+
+  return nodes
+}
+
 // 生成虚拟节点函数
 const generateVirtualNodes = (target) => {
   const { originTarget } = target
+  console.log('originTarget:', originTarget)
 
   const nodes = []
   const nodeCount = originTarget.nodeConnections.length
@@ -1381,7 +1512,7 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
     return {
       longitude: trajectory[0].longitude,
       latitude: trajectory[0].latitude,
-      height: trajectory[0].altitude || trajectory[0].height || 0
+      height: trajectory[0].altitude || trajectory[0].height || 0,
     }
   }
 
@@ -1409,7 +1540,7 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
       return {
         longitude: trajectory[0].longitude,
         latitude: trajectory[0].latitude,
-        height: trajectory[0].altitude || trajectory[0].height || 0
+        height: trajectory[0].altitude || trajectory[0].height || 0,
       }
     }
     // 如果目标时间晚于轨迹结束时间，返回最后一个点
@@ -1418,7 +1549,7 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
       return {
         longitude: lastPoint.longitude,
         latitude: lastPoint.latitude,
-        height: lastPoint.altitude || lastPoint.height || 0
+        height: lastPoint.altitude || lastPoint.height || 0,
       }
     }
     return null
@@ -1436,9 +1567,167 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
   return {
     longitude: beforePoint.longitude + (afterPoint.longitude - beforePoint.longitude) * factor,
     latitude: beforePoint.latitude + (afterPoint.latitude - beforePoint.latitude) * factor,
-    height: (beforePoint.altitude || beforePoint.height || 0) +
-           ((afterPoint.altitude || afterPoint.height || 0) - (beforePoint.altitude || beforePoint.height || 0)) * factor
+    height:
+      (beforePoint.altitude || beforePoint.height || 0) +
+      ((afterPoint.altitude || afterPoint.height || 0) -
+        (beforePoint.altitude || beforePoint.height || 0)) *
+        factor,
   }
+}
+
+// 生成轨迹动态虚拟节点连线函数
+const generateTrajectoryVirtualRelations = (trajectory, nodes) => {
+  console.log('轨迹虚拟连线 - trajectory', trajectory)
+  console.log('轨迹虚拟连线 - nodes', nodes)
+  const { trajectoryData } = trajectory
+  const relations = []
+
+  // 获取目标基础数据
+  const base = dataManager.targetBaseManager.findById(trajectoryData.target_id)
+  console.log('轨迹虚拟连线 - base', base)
+
+  // 从base的nodeConnections生成连线数据
+  if (base && base.nodeConnections && Array.isArray(base.nodeConnections)) {
+    base.nodeConnections.forEach((connection, index) => {
+      // 查找源节点：根据connection.source匹配对应的虚拟节点
+      const nodeIndex = nodes.findIndex(
+        (item) => item.originNode && item.originNode.id === connection.source,
+      )
+      const sourceNode = nodes[nodeIndex]
+
+      console.log('轨迹虚拟连线 - sourceNode====================', sourceNode)
+
+      if (!sourceNode) {
+        console.warn(`轨迹虚拟连线警告: 找不到源节点 ${connection.source}，连线索引: ${index}`)
+        return
+      }
+
+      // 检查目标是否为轨迹目标
+      const trajectoryData = dataManager.trajectoryManager.findByTargetId(connection.target)
+      const isTrajectoryTarget = !!(
+        trajectoryData &&
+        trajectoryData.trajectory &&
+        trajectoryData.trajectory.length > 0
+      )
+      console.log('轨迹虚拟连线 - trajectoryData', trajectoryData)
+      console.log('轨迹虚拟连线 - isTrajectoryTarget', isTrajectoryTarget)
+      console.log('轨迹虚拟连线 - connection.target', connection.target)
+
+      // 获取静态目标数据（在作用域顶层定义）
+      const staticTargetData = !isTrajectoryTarget
+        ? dataManager.targetLocationManager.findById(connection.target)
+        : null
+
+      let positions
+
+      if (isTrajectoryTarget) {
+        // 对于轨迹目标，使用CallbackProperty动态获取位置
+        positions = new window.Cesium.CallbackProperty((time, result) => {
+          try {
+            const viewer = window.viewer || window.cesiumViewer
+            if (viewer) {
+              const trajectoryEntity = viewer.entities.getById(connection.target)
+
+              let targetPosition
+              if (trajectoryEntity && trajectoryEntity.position) {
+                targetPosition = trajectoryEntity.position.getValue(time)
+              }
+
+              // 获取源节点的动态位置
+              let sourcePosition
+              if (sourceNode.position && typeof sourceNode.position.getValue === 'function') {
+                sourcePosition = sourceNode.position.getValue(time)
+              }
+
+              if (sourcePosition && targetPosition) {
+                return [sourcePosition, targetPosition]
+              }
+            }
+          } catch (error) {
+            console.warn('获取轨迹虚拟连线位置失败:', error)
+          }
+          return []
+        }, false)
+      } else {
+        // 对于静态目标，创建动态连线到静态位置
+        console.log('staticTargetData', staticTargetData)
+        if (staticTargetData) {
+          const staticTargetPosition = window.Cesium.Cartesian3.fromDegrees(
+            staticTargetData.longitude,
+            staticTargetData.latitude,
+            staticTargetData.height || 0,
+          )
+
+          positions = new window.Cesium.CallbackProperty((time, result) => {
+            try {
+              // 获取源节点的动态位置
+              let sourcePosition
+              if (sourceNode.position && typeof sourceNode.position.getValue === 'function') {
+                sourcePosition = sourceNode.position.getValue(time)
+              }
+
+              if (sourcePosition) {
+                return [sourcePosition, staticTargetPosition]
+              }
+            } catch (error) {
+              console.warn('获取轨迹虚拟连线到静态目标位置失败:', error)
+            }
+            return []
+          }, false)
+        }
+      }
+
+      if (positions) {
+        const relation = {
+          id: `${trajectory.id}-trajectory-relation-${index}`,
+          sourceId: sourceNode.id,
+          targetId: connection.target,
+          positions: positions,
+          width: connection.width || 2,
+          material: connection.material || window.Cesium?.Color?.YELLOW || '#ffff00',
+          showLabel: connection.showLabel !== false,
+          labelStyle: {
+            text: connection.label || `${sourceNode.name} → ${connection.target}`,
+            font: '10pt sans-serif',
+            fillColor: window.Cesium?.Color?.WHITE || '#ffffff',
+            outlineColor: window.Cesium?.Color?.BLACK || '#000000',
+            outlineWidth: 1,
+            style: window.Cesium?.LabelStyle?.FILL_AND_OUTLINE || 0,
+            pixelOffset: new (window.Cesium?.Cartesian2 || Object)(0, -20),
+            ...distanceConfigs,
+          },
+          // 动态计算源位置和目标位置用于标签定位
+          sourcePosition: sourceNode.position,
+          targetPosition: isTrajectoryTarget
+            ? new window.Cesium.CallbackProperty((time) => {
+                try {
+                  const viewer = window.viewer || window.cesiumViewer
+                  if (viewer) {
+                    const trajectoryEntity = viewer.entities.getById(connection.target)
+                    if (trajectoryEntity && trajectoryEntity.position) {
+                      return trajectoryEntity.position.getValue(time)
+                    }
+                  }
+                } catch (error) {
+                  console.warn('获取目标位置失败:', error)
+                }
+                return null
+              }, false)
+            : staticTargetData
+              ? window.Cesium.Cartesian3.fromDegrees(
+                  staticTargetData.longitude,
+                  staticTargetData.latitude,
+                  staticTargetData.height || 0,
+                )
+              : null,
+        }
+
+        relations.push(relation)
+      }
+    })
+  }
+  console.log('relations', relations)
+  return relations
 }
 
 // 生成虚拟节点连线函数
@@ -1464,7 +1753,16 @@ const generateVirtualRelations = (target, nodes) => {
 
       // 检查目标是否为轨迹目标
       const trajectoryData = dataManager.trajectoryManager.findByTargetId(connection.target)
-      const isTrajectoryTarget = !!(trajectoryData && trajectoryData.trajectory && trajectoryData.trajectory.length > 0)
+      const isTrajectoryTarget = !!(
+        trajectoryData &&
+        trajectoryData.trajectory &&
+        trajectoryData.trajectory.length > 0
+      )
+
+      // 预先获取静态目标数据，避免作用域问题
+      const staticTargetData = !isTrajectoryTarget
+        ? dataManager.targetLocationManager.findById(connection.target)
+        : null
 
       let positions
 
@@ -1488,13 +1786,16 @@ const generateVirtualRelations = (target, nodes) => {
           if (!targetPosition) {
             // 如果无法从实体获取位置，使用插值计算
             const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
-            const interpolatedPosition = interpolateTrajectoryPosition(trajectoryData.trajectory, currentTimeStr)
+            const interpolatedPosition = interpolateTrajectoryPosition(
+              trajectoryData.trajectory,
+              currentTimeStr,
+            )
 
             if (interpolatedPosition) {
               targetPosition = Cesium.Cartesian3.fromDegrees(
                 interpolatedPosition.longitude,
                 interpolatedPosition.latitude,
-                interpolatedPosition.height || 0
+                interpolatedPosition.height || 0,
               )
             } else {
               // 使用最新点位作为备选
@@ -1502,7 +1803,7 @@ const generateVirtualRelations = (target, nodes) => {
               targetPosition = Cesium.Cartesian3.fromDegrees(
                 latestPoint.longitude,
                 latestPoint.latitude,
-                latestPoint.altitude || latestPoint.height || 0
+                latestPoint.altitude || latestPoint.height || 0,
               )
             }
           }
@@ -1514,7 +1815,9 @@ const generateVirtualRelations = (target, nodes) => {
         // 对于静态目标，使用固定位置
         const actualPoint = dataManager.targetLocationManager.findById(connection.target)
         if (!actualPoint) {
-          console.warn(`虚拟连线警告: 找不到目标点位 ${connection.target}，既不在目标位置管理器中，也不在轨迹管理器中，连线索引: ${index}`)
+          console.warn(
+            `虚拟连线警告: 找不到目标点位 ${connection.target}，既不在目标位置管理器中，也不在轨迹管理器中，连线索引: ${index}`,
+          )
           return
         }
 
@@ -1658,6 +1961,84 @@ const onTrajectoryLeave = debounceEvent((trajectory, event) => {
   setPointer('auto')
   emit('trajectoryLeave', trajectory, event)
 }, 100)
+
+// 轨迹双击事件处理函数
+const onTrajectoryDblClick = (trajectory, event) => {
+  emit('trajectoryDblClick', trajectory, event)
+  const { trajectoryData } = trajectory
+  const base = dataManager.targetBaseManager.findById(trajectoryData.target_id)
+  // 检查轨迹目标是否包含圆环相关属性
+  if (base && base.ringMaterial && base.ringOutlineColor && base.ringRadius) {
+    const ringId = `ring-${trajectory.id}`
+    const nodesId = `nodes-${trajectory.id}`
+
+    // 如果圆环已存在，则移除它和虚拟节点
+    if (activeRings.value.has(ringId)) {
+      activeRings.value.delete(ringId)
+      virtualNodes.value.delete(nodesId)
+      virtualRelations.value.delete(nodesId)
+      console.log('移除轨迹圆环、虚拟节点和连线:', ringId)
+    } else {
+      console.log('轨迹目标:', trajectory)
+      // 使用CallbackProperty动态获取轨迹的实时位置
+      const dynamicPosition = new window.Cesium.CallbackProperty((time) => {
+        try {
+          const viewer = window.viewer || window.cesiumViewer
+          if (viewer) {
+            const trajectoryEntity = viewer.entities.getById(trajectory.id)
+
+            if (trajectoryEntity && trajectoryEntity.position) {
+              const realTimePosition = trajectoryEntity.position.getValue(time)
+              if (realTimePosition) {
+                // 直接返回Cartesian3位置
+                return realTimePosition
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('获取轨迹实时位置失败:', error)
+        }
+        // 如果获取失败，返回默认位置的Cartesian3
+        const defaultPos = trajectory.position || [121.774, 24.5674, 0]
+        return window.Cesium.Cartesian3.fromDegrees(
+          defaultPos[0],
+          defaultPos[1],
+          defaultPos[2] || 0,
+        )
+      }, false)
+
+      // 创建新的圆环配置，使用动态位置
+      const ringConfig = {
+        id: ringId,
+        targetId: trajectory.id,
+        position: dynamicPosition,
+        material: base.ringMaterial,
+        outlineColor: base.ringOutlineColor,
+        radius: base.ringRadius,
+        height: 0, // 高度也可以通过CallbackProperty动态获取
+        target: trajectory,
+      }
+
+      activeRings.value.set(ringId, ringConfig)
+      console.log('创建轨迹圆环:', ringId, ringConfig)
+
+      // 如果轨迹目标包含nodeCount属性，生成动态虚拟节点
+      if (base.nodeCount) {
+        const nodes = generateTrajectoryVirtualNodes(trajectory)
+        virtualNodes.value.set(nodesId, nodes)
+        console.log('创建轨迹动态虚拟节点:', nodesId, nodes)
+
+        // 生成轨迹动态虚拟节点连线
+        const relations = generateTrajectoryVirtualRelations(trajectory, nodes)
+        console.log('生成的轨迹动态虚拟连线数据:', relations)
+        console.log('轨迹动态连线数量:', relations.length)
+        virtualRelations.value.set(nodesId, relations)
+      }
+    }
+  } else {
+    console.log('轨迹目标缺少圆环配置属性:', trajectory)
+  }
+}
 
 const onRelationHover = debounceEvent((relation, event) => {
   setPointer('pointer')
