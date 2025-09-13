@@ -436,6 +436,7 @@ function getPosition(source, target, styleConfig, isCartesian3 = false) {
  * const entity = getEntityByIds(['entityId1', 'entityId2'])
  */
 function getEntityByIds(entityIds = []) {
+  // console.log('viewer.value?.entities', viewer.value?.entities)
   // 遍历实体ID数组,返回第一个找到的实体
   for (const entityId of entityIds) {
     const entity = viewer.value?.entities?.getById(entityId)
@@ -1374,7 +1375,7 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
   if (!trajectory || trajectory.length === 0) {
     return null
   }
-  
+
   // 如果只有一个点，直接返回该点
   if (trajectory.length === 1) {
     return {
@@ -1383,24 +1384,24 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
       height: trajectory[0].altitude || trajectory[0].height || 0
     }
   }
-  
+
   const targetTime = new Date(targetTimeStr).getTime()
-  
+
   // 查找时间范围
   let beforeIndex = -1
   let afterIndex = -1
-  
+
   for (let i = 0; i < trajectory.length - 1; i++) {
     const currentTime = new Date(trajectory[i].timestamp).getTime()
     const nextTime = new Date(trajectory[i + 1].timestamp).getTime()
-    
+
     if (currentTime <= targetTime && nextTime >= targetTime) {
       beforeIndex = i
       afterIndex = i + 1
       break
     }
   }
-  
+
   // 如果目标时间在轨迹范围之外
   if (beforeIndex === -1 || afterIndex === -1) {
     // 如果目标时间早于轨迹开始时间，返回第一个点
@@ -1422,20 +1423,20 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
     }
     return null
   }
-  
+
   const beforePoint = trajectory[beforeIndex]
   const afterPoint = trajectory[afterIndex]
-  
+
   // 计算插值因子
   const beforeTime = new Date(beforePoint.timestamp).getTime()
   const afterTime = new Date(afterPoint.timestamp).getTime()
   const factor = (targetTime - beforeTime) / (afterTime - beforeTime)
-  
+
   // 线性插值计算位置
   return {
     longitude: beforePoint.longitude + (afterPoint.longitude - beforePoint.longitude) * factor,
     latitude: beforePoint.latitude + (afterPoint.latitude - beforePoint.latitude) * factor,
-    height: (beforePoint.altitude || beforePoint.height || 0) + 
+    height: (beforePoint.altitude || beforePoint.height || 0) +
            ((afterPoint.altitude || afterPoint.height || 0) - (beforePoint.altitude || beforePoint.height || 0)) * factor
   }
 }
@@ -1464,28 +1465,31 @@ const generateVirtualRelations = (target, nodes) => {
       // 检查目标是否为轨迹目标
       const trajectoryData = dataManager.trajectoryManager.findByTargetId(connection.target)
       const isTrajectoryTarget = !!(trajectoryData && trajectoryData.trajectory && trajectoryData.trajectory.length > 0)
-      
+
       let positions
-      
+
       if (isTrajectoryTarget) {
         // 对于轨迹目标，使用CallbackProperty动态获取位置
         positions = new Cesium.CallbackProperty((time, result) => {
           // 尝试从实体中获取轨迹位置
-          const trajectoryEntity = getEntityByIds([
-            connection.target + '@trajectory@' + layerId.value,
-            connection.target + '@point@' + layerId.value,
-          ])
-          
+          let trajectoryEntity
+          // const trajectoryEntity = getEntityByIds([
+          //   connection.target + '@trajectory@' + layerId.value,
+          //   connection.target + '@point@' + layerId.value,
+          // ])
+
+          // console.log('trajectoryEntity', trajectoryEntity)
+
           let targetPosition
           if (trajectoryEntity && trajectoryEntity.position) {
             targetPosition = trajectoryEntity.position.getValue(time)
           }
-          
+
           if (!targetPosition) {
             // 如果无法从实体获取位置，使用插值计算
             const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
             const interpolatedPosition = interpolateTrajectoryPosition(trajectoryData.trajectory, currentTimeStr)
-            
+
             if (interpolatedPosition) {
               targetPosition = Cesium.Cartesian3.fromDegrees(
                 interpolatedPosition.longitude,
@@ -1502,7 +1506,7 @@ const generateVirtualRelations = (target, nodes) => {
               )
             }
           }
-          
+
           const sourcePosition = Cesium.Cartesian3.fromDegrees(...sourceNode.position)
           return [sourcePosition, targetPosition]
         }, false)
@@ -1513,7 +1517,7 @@ const generateVirtualRelations = (target, nodes) => {
           console.warn(`虚拟连线警告: 找不到目标点位 ${connection.target}，既不在目标位置管理器中，也不在轨迹管理器中，连线索引: ${index}`)
           return
         }
-        
+
         positions = [
           Cesium.Cartesian3.fromDegrees(...sourceNode.position),
           Cesium.Cartesian3.fromDegrees(
@@ -1527,7 +1531,7 @@ const generateVirtualRelations = (target, nodes) => {
       const relationId = `circle_connector_${String(index + 1).padStart(3, '0')}`
       const cleanTargetId = connection.target
       const cleanSourceId = connection.source
-      
+
       console.log(
         `连线${index}: source=${connection.source}, target=${connection.target}, 是轨迹目标=${isTrajectoryTarget}`,
       )
@@ -1684,7 +1688,7 @@ const onEventLeave = debounceEvent((data, event) => {
 // 组件挂载时确保处理初始数据
 onMounted(() => {
   console.log('🎯 DataVisualization - 组件已挂载，开始处理初始数据')
-  
+
   // 确保在组件挂载后处理所有初始数据
   nextTick(() => {
     if (props.points && props.points.length > 0) {
