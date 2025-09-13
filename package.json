@@ -48,7 +48,7 @@
     "@vue/eslint-config-prettier": "^10.2.0",
     "cesium": "^1.132.0",
     "eslint": "^9.31.0",
-    "eslint-plugin-vue": "~10.3.0",
+    "eslint-plugin-vue": "^10.3.0",
     "globals": "^16.3.0",
     "less": "^4.4.0",
     "prettier": "3.6.2",
@@ -56,5 +56,17 @@
     "vite-plugin-cesium": "^1.2.23",
     "vite-plugin-mars3d": "^4.2.2",
     "vite-plugin-vue-devtools": "^8.0.0"
-  }
+  },
+  "description": "This template should help get you started developing with Vue 3 in Vite.",
+  "main": "vite.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/lemonly14_admin/vue-cesium-ultimate.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

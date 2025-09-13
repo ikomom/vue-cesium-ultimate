@@ -45,6 +45,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     ])
       .then((res) => {
         console.log('????????????????????????????????',res[6])
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',res[3])
         targetBaseData.value = [...(res[0] || [])]
         targetLocationData.value = [...(res[1] || [])]
         relationData.value = [...(res[2] || [])]
@@ -107,11 +108,12 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     // 设置显示控制 - 启用关系连线显示
     circleConnectorLayer.setShowControl('showRelation', true)
 
-    console.log(circleConnectorData.value)
+    console.log('圆环连接器数据!!!!!!!!!!!!!!!!!!!!!', circleConnectorData.value)
     circleConnectorLayer.updateAllData({
       targets: circleConnectorData.value.targets || [],
       points: circleConnectorData.value.points || [],
       relations: circleConnectorData.value.relations || [],
+      trajectories: {...circleConnectorData.value.trajectories}  || [],
     })
 
     // 全数据图层

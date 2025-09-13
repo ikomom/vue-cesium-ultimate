@@ -28,7 +28,7 @@
       :width="relation.width"
       :distance-display-condition="relation.distanceDisplayCondition"
       :material="relation.material"
-      :show-label="true"
+      :show-label="false"
       :label-style="relation.labelStyle"
       :curve-config="relation.curveConfig"
       @click="onRelationClick(relation, $event)"
@@ -72,10 +72,70 @@
     />
   </template>
 
+  <!-- 动态圆环渲染 -->
+  <template v-for="[ringId, ringConfig] in activeRings" :key="ringId">
+    <vc-entity
+      :id="ringConfig.id"
+      :position="ringConfig.position"
+      :selectable="false"
+      @dblclick="onTargetDblClick(ringConfig.target, $event)"
+    >
+      <vc-graphics-ellipse
+        :semi-major-axis="ringConfig.radius"
+        :semi-minor-axis="ringConfig.radius"
+        :height="ringConfig.height || 0"
+        :material="ringConfig.material"
+        :outline="true"
+        :outline-color="ringConfig.outlineColor"
+        :outline-width="2"
+      />
+    </vc-entity>
+  </template>
+
+  <!-- 虚拟节点渲染 -->
+  <template v-for="[nodesId, nodes] in virtualNodes" :key="nodesId">
+    <template v-for="node in nodes" :key="node.id">
+      <vc-entity
+        :id="node.id"
+        :position="node.position"
+        :billboard="node.billboard"
+        :label="node.label"
+        :point="node.point"
+        @click="onVirtualNodeClick(node)"
+      />
+    </template>
+  </template>
+
+  <!-- 虚拟节点连线渲染 -->
+  <template v-for="[relationsId, relations] in virtualRelations" :key="relationsId">
+    <template v-for="relation in relations" :key="relation.id">
+      <LineWithLabel
+        :id="relation.id"
+        :show="true"
+        :positions="relation.positions"
+        :width="relation.width"
+        :material="relation.material"
+        :show-label="relation.showLabel"
+        :label-style="relation.labelStyle"
+        :source-position="relation.sourcePosition"
+        :target-position="relation.targetPosition"
+      />
+    </template>
+  </template>
 </template>
 
 <script setup>
-import { watch, watchEffect, ref, shallowRef, toRefs, computed, toRaw, nextTick, onMounted } from 'vue'
+import {
+  watch,
+  watchEffect,
+  ref,
+  shallowRef,
+  toRefs,
+  computed,
+  toRaw,
+  nextTick,
+  onMounted,
+} from 'vue'
 import { debounce } from 'lodash-es'
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import {
@@ -192,6 +252,11 @@ const renderRelations = shallowRef([])
 const renderTrajectory = shallowRef([])
 const renderEvents = shallowRef([])
 
+// 圆环状态管理
+const activeRings = ref(new Map()) // 存储活跃的圆环实体
+const virtualNodes = ref(new Map()) // 存储虚拟节点
+const virtualRelations = ref(new Map()) // 虚拟节点上的连线
+
 // 缓存配置对象，避免重复计算
 const distanceConfigs = getDistanceConfigs()
 
@@ -256,7 +321,7 @@ function createImageWithAffiliationDot(baseImageUrl, affiliationColor) {
     // 设置跨域属性
     img.crossOrigin = 'anonymous'
 
-    img.onload = function() {
+    img.onload = function () {
       try {
         // 设置canvas尺寸
         canvas.width = img.width
@@ -301,7 +366,7 @@ function createImageWithAffiliationDot(baseImageUrl, affiliationColor) {
       }
     }
 
-    img.onerror = function() {
+    img.onerror = function () {
       console.warn('Failed to load image for affiliation dot:', baseImageUrl)
       resolve(baseImageUrl)
     }
@@ -386,7 +451,6 @@ function getSourceTarget(data, styleConfig) {
   const linkTrajectoryTarget = dataManager.trajectoryManager.findById(data.target_id)
   const islinkTrajectory = !!(linkTrajectorySource || linkTrajectoryTarget)
 
-
   const source = dataManager.targetLocationManager.findById(data.source_id)
   const target = dataManager.targetLocationManager.findById(data.target_id)
 
@@ -436,7 +500,7 @@ const processPoint = logFuncWrap(() => {
   if (props.points && props.points.length > 0) {
     // console.log('🎯 DataVisualization - 处理props.points数据:', props.points.length, '个点')
     // console.log('🎯 props.points详细内容:', JSON.stringify(props.points, null, 2))
-    props.points.forEach(point => {
+    props.points.forEach((point) => {
       // 检查是否已存在，避免重复添加
       const existingLocation = dataManager.targetLocationManager.findById(point.id)
       const existingBase = dataManager.targetBaseManager.findById(point.id)
@@ -454,7 +518,7 @@ const processPoint = logFuncWrap(() => {
           name: point.name || point.id,
           type: point.type || 'unknown',
           description: point.description || '',
-          status: point.status || 'active'
+          status: point.status || 'active',
         }
         dataManager.targetBaseManager.addItem(baseInfo)
         console.log('🎯 添加基础数据:', baseInfo.id, baseInfo.name)
@@ -496,15 +560,16 @@ const processPoint = logFuncWrap(() => {
       }
 
       // 获取目标的所有状态数据并确保按时间排序（用于二分查找优化）
-      const allTargetStatus = (dataManager.targetStatusManager?.findByTargetId(target.id) || [])
-        .sort((a, b) => a.startTime.localeCompare(b.startTime))
+      const allTargetStatus = (
+        dataManager.targetStatusManager?.findByTargetId(target.id) || []
+      ).sort((a, b) => a.startTime.localeCompare(b.startTime))
 
       // 性能优化：状态缓存机制 - 避免重复计算
       // 由于 CallbackProperty 会频繁调用，缓存可以显著提升性能
       let statusCache = {
         lastTime: null,
         lastTimeStr: null,
-        cachedStatus: null
+        cachedStatus: null,
       }
 
       // 根据时间获取当前有效状态的函数（性能优化版本）
@@ -516,7 +581,10 @@ const processPoint = logFuncWrap(() => {
         if (!allTargetStatus.length) return null
 
         // 性能优化1：检查缓存是否有效（时间相同则直接返回缓存结果）
-        if (statusCache.lastTime && window.Cesium.JulianDate.equals(currentTime, statusCache.lastTime)) {
+        if (
+          statusCache.lastTime &&
+          window.Cesium.JulianDate.equals(currentTime, statusCache.lastTime)
+        ) {
           return statusCache.cachedStatus
         }
 
@@ -569,10 +637,12 @@ const processPoint = logFuncWrap(() => {
         const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
         const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
 
-        const healthColor = currentStatus.metadata?.healthLevel ?
-          getHealthLevelColor(currentStatus.metadata.healthLevel) : null
-        const affiliationColor = currentStatus.metadata?.affiliation ?
-          getAffiliationColor(currentStatus.metadata.affiliation) : null
+        const healthColor = currentStatus.metadata?.healthLevel
+          ? getHealthLevelColor(currentStatus.metadata.healthLevel)
+          : null
+        const affiliationColor = currentStatus.metadata?.affiliation
+          ? getAffiliationColor(currentStatus.metadata.affiliation)
+          : null
 
         return {
           statusType: currentStatus.status_type,
@@ -587,7 +657,7 @@ const processPoint = logFuncWrap(() => {
           visualProperties: statusConfig.visualProperties,
           priorityConfig: priorityConfig,
           startTime: currentStatus.startTime,
-          metadata: currentStatus.metadata
+          metadata: currentStatus.metadata,
         }
       }, false)
 
@@ -604,8 +674,9 @@ const processPoint = logFuncWrap(() => {
           const baseImage = statusConfig.billboard?.image || iconConfig.billboard.image
 
           // 获取affiliation颜色
-          const affiliationColor = currentStatus.metadata?.affiliation ?
-            getAffiliationColor(currentStatus.metadata.affiliation) : null
+          const affiliationColor = currentStatus.metadata?.affiliation
+            ? getAffiliationColor(currentStatus.metadata.affiliation)
+            : null
 
           // 如果有affiliation颜色，使用canvas重绘图像添加右上角圆点
           if (affiliationColor) {
@@ -620,12 +691,15 @@ const processPoint = logFuncWrap(() => {
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
-          let baseScale = (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) * (priorityConfig.scale || 1.0)
+          let baseScale =
+            (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) *
+            (priorityConfig.scale || 1.0)
 
           // 应用动画效果
           if (statusConfig.visualProperties) {
-
-            const animationEffects = animationManager.getAnimationEffects(statusConfig.visualProperties)
+            const animationEffects = animationManager.getAnimationEffects(
+              statusConfig.visualProperties,
+            )
             if (animationEffects.scaleAnimation) {
               baseScale = animationEffects.scaleAnimation(time, baseScale)
             }
@@ -635,21 +709,28 @@ const processPoint = logFuncWrap(() => {
         }, false),
         color: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
-          if (!currentStatus) return window.Cesium.Color.fromCssColorString(iconConfig.billboard.color) || window.Cesium.Color.WHITE
+          if (!currentStatus)
+            return (
+              window.Cesium.Color.fromCssColorString(iconConfig.billboard.color) ||
+              window.Cesium.Color.WHITE
+            )
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
 
           // 如果使用了affiliation圆点，则使用白色避免颜色混合
-          const affiliationColor = currentStatus.metadata?.affiliation ?
-            getAffiliationColor(currentStatus.metadata.affiliation) : null
+          const affiliationColor = currentStatus.metadata?.affiliation
+            ? getAffiliationColor(currentStatus.metadata.affiliation)
+            : null
 
           if (affiliationColor) {
             return window.Cesium.Color.WHITE
           }
 
-          let color = currentStatus.colorCode ?
-            window.Cesium.Color.fromCssColorString(currentStatus.colorCode) :
-            window.Cesium.Color.fromCssColorString(statusConfig.billboard?.color || iconConfig.billboard.color);
+          let color = currentStatus.colorCode
+            ? window.Cesium.Color.fromCssColorString(currentStatus.colorCode)
+            : window.Cesium.Color.fromCssColorString(
+                statusConfig.billboard?.color || iconConfig.billboard.color,
+              )
 
           // 应用视觉属性
           if (statusConfig.visualProperties) {
@@ -672,7 +753,7 @@ const processPoint = logFuncWrap(() => {
                 Math.min(1.0, color.red * visualProps.brightness),
                 Math.min(1.0, color.green * visualProps.brightness),
                 Math.min(1.0, color.blue * visualProps.brightness),
-                color.alpha
+                color.alpha,
               )
             }
 
@@ -694,7 +775,9 @@ const processPoint = logFuncWrap(() => {
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           if (statusConfig.visualProperties) {
-            const animationEffects = animationManager.getAnimationEffects(statusConfig.visualProperties)
+            const animationEffects = animationManager.getAnimationEffects(
+              statusConfig.visualProperties,
+            )
             if (animationEffects.rotationAnimation) {
               // console.log('animationEffects.rotationAnimation(time)', animationEffects.rotationAnimation(time));
 
@@ -710,13 +793,15 @@ const processPoint = logFuncWrap(() => {
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           if (statusConfig.visualProperties && statusConfig.visualProperties.shakeIntensity) {
-            const shakeEffect = animationManager.createShakeEffect(statusConfig.visualProperties.shakeIntensity)
+            const shakeEffect = animationManager.createShakeEffect(
+              statusConfig.visualProperties.shakeIntensity,
+            )
             if (shakeEffect) {
               return shakeEffect(time)
             }
           }
           return new window.Cesium.Cartesian2(0, 0)
-        }, false)
+        }, false),
       }
 
       const dynamicLabel = {
@@ -724,7 +809,10 @@ const processPoint = logFuncWrap(() => {
         ...iconConfig.label,
         text: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
-          return target.name + (currentStatus ? ` [${currentStatus.status_name || currentStatus.statusName}]` : '')
+          return (
+            target.name +
+            (currentStatus ? ` [${currentStatus.status_name || currentStatus.statusName}]` : '')
+          )
         }, false),
         fillColor: new window.Cesium.CallbackProperty((time) => {
           const currentStatus = getCurrentStatus(time)
@@ -733,8 +821,10 @@ const processPoint = logFuncWrap(() => {
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           const fillColor = statusConfig.label?.fillColor || iconConfig.label.fillColor
 
-          return  fillColor ? window.Cesium.Color.fromCssColorString(fillColor) : window.Cesium.Color.WHITE
-        }, false)
+          return fillColor
+            ? window.Cesium.Color.fromCssColorString(fillColor)
+            : window.Cesium.Color.WHITE
+        }, false),
       }
 
       const dynamicModel = {
@@ -746,7 +836,7 @@ const processPoint = logFuncWrap(() => {
 
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           return statusConfig.model?.uri || iconConfig.model.uri
-        }, false)
+        }, false),
       }
 
       // 创建基于healthLevel的动态圆圈
@@ -762,7 +852,9 @@ const processPoint = logFuncWrap(() => {
           // 获取图标的scale配置
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
-          let iconScale = (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) * (priorityConfig.scale || 1.0)
+          let iconScale =
+            (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) *
+            (priorityConfig.scale || 1.0)
 
           // 基础图标大小（像素），转换为米
           const baseIconSizeInMeters = 32 * iconScale * heightFactor
@@ -784,7 +876,9 @@ const processPoint = logFuncWrap(() => {
           // 获取图标的scale配置
           const statusConfig = getTargetStatusStyleConfig(currentStatus.status_type)
           const priorityConfig = getStatusConfigByPriority(currentStatus.priority)
-          let iconScale = (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) * (priorityConfig.scale || 1.0)
+          let iconScale =
+            (statusConfig.billboard?.scale || iconConfig.billboard.scale || 1.0) *
+            (priorityConfig.scale || 1.0)
 
           // 基础图标大小（像素），转换为米
           const baseIconSizeInMeters = 32 * iconScale * heightFactor
@@ -807,7 +901,7 @@ const processPoint = logFuncWrap(() => {
 
             // 设置透明度，使圆圈半透明
             return color.withAlpha(0.3)
-          }, false)
+          }, false),
         ),
         outline: true,
         outlineColor: new window.Cesium.CallbackProperty((time) => {
@@ -825,19 +919,19 @@ const processPoint = logFuncWrap(() => {
           const currentStatus = getCurrentStatus(time)
           // 只有当存在healthLevel时才显示圆圈
           return currentStatus && currentStatus.metadata?.healthLevel !== undefined
-        }, false)
+        }, false),
       }
 
       return {
         id: target.id + '@point@' + layerId.value,
-        origin: {...target},
+        origin: { ...target },
+        originTarget: base, // 源target
         name: target.name,
         type: target.type,
         ringRadius: target.ringRadius || '',
         nodeCount: target.nodeCount || '',
         ringMaterial: target.ringMaterial || '',
         ringOutlineColor: target.ringOutlineColor || '',
-        // virtualNodes: target.virtualNodes || [],
         nodeConnections: target.nodeConnections || [],
         position: [target.longitude, target.latitude, target.height],
         billboard: dynamicBillboard,
@@ -873,13 +967,10 @@ const processRelation = logFuncWrap(() => {
     return
   }
 
-
   renderRelations.value = allRelation
     .map((relation) => {
       const styleConfig = getRelationStyleConfig(relation.type)
-      console.log('关系样式', styleConfig)
       const sourceTarget = getSourceTarget(relation, styleConfig)
-      console.log('关系数据2222222222222222', sourceTarget)
       if (!sourceTarget) return null
       const { source, target, positions } = sourceTarget
 
@@ -1031,38 +1122,38 @@ const processEvent = logFuncWrap(() => {
     const sourceTarget = getSourceTarget(event, styleConfig)
     if (!sourceTarget) return null
     const { source, target, positions } = sourceTarget
-     const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
-      // 标签文本优先级：描述 > 名称 > 类型
-      const labelText = event.description || '事件'
+    const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
+    // 标签文本优先级：描述 > 名称 > 类型
+    const labelText = event.description || '事件'
 
     return {
-  id: event.id + '@event@' + layerId.value,
-        name: event.name,
-        type: event.type,
-        target,
-        source,
-        // EventLine组件属性
-        positions,
-        width: styleConfig.width,
-        material: material,
-        distanceDisplayCondition: distanceConfigs.distanceDisplayCondition,
-        labelStyle: {
-          ...distanceConfigs,
-          text: labelText,
-          font: '8pt sans-serif',
-          fillColor: '#fff',
-          outlineColor: '#000000',
-          showBackground: true,
-          backgroundColor: 'rgba(113,211,0,0.3)',
-          outlineWidth: 2,
-          pixelOffset: [0, -20],
-          verticalOrigin: 1,
-        },
-        curveConfig: {
-          enabled: styleConfig.curve?.enabled || false,
-          height: styleConfig.curve?.height || 100000,
-        },
-        materialType: styleConfig.material,
+      id: event.id + '@event@' + layerId.value,
+      name: event.name,
+      type: event.type,
+      target,
+      source,
+      // EventLine组件属性
+      positions,
+      width: styleConfig.width,
+      material: material,
+      distanceDisplayCondition: distanceConfigs.distanceDisplayCondition,
+      labelStyle: {
+        ...distanceConfigs,
+        text: labelText,
+        font: '8pt sans-serif',
+        fillColor: '#fff',
+        outlineColor: '#000000',
+        showBackground: true,
+        backgroundColor: 'rgba(113,211,0,0.3)',
+        outlineWidth: 2,
+        pixelOffset: [0, -20],
+        verticalOrigin: 1,
+      },
+      curveConfig: {
+        enabled: styleConfig.curve?.enabled || false,
+        height: styleConfig.curve?.height || 100000,
+      },
+      materialType: styleConfig.material,
     }
   })
   // console.log('事件数据', { renderEvents: toRaw(renderEvents.value) })
@@ -1173,11 +1264,253 @@ const onTargetClick = (target, event) => {
   // console.log('🎯 DataVisualization - targetClick 事件已发射')
 }
 
+// 生成虚拟节点函数
+const generateVirtualNodes = (target) => {
+  const { originTarget } = target
+
+  const nodes = []
+  const nodeCount = originTarget.nodeConnections.length
+  const radius = originTarget.ringRadius || 50000
+  const centerLng = target.position[0]
+  const centerLat = target.position[1]
+  const centerHeight = target.position[2] || 0
+
+  for (let i = 0; i < nodeCount; i++) {
+    const angle = (i * 360) / nodeCount
+    const radian = (angle * Math.PI) / 180
+
+    // 使用球面几何学的精确计算方法
+    const earthRadius = 6371000 // 地球半径(米)
+    const latRad = (centerLat * Math.PI) / 180
+    const lonRad = (centerLng * Math.PI) / 180
+
+    // 计算新的纬度
+    const newLatRad = Math.asin(
+      Math.sin(latRad) * Math.cos(radius / earthRadius) +
+        Math.cos(latRad) * Math.sin(radius / earthRadius) * Math.cos(radian),
+    )
+
+    // 计算新的经度
+    const newLonRad =
+      lonRad +
+      Math.atan2(
+        Math.sin(radian) * Math.sin(radius / earthRadius) * Math.cos(latRad),
+        Math.cos(radius / earthRadius) - Math.sin(latRad) * Math.sin(newLatRad),
+      )
+
+    const nodeLng = (newLonRad * 180) / Math.PI
+    const nodeLat = (newLatRad * 180) / Math.PI
+
+    // 获取对应的virtualNode配置数据
+    const virtualNodeData =
+      target.virtualNodes && target.virtualNodes[i] ? target.virtualNodes[i] : null
+    const nodeName = virtualNodeData ? virtualNodeData.name : `节点${i + 1}`
+    const nodeIcon = virtualNodeData ? virtualNodeData.icon : '/icons/communication.svg'
+    const nodeColor = virtualNodeData ? virtualNodeData.color : '#ff6b35'
+
+    // 获取当前节点对应的连接目标
+    const connectionTarget =
+      target.nodeConnections && target.nodeConnections[i]
+        ? target.nodeConnections[i].target
+        : target.id
+    console.log(`节点${i}: 原target.id=${target.id}, 连接目标=${connectionTarget}`)
+
+    // 参考DataVisualization.vue中renderPoints的结构，创建完整的节点配置
+    const node = {
+      id: `${target.id}-node-${i}`,
+      name: nodeName,
+      type: virtualNodeData ? virtualNodeData.type : 'virtual_node',
+      position: [nodeLng, nodeLat, centerHeight],
+      targetId: connectionTarget,
+      angle: angle,
+      virtualNodeData: virtualNodeData, // 保存原始数据用于连线匹配
+      originNode: originTarget.virtualNodes[i],
+      // 添加billboard配置，包含自适应缩放
+      billboard: {
+        image: nodeIcon,
+        scale: 0.8,
+        verticalOrigin: window.Cesium?.VerticalOrigin?.BOTTOM || 0,
+        horizontalOrigin: window.Cesium?.HorizontalOrigin?.CENTER || 0,
+        pixelOffset: new (window.Cesium?.Cartesian2 || Object)(0, 0),
+        heightReference: window.Cesium?.HeightReference?.NONE || 0,
+        // 添加自适应缩放配置
+        ...distanceConfigs,
+      },
+      // 添加label配置，包含自适应缩放
+      label: {
+        text: nodeName,
+        font: '10pt sans-serif',
+        fillColor: window.Cesium?.Color?.WHITE || '#ffffff',
+        outlineColor: window.Cesium?.Color?.BLACK || '#000000',
+        outlineWidth: 1,
+        style: window.Cesium?.LabelStyle?.FILL_AND_OUTLINE || 0,
+        pixelOffset: new (window.Cesium?.Cartesian2 || Object)(0, 25),
+        showBackground: true,
+        backgroundColor:
+          window.Cesium?.Color?.fromCssColorString?.('rgba(0,0,0,0.7)') || 'rgba(0,0,0,0.7)',
+        // 添加自适应缩放配置
+        ...distanceConfigs,
+      },
+      // 添加point配置，包含自适应缩放
+      point: {
+        pixelSize: 8,
+        color: window.Cesium?.Color?.fromCssColorString?.(nodeColor) || nodeColor,
+        outlineColor: window.Cesium?.Color?.WHITE || '#ffffff',
+        outlineWidth: 2,
+        heightReference: window.Cesium?.HeightReference?.NONE || 0,
+        // 添加自适应缩放配置
+        ...distanceConfigs,
+      },
+    }
+
+    nodes.push(node)
+  }
+
+  return nodes
+}
+
+// 生成虚拟节点连线函数
+const generateVirtualRelations = (target, nodes) => {
+  console.log('target', target)
+  console.log('nodes', nodes)
+  const { originTarget } = target
+  const relations = []
+
+  // 从target的nodeConnections生成连线数据
+  if (originTarget.nodeConnections && Array.isArray(originTarget.nodeConnections)) {
+    originTarget.nodeConnections.forEach((connection, index) => {
+      // 查找源节点：根据connection.source匹配对应的虚拟节点
+      // connection.source格式为node_001, node_002等
+      // 生成的虚拟节点id格式为target_041-node-0, target_041-node-1等
+      // 需要建立映射关系：node_001对应第0个节点，node_002对应第1个节点
+      console.log('connection', connection)
+      const nodeIndex = nodes.findIndex((item) => item.originNode.id === connection.source)
+      const sourceNode = nodes[nodeIndex]
+
+      console.log('sourceNode====================', sourceNode)
+
+      // 根据connection.target查找实际的点位数据
+      let actualPoint = dataManager.targetLocationManager.findById(connection.target)
+      console.log('actualPoint', actualPoint)
+
+      if (sourceNode && actualPoint) {
+        // 计算距离（简化计算，实际应使用地理距离）
+        const distance =
+          Math.sqrt(
+            Math.pow(actualPoint.longitude - sourceNode.position[0], 2) +
+              Math.pow(actualPoint.latitude - sourceNode.position[1], 2),
+          ) * 111 // 粗略转换为公里
+
+        const relationId = `circle_connector_${String(index + 1).padStart(3, '0')}`
+
+        const cleanTargetId = connection.target
+        const cleanSourceId = connection.source
+        console.log(
+          `连线${index}: source=${connection.source}, target=${connection.target}, 实际点位=${actualPoint.name}, 原target.id=${target.id}`,
+        )
+
+        const relation = {
+          id: relationId,
+          description: connection.description,
+          source_id: cleanSourceId, // 使用清理后的source_id
+          target_id: cleanTargetId, // 使用connection.target
+          type: connection.type || '圆环连接',
+          distance: Math.round(distance * 10) / 10,
+          createdAt: new Date().toISOString(),
+          // 保留原有属性用于兼容
+          name: connection.description || `${sourceNode.name} -> ${connection.target}`,
+          sourceId: cleanSourceId, // 使用清理后的source_id
+          targetId: cleanTargetId, // 使用connection.target
+          sourcePosition: sourceNode.position,
+          targetPosition: [actualPoint.longitude, actualPoint.latitude, actualPoint.height || 0], // 使用实际目标点的位置作为连线终点位置
+          // LineWithLabel组件需要的属性
+          positions: [
+            Cesium.Cartesian3.fromDegrees(...sourceNode.position),
+            Cesium.Cartesian3.fromDegrees(
+              actualPoint.longitude,
+              actualPoint.latitude,
+              actualPoint.height || 0,
+            ),
+          ],
+          width: 2,
+          material: connection.status === 'active' ? Cesium.Color.LIME : Cesium.Color.GRAY,
+          showLabel: false,
+          labelStyle: {
+            text: connection.description || connection.type,
+            font: '10pt sans-serif',
+            fillColor: Cesium.Color.WHITE,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 1,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            showBackground: true,
+            backgroundColor: Cesium.Color.BLACK.withAlpha(0.7),
+            backgroundPadding: new Cesium.Cartesian2(8, 4),
+            pixelOffset: new Cesium.Cartesian2(0, -15),
+            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          },
+        }
+        relations.push(relation)
+      }
+    })
+  }
+
+  return relations
+}
+
 const onTargetDblClick = (target, event) => {
-  console.log('🎯 DataVisualization - onTargetDblClick 被触发:', target.id, target)
-  console.log('🎯 DataVisualization - 双击事件对象:', event)
   emit('targetDblClick', target, event)
-  console.log('🎯 DataVisualization - targetDblClick 事件已发射')
+  const { originTarget } = target
+  // 检查目标是否包含圆环相关属性
+  if (originTarget.ringMaterial && originTarget.ringOutlineColor && originTarget.ringRadius) {
+    const ringId = `ring-${target.id}`
+    const nodesId = `nodes-${target.id}`
+
+    // 如果圆环已存在，则移除它和虚拟节点
+    if (activeRings.value.has(ringId)) {
+      activeRings.value.delete(ringId)
+      virtualNodes.value.delete(nodesId)
+      virtualRelations.value.delete(nodesId)
+      console.log('移除圆环、虚拟节点和连线:', ringId)
+    } else {
+      console.log('target', target)
+      // 创建新的圆环配置
+      const ringConfig = {
+        id: ringId,
+        targetId: target.id,
+        position: target.position,
+        material: originTarget.ringMaterial,
+        outlineColor: originTarget.ringOutlineColor,
+        radius: originTarget.ringRadius,
+        height: target.position[2] || 0,
+        target,
+      }
+
+      activeRings.value.set(ringId, ringConfig)
+      console.log('创建圆环:', ringId, ringConfig)
+
+      // 如果目标包含nodeCount属性，生成虚拟节点
+      if (originTarget.nodeCount) {
+        const nodes = generateVirtualNodes(target)
+        virtualNodes.value.set(nodesId, nodes)
+        console.log('创建虚拟节点:', nodesId, nodes)
+
+        // 生成虚拟节点连线
+        const relations = generateVirtualRelations(target, nodes)
+        console.log('生成的虚拟连线数据:', relations)
+        console.log('连线数量:', relations.length)
+        // if (relations.length > 0) {
+        //   console.log('第一条连线详情:', relations[0])
+        //   console.log('positions:', relations[0].positions)
+        //   console.log('material:', relations[0].material)
+        //   console.log('labelStyle:', relations[0].labelStyle)
+        // }
+        virtualRelations.value.set(nodesId, relations)
+        // console.log('virtualRelations Map大小:', virtualRelations.value.size)
+        // console.log('virtualRelations内容:', Array.from(virtualRelations.value.entries()))
+      }
+    }
+  }
 }
 
 const onRelationClick = debounceEvent((relation, event) => {

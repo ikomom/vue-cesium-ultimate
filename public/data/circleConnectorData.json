@@ -1,82 +1,22 @@
 {
   "targets": [
     {
-      "id": "target_041",
+      "id": "target_04111",
       "name": "北京通信中心",
       "type": "通信",
       "status": "正常",
       "priority": "高",
       "description": "北京通信中心基础信息",
-      "createdAt": "2024-01-20T08:30:00.000Z"
-    },
-    {
-      "id": "target_022",
-      "name": "上海雷达站B",
-      "type": "雷达",
-      "status": "正常",
-      "priority": "高",
-      "description": "上海雷达站B基础信息",
-      "createdAt": "2024-01-20T08:30:00.000Z"
-    },
-    {
-      "id": "target_023",
-      "name": "广州雷达站C",
-      "type": "雷达",
-      "status": "正常",
-      "priority": "中",
-      "description": "广州雷达站C基础信息",
-      "createdAt": "2024-01-20T09:15:00.000Z"
-    },
-    {
-      "id": "target_044",
-      "name": "武汉指挥中心",
-      "type": "指挥",
-      "status": "正常",
-      "priority": "高",
-      "description": "武汉指挥中心基础信息",
-      "createdAt": "2024-01-20T11:00:00.000Z"
-    },
-    {
-      "id": "target_045",
-      "name": "长沙数据中心",
-      "type": "数据",
-      "status": "正常",
-      "priority": "高",
-      "description": "长沙数据中心基础信息",
-      "createdAt": "2024-01-20T12:00:00.000Z"
-    },
-    {
-      "id": "target_046",
-      "name": "拉萨高原站",
-      "type": "高原",
-      "status": "正常",
-      "priority": "中",
-      "description": "拉萨高原站基础信息",
-      "createdAt": "2024-01-20T13:00:00.000Z"
-    }
-  ],
-  "points": [
-    {
-      "id": "target_041",
-      "name": "北京通信中心",
-      "type": "通信",
-      "longitude": 116.3974,
-      "latitude": 39.9093,
-      "height": 15000,
-      "region": "华北",
-      "province": "北京市",
-      "city": "北京市",
-      "address": "北京市朝阳区",
       "createdAt": "2024-01-20T08:30:00.000Z",
-      "ringRadius": 50000,
-      "nodeCount": 6,
-      "ringMaterial": "rgba(0, 255, 255, 0.3)",
-      "ringOutlineColor": "#00ffff",
-      "nodeColor": "#ff6b35",
+      "ringRadius": 35000,
+      "nodeCount": 5,
+      "ringMaterial": "rgba(255, 255, 0, 0.3)",
+      "ringOutlineColor": "#ffff00",
+      "nodeColor": "#ff0000",
       "showNodeLabels": true,
       "showConnections": true,
       "enableAnimation": true,
-      "animationSpeed": 1.0,
+      "animationSpeed": 0.8,
       "virtualNodes": [
         {
           "id": "node_001",
@@ -107,7 +47,11 @@
           "icon": "/icons/alert.svg",
           "color": "#ffff00",
           "status": "active",
-          "sensors": ["温度", "湿度", "电压"],
+          "sensors": [
+            "温度",
+            "湿度",
+            "电压"
+          ],
           "alertLevel": "normal",
           "description": "环境监控节点"
         },
@@ -149,7 +93,7 @@
         {
           "id": "conn_001",
           "source": "node_001",
-          "target": "target_022",
+          "target": "target_04711",
           "type": "通信链路",
           "bandwidth": "100Mbps",
           "protocol": "TCP/IP",
@@ -159,7 +103,7 @@
         {
           "id": "conn_002",
           "source": "node_002",
-          "target": "target_022",
+          "target": "target_04611",
           "type": "圆环连接",
           "bandwidth": "200Mbps",
           "protocol": "UDP",
@@ -169,7 +113,7 @@
         {
           "id": "conn_003",
           "source": "node_003",
-          "target": "target_022",
+          "target": "target_04611",
           "type": "monitoring",
           "bandwidth": "10Mbps",
           "protocol": "SNMP",
@@ -179,7 +123,7 @@
         {
           "id": "conn_004",
           "source": "node_004",
-          "target": "target_022",
+          "target": "target_04311",
           "type": "数据传输",
           "bandwidth": "500Mbps",
           "protocol": "HTTPS",
@@ -189,7 +133,7 @@
         {
           "id": "conn_005",
           "source": "node_005",
-          "target": "target_022",
+          "target": "target_04311",
           "type": "军事协防",
           "bandwidth": "50Mbps",
           "protocol": "SSL/TLS",
@@ -199,7 +143,7 @@
         {
           "id": "conn_006",
           "source": "node_006",
-          "target": "target_022",
+          "target": "target_04311",
           "type": "数据传输",
           "bandwidth": "200Mbps",
           "protocol": "RSYNC",
@@ -209,153 +153,13 @@
       ]
     },
     {
-      "id": "target_022",
-      "name": "上海雷达站B",
-      "type": "雷达",
-      "longitude": 121.4737,
-      "latitude": 31.2304,
-      "height": 0,
-      "region": "华东",
-      "province": "上海市",
-      "city": "上海市",
-      "address": "上海市浦东新区",
-      "createdAt": "2024-01-20T08:30:00.000Z"
-    },
-    {
-      "id": "target_023",
-      "name": "广州雷达站C",
-      "type": "雷达",
-      "longitude": 113.2644,
-      "latitude": 23.1291,
-      "height": 0,
-      "region": "华南",
-      "province": "广东省",
-      "city": "广州市",
-      "address": "广州市天河区",
-      "createdAt": "2024-01-20T09:15:00.000Z"
-    },
-    {
-      "id": "target_042",
-      "name": "上海雷达中心",
-      "type": "雷达",
-      "longitude": 121.4737,
-      "latitude": 31.2304,
-      "height": 12000,
-      "region": "华东",
-      "province": "上海市",
-      "city": "上海市",
-      "address": "上海市浦东新区",
-      "createdAt": "2024-01-20T09:00:00.000Z",
-      "ringRadius": 40000,
-      "nodeCount": 4,
-      "ringMaterial": "rgba(255, 107, 53, 0.3)",
-      "ringOutlineColor": "#ff6b35",
-      "nodeColor": "#00ffff",
-      "showNodeLabels": true,
-      "showConnections": true,
-      "enableAnimation": true,
-      "animationSpeed": 1.2,
-      "virtualNodes": [
-        {
-          "id": "node_sh01",
-          "name": "主雷达单元",
-          "type": "radar_primary",
-          "icon": "/icons/radar.svg",
-          "color": "#ff6b35",
-          "status": "active",
-          "range": "150km",
-          "frequency": "S波段",
-          "description": "主要雷达探测单元"
-        },
-        {
-          "id": "node_sh02",
-          "name": "通信中继",
-          "type": "communication",
-          "icon": "/icons/communication.svg",
-          "color": "#00ffff",
-          "status": "active",
-          "bandwidth": "1Gbps",
-          "protocol": "5G",
-          "description": "高速通信中继节点"
-        },
-        {
-          "id": "node_sh03",
-          "name": "数据处理",
-          "type": "数据传输",
-          "icon": "/icons/completed.svg",
-          "color": "#00ff00",
-          "status": "active",
-          "cpu": "64核",
-          "memory": "256GB",
-          "description": "实时数据处理单元"
-        },
-        {
-          "id": "node_sh04",
-          "name": "备用系统",
-          "type": "backup",
-          "icon": "/icons/standby.svg",
-          "color": "#888888",
-          "status": "standby",
-          "redundancy": "cold-standby",
-          "switchTime": "<5s",
-          "description": "冷备份系统"
-        }
-      ],
-      "nodeConnections": [
-        {
-          "id": "conn_sh01",
-          "source": "node_sh01",
-          "target": "target_042",
-          "type": "雷达覆盖",
-          "bandwidth": "500Mbps",
-          "protocol": "UDP",
-          "status": "active",
-          "description": "主雷达到中心数据传输"
-        },
-        {
-          "id": "conn_sh02",
-          "source": "node_sh02",
-          "target": "target_042",
-          "type": "communication",
-          "bandwidth": "1Gbps",
-          "protocol": "5G-NR",
-          "status": "active",
-          "description": "通信中继到中心连接"
-        },
-        {
-          "id": "conn_sh03",
-          "source": "node_sh03",
-          "target": "target_042",
-          "type": "data_processing",
-          "bandwidth": "800Mbps",
-          "protocol": "TCP/IP",
-          "status": "active",
-          "description": "数据处理结果上传"
-        },
-        {
-          "id": "conn_sh04",
-          "source": "node_sh04",
-          "target": "target_042",
-          "type": "backup_sync",
-          "bandwidth": "100Mbps",
-          "protocol": "RSYNC",
-          "status": "standby",
-          "description": "备用系统同步连接"
-        }
-      ]
-    },
-    {
-      "id": "target_043",
+      "id": "target_04311",
       "name": "广州监控中心",
       "type": "监控",
-      "longitude": 113.2644,
-      "latitude": 23.1291,
-      "height": 8000,
-      "region": "华南",
-      "province": "广东省",
-      "city": "广州市",
-      "address": "广州市天河区",
-      "createdAt": "2024-01-20T10:00:00.000Z",
+      "status": "正常",
+      "priority": "高",
+      "description": "广州监控中心基础信息",
+      "createdAt": "2024-01-20T08:30:00.000Z",
       "ringRadius": 35000,
       "nodeCount": 5,
       "ringMaterial": "rgba(255, 255, 0, 0.3)",
@@ -373,7 +177,12 @@
           "icon": "/icons/alert.svg",
           "color": "#ffff00",
           "status": "active",
-          "sensors": ["温度", "湿度", "气压", "风速"],
+          "sensors": [
+            "温度",
+            "湿度",
+            "气压",
+            "风速"
+          ],
           "alertLevel": "normal",
           "description": "环境参数监控节点"
         },
@@ -417,7 +226,11 @@
           "icon": "/icons/warning.svg",
           "color": "#ff4500",
           "status": "active",
-          "alertTypes": ["critical", "warning", "info"],
+          "alertTypes": [
+            "critical",
+            "warning",
+            "info"
+          ],
           "responseTime": "<30s",
           "description": "集中告警处理中心"
         }
@@ -426,7 +239,7 @@
         {
           "id": "conn_gz01",
           "source": "node_gz01",
-          "target": "target_043",
+          "target": "target_04311",
           "type": "雷达覆盖",
           "bandwidth": "50Mbps",
           "protocol": "MQTT",
@@ -436,7 +249,7 @@
         {
           "id": "conn_gz02",
           "source": "node_gz02",
-          "target": "target_043",
+          "target": "target_04311",
           "type": "军事协防",
           "bandwidth": "2Gbps",
           "protocol": "RTSP",
@@ -446,7 +259,7 @@
         {
           "id": "conn_gz03",
           "source": "node_gz03",
-          "target": "target_043",
+          "target": "target_04311",
           "type": "通信链路",
           "bandwidth": "100Mbps",
           "protocol": "SNMP",
@@ -456,7 +269,7 @@
         {
           "id": "conn_gz04",
           "source": "node_gz04",
-          "target": "target_043",
+          "target": "target_04311",
           "type": "雷达覆盖",
           "bandwidth": "80Mbps",
           "protocol": "HTTP/2",
@@ -466,7 +279,7 @@
         {
           "id": "conn_gz05",
           "source": "node_gz05",
-          "target": "target_043",
+          "target": "target_04311",
           "type": "军事协防",
           "bandwidth": "20Mbps",
           "protocol": "WebSocket",
@@ -474,443 +287,2524 @@
           "description": "告警通知推送"
         }
       ]
-     },
-     {
-       "id": "target_044",
-       "name": "武汉指挥中心",
-       "type": "指挥",
-       "longitude": 114.3054,
-       "latitude": 30.5928,
-       "height": 10000,
-       "region": "华中",
-       "province": "湖北省",
-       "city": "武汉市",
-       "address": "武汉市武昌区",
-       "createdAt": "2024-01-20T11:00:00.000Z",
-       "ringRadius": 45000,
-       "nodeCount": 6,
-       "ringMaterial": "rgba(128, 0, 128, 0.3)",
-       "ringOutlineColor": "#8000ff",
-       "nodeColor": "#ff1493",
-       "showNodeLabels": true,
-       "showConnections": true,
-       "enableAnimation": true,
-       "animationSpeed": 1.1,
-       "virtualNodes": [
-         {
-           "id": "node_wh01",
-           "name": "指挥调度",
-           "type": "command_control",
-           "icon": "/icons/military.svg",
-           "color": "#8000ff",
-           "status": "active",
-           "operators": 12,
-           "capacity": "24/7",
-           "description": "中央指挥调度中心"
-         },
-         {
-           "id": "node_wh02",
-           "name": "通信枢纽",
-           "type": "communication_hub",
-           "icon": "/icons/communication.svg",
-           "color": "#00ffff",
-           "status": "active",
-           "channels": 64,
-           "bandwidth": "10Gbps",
-           "description": "区域通信枢纽"
-         },
-         {
-           "id": "node_wh03",
-           "name": "情报分析",
-           "type": "intelligence",
-           "icon": "/icons/completed.svg",
-           "color": "#00ff00",
-           "status": "active",
-           "analysts": 8,
-           "databases": 15,
-           "description": "情报收集分析中心"
-         },
-         {
-           "id": "node_wh04",
-           "name": "后勤保障",
-           "type": "logistics",
-           "icon": "/icons/maintenance.svg",
-           "color": "#ffa500",
-           "status": "active",
-           "supplies": "充足",
-           "vehicles": 25,
-           "description": "后勤物资保障"
-         },
-         {
-           "id": "node_wh05",
-           "name": "技术支持",
-           "type": "通信链路",
-           "icon": "/icons/upgrade.svg",
-           "color": "#ff6b35",
-           "status": "active",
-           "engineers": 6,
-           "equipment": "先进",
-           "description": "技术维护支持"
-         },
-         {
-           "id": "node_wh06",
-           "name": "应急响应",
-           "type": "emergency",
-           "icon": "/icons/alert.svg",
-           "color": "#ff0000",
-           "status": "active",
-           "responseTime": "<10min",
-           "teams": 4,
-           "description": "应急快速响应队"
-         }
-       ],
-       "nodeConnections": [
-         {
-           "id": "conn_wh01",
-           "source": "node_wh01",
-           "target": "target_044",
-           "type": "军事协防",
-           "bandwidth": "1Gbps",
-           "protocol": "TCP/IP",
-           "status": "active",
-           "description": "指挥调度数据传输"
-         },
-         {
-           "id": "conn_wh02",
-           "source": "node_wh02",
-           "target": "target_044",
-           "type": "communication",
-           "bandwidth": "5Gbps",
-           "protocol": "Multi-Protocol",
-           "status": "active",
-           "description": "通信枢纽连接"
-         },
-         {
-           "id": "conn_wh03",
-           "source": "node_wh03",
-           "target": "target_044",
-           "type": "军事协防",
-           "bandwidth": "800Mbps",
-           "protocol": "HTTPS",
-           "status": "active",
-           "description": "情报数据上报"
-         },
-         {
-           "id": "conn_wh04",
-           "source": "node_wh04",
-           "target": "target_044",
-           "type": "数据传输",
-           "bandwidth": "200Mbps",
-           "protocol": "HTTP/2",
-           "status": "active",
-           "description": "后勤状态报告"
-         },
-         {
-           "id": "conn_wh05",
-           "source": "node_wh05",
-           "target": "target_044",
-           "type": "technical_support",
-           "bandwidth": "300Mbps",
-           "protocol": "SSH/SFTP",
-           "status": "active",
-           "description": "技术支持连接"
-         },
-         {
-           "id": "conn_wh06",
-           "source": "node_wh06",
-           "target": "target_044",
-           "type": "军事协防",
-           "bandwidth": "100Mbps",
-           "protocol": "WebSocket",
-           "status": "active",
-           "description": "应急响应通道"
-         }
-       ]
-     },
-     {
-       "id": "target_045",
-       "name": "长沙数据中心",
-       "type": "数据",
-       "longitude": 112.9388,
-       "latitude": 28.2282,
-       "height": 9000,
-       "region": "华中",
-       "province": "湖南省",
-       "city": "长沙市",
-       "address": "长沙市岳麓区",
-       "createdAt": "2024-01-20T12:00:00.000Z",
-       "ringRadius": 38000,
-       "nodeCount": 4,
-       "ringMaterial": "rgba(0, 128, 255, 0.3)",
-       "ringOutlineColor": "#0080ff",
-       "nodeColor": "#32cd32",
-       "showNodeLabels": true,
-       "showConnections": true,
-       "enableAnimation": true,
-       "animationSpeed": 1.3,
-       "virtualNodes": [
-         {
-           "id": "node_cs01",
-           "name": "主数据库",
-           "type": "database_primary",
-           "icon": "/icons/completed.svg",
-           "color": "#0080ff",
-           "status": "active",
-           "storage": "500TB",
-           "throughput": "50K TPS",
-           "description": "主数据库集群"
-         },
-         {
-           "id": "node_cs02",
-           "name": "备份存储",
-           "type": "backup_storage",
-           "icon": "/icons/standby.svg",
-           "color": "#888888",
-           "status": "active",
-           "capacity": "1PB",
-           "replication": "3副本",
-           "description": "分布式备份存储"
-         },
-         {
-           "id": "node_cs03",
-           "name": "计算集群",
-           "type": "compute_cluster",
-           "icon": "/icons/upgrade.svg",
-           "color": "#32cd32",
-           "status": "active",
-           "nodes": 128,
-           "cores": "8192核",
-           "description": "高性能计算集群"
-         },
-         {
-           "id": "node_cs04",
-           "name": "网络接入",
-           "type": "network_gateway",
-           "icon": "/icons/communication.svg",
-           "color": "#00ffff",
-           "status": "active",
-           "bandwidth": "100Gbps",
-           "connections": 1000,
-           "description": "高速网络接入点"
-         }
-       ],
-       "nodeConnections": [
-         {
-           "id": "conn_cs01",
-           "source": "node_cs01",
-           "target": "target_045",
-           "type": "数据传输",
-           "bandwidth": "10Gbps",
-           "protocol": "MySQL Cluster",
-           "status": "active",
-           "description": "主数据库同步"
-         },
-         {
-           "id": "conn_cs02",
-           "source": "node_cs02",
-           "target": "target_045",
-           "type": "backup_sync",
-           "bandwidth": "5Gbps",
-           "protocol": "RSYNC",
-           "status": "active",
-           "description": "备份数据同步"
-         },
-         {
-           "id": "conn_cs03",
-           "source": "node_cs03",
-           "target": "target_045",
-           "type": "数据传输",
-           "bandwidth": "20Gbps",
-           "protocol": "InfiniBand",
-           "status": "active",
-           "description": "计算结果传输"
-         },
-         {
-           "id": "conn_cs04",
-           "source": "node_cs04",
-           "target": "target_045",
-           "type": "通信链路",
-           "bandwidth": "50Gbps",
-           "protocol": "BGP/OSPF",
-           "status": "active",
-           "description": "网络流量汇聚"
-         }
-       ]
-     },
-     {
-       "id": "target_046",
-       "name": "拉萨高原站",
-       "type": "高原",
-       "longitude": 91.1322,
-       "latitude": 29.6544,
-       "height": 25000,
-       "region": "西南",
-       "province": "西藏自治区",
-       "city": "拉萨市",
-       "address": "拉萨市城关区",
-       "createdAt": "2024-01-20T13:00:00.000Z",
-       "ringRadius": 60000,
-       "nodeCount": 3,
-       "ringMaterial": "rgba(255, 215, 0, 0.3)",
-       "ringOutlineColor": "#ffd700",
-       "nodeColor": "#dc143c",
-       "showNodeLabels": true,
-       "showConnections": true,
-       "enableAnimation": true,
-       "animationSpeed": 0.6,
-       "virtualNodes": [
-         {
-           "id": "node_ls01",
-           "name": "高原观测",
-           "type": "plateau_observation",
-           "icon": "/icons/radar.svg",
-           "color": "#ffd700",
-           "status": "active",
-           "altitude": "3650m",
-           "visibility": "500km",
-           "description": "高原环境观测站"
-         },
-         {
-           "id": "node_ls02",
-           "name": "卫星通信",
-           "type": "satellite_comm",
-           "icon": "/icons/communication.svg",
-           "color": "#00ffff",
-           "status": "active",
-           "satellites": 8,
-           "frequency": "Ku/Ka波段",
-           "description": "卫星通信终端"
-         },
-         {
-           "id": "node_ls03",
-           "name": "应急保障",
-           "type": "emergency_support",
-           "icon": "/icons/alert.svg",
-           "color": "#dc143c",
-           "status": "active",
-           "oxygen": "充足",
-           "heating": "正常",
-           "description": "高原应急保障系统"
-         }
-       ],
-       "nodeConnections": [
-         {
-           "id": "conn_ls01",
-           "source": "node_ls01",
-           "target": "target_046",
-           "type": "雷达覆盖",
-           "bandwidth": "200Mbps",
-           "protocol": "Satellite",
-           "status": "active",
-           "description": "观测数据传输"
-         },
-         {
-           "id": "conn_ls02",
-           "source": "node_ls02",
-           "target": "target_046",
-           "type": "通信链路",
-           "bandwidth": "1Gbps",
-           "protocol": "DVB-S2X",
-           "status": "active",
-           "description": "卫星链路连接"
-         },
-         {
-           "id": "conn_ls03",
-           "source": "node_ls03",
-           "target": "target_046",
-           "type": "军事协防",
-           "bandwidth": "50Mbps",
-           "protocol": "MQTT",
-           "status": "active",
-           "description": "应急状态监控"
-         }
-       ]
-     }
-   ],
-   "relations": [
-     {
-        "id": "circle_connector_001",
-        "description": "北京通信中心到广州雷达站C的圆环连接器",
-        "source_id": "target_041",
-        "target_id": "target_023",
-        "type": "圆环连接",
-        "status": "正常",
-        "priority": "高",
-        "distance": 1876.5,
-        "capacity": "高带宽",
-        "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "id": "target_02211",
+      "name": "上海雷达站B",
+      "type": "雷达",
+      "status": "正常",
+      "priority": "高",
+      "description": "上海雷达站B基础信息",
+      "createdAt": "2024-01-20T08:30:00.000Z",
+      "ringRadius": 35000,
+      "nodeCount": 5,
+      "ringMaterial": "rgba(255, 255, 0, 0.3)",
+      "ringOutlineColor": "#ffff00",
+      "nodeColor": "#ff0000",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 0.8
+    },
+    {
+      "id": "target_02311",
+      "name": "广州雷达站C",
+      "type": "雷达",
+      "status": "正常",
+      "priority": "中",
+      "description": "广州雷达站C基础信息",
+      "createdAt": "2024-01-20T09:15:00.000Z",
+      "ringRadius": 35000,
+      "nodeCount": 5,
+      "ringMaterial": "rgba(255, 255, 0, 0.3)",
+      "ringOutlineColor": "#ffff00",
+      "nodeColor": "#ff0000",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 0.8
+    },
+    {
+      "id": "target_04411",
+      "name": "武汉指挥中心",
+      "type": "指挥",
+      "status": "正常",
+      "priority": "高",
+      "description": "武汉指挥中心基础信息",
+      "createdAt": "2024-01-20T11:00:00.000Z",
+      "ringRadius": 35000,
+      "nodeCount": 5,
+      "ringMaterial": "rgba(255, 255, 0, 0.3)",
+      "ringOutlineColor": "#ffff00",
+      "nodeColor": "#ff0000",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 0.8,
+      "virtualNodes": [
+        {
+          "id": "node_wh01",
+          "name": "指挥调度",
+          "type": "command_control",
+          "icon": "/icons/military.svg",
+          "color": "#8000ff",
+          "status": "active",
+          "operators": 12,
+          "capacity": "24/7",
+          "description": "中央指挥调度中心"
+        },
+        {
+          "id": "node_wh02",
+          "name": "通信枢纽",
+          "type": "communication_hub",
+          "icon": "/icons/communication.svg",
+          "color": "#00ffff",
+          "status": "active",
+          "channels": 64,
+          "bandwidth": "10Gbps",
+          "description": "区域通信枢纽"
+        },
+        {
+          "id": "node_wh03",
+          "name": "情报分析",
+          "type": "intelligence",
+          "icon": "/icons/completed.svg",
+          "color": "#00ff00",
+          "status": "active",
+          "analysts": 8,
+          "databases": 15,
+          "description": "情报收集分析中心"
+        },
+        {
+          "id": "node_wh04",
+          "name": "后勤保障",
+          "type": "logistics",
+          "icon": "/icons/maintenance.svg",
+          "color": "#ffa500",
+          "status": "active",
+          "supplies": "充足",
+          "vehicles": 25,
+          "description": "后勤物资保障"
+        },
+        {
+          "id": "node_wh05",
+          "name": "技术支持",
+          "type": "通信链路",
+          "icon": "/icons/upgrade.svg",
+          "color": "#ff6b35",
+          "status": "active",
+          "engineers": 6,
+          "equipment": "先进",
+          "description": "技术维护支持"
+        },
+        {
+          "id": "node_wh06",
+          "name": "应急响应",
+          "type": "emergency",
+          "icon": "/icons/alert.svg",
+          "color": "#ff0000",
+          "status": "active",
+          "responseTime": "<10min",
+          "teams": 4,
+          "description": "应急快速响应队"
+        }
+      ],
+      "nodeConnections": [
+        {
+          "id": "conn_wh01",
+          "source": "node_wh01",
+          "target": "target_04411",
+          "type": "军事协防",
+          "bandwidth": "1Gbps",
+          "protocol": "TCP/IP",
+          "status": "active",
+          "description": "指挥调度数据传输"
+        },
+        {
+          "id": "conn_wh02",
+          "source": "node_wh02",
+          "target": "target_04411",
+          "type": "communication",
+          "bandwidth": "5Gbps",
+          "protocol": "Multi-Protocol",
+          "status": "active",
+          "description": "通信枢纽连接"
+        },
+        {
+          "id": "conn_wh03",
+          "source": "node_wh03",
+          "target": "target_04411",
+          "type": "军事协防",
+          "bandwidth": "800Mbps",
+          "protocol": "HTTPS",
+          "status": "active",
+          "description": "情报数据上报"
+        },
+        {
+          "id": "conn_wh04",
+          "source": "node_wh04",
+          "target": "target_04411",
+          "type": "数据传输",
+          "bandwidth": "200Mbps",
+          "protocol": "HTTP/2",
+          "status": "active",
+          "description": "后勤状态报告"
+        },
+        {
+          "id": "conn_wh05",
+          "source": "node_wh05",
+          "target": "target_04411",
+          "type": "technical_support",
+          "bandwidth": "300Mbps",
+          "protocol": "SSH/SFTP",
+          "status": "active",
+          "description": "技术支持连接"
+        },
+        {
+          "id": "conn_wh06",
+          "source": "node_wh06",
+          "target": "target_04411",
+          "type": "军事协防",
+          "bandwidth": "100Mbps",
+          "protocol": "WebSocket",
+          "status": "active",
+          "description": "应急响应通道"
+        }
+      ]
+    },
+    {
+      "id": "target_04511",
+      "name": "长沙数据中心",
+      "type": "数据",
+      "status": "正常",
+      "priority": "高",
+      "description": "长沙数据中心基础信息",
+      "createdAt": "2024-01-20T12:00:00.000Z",
+      "ringRadius": 35000,
+      "nodeCount": 5,
+      "ringMaterial": "rgba(255, 255, 0, 0.3)",
+      "ringOutlineColor": "#ffff00",
+      "nodeColor": "#ff0000",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 0.8
+    },
+    {
+      "id": "target_04611",
+      "name": "拉萨高原站",
+      "type": "高原",
+      "status": "正常",
+      "priority": "中",
+      "description": "拉萨高原站基础信息",
+      "createdAt": "2024-01-20T13:00:00.000Z",
+      "ringRadius": 35000,
+      "nodeCount": 5,
+      "ringMaterial": "rgba(255, 255, 0, 0.3)",
+      "ringOutlineColor": "#ffff00",
+      "nodeColor": "#ff0000",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 0.8
+    },
+    {
+      "id": "target_04711",
+      "name": "台湾海峡监测站",
+      "type": "海事监控",
+      "longitude": 119.774,
+      "latitude": 24.5674,
+      "height": 0,
+      "region": "东南沿海",
+      "province": "福建省",
+      "city": "厦门市",
+      "address": "台湾海峡中部海域",
+      "createdAt": "2024-01-22T10:30:00.000Z",
+      "virtualNodes": [
+        {
+          "id": "node_047_001",
+          "name": "海事雷达",
+          "type": "radar",
+          "icon": "/icons/radar.svg",
+          "color": "#00bfff",
+          "status": "active",
+          "range": "80km",
+          "frequency": "S波段",
+          "description": "海峡船只监控雷达"
+        },
+        {
+          "id": "node_047_002",
+          "name": "通信中继",
+          "type": "通信链路",
+          "icon": "/icons/communication.svg",
+          "color": "#32cd32",
+          "status": "active",
+          "capacity": "超高带宽",
+          "frequency": "5G",
+          "description": "海峡通信中继站"
+        },
+        {
+          "id": "node_047_003",
+          "name": "气象监测",
+          "type": "环境监控",
+          "icon": "/icons/alert.svg",
+          "color": "#ffd700",
+          "status": "active",
+          "sensors": [
+            "风速",
+            "海浪",
+            "能见度"
+          ],
+          "description": "海峡气象监测点"
+        },
+        {
+          "id": "node_047_004",
+          "name": "救援协调",
+          "type": "应急救援",
+          "icon": "/icons/patrol.svg",
+          "color": "#ff6347",
+          "status": "standby",
+          "coverage": "台湾海峡全域",
+          "description": "海上救援协调中心"
+        },
+        {
+          "id": "node_047_005",
+          "name": "航道管制",
+          "type": "交通管制",
+          "icon": "/icons/port.svg",
+          "color": "#9370db",
+          "status": "active",
+          "jurisdiction": "主航道",
+          "description": "海峡航道交通管制"
+        },
+        {
+          "id": "node_047_006",
+          "name": "数据中心",
+          "type": "数据处理",
+          "icon": "/icons/communication.svg",
+          "color": "#ff1493",
+          "status": "active",
+          "capacity": "大数据处理",
+          "description": "海峡监测数据处理中心"
+        }
+      ],
+      "nodeConnections": [
+        {
+          "id": "conn_047_001",
+          "source": "node_047_001",
+          "target": "target_04711",
+          "type": "数据传输",
+          "bandwidth": "1Gbps",
+          "status": "active"
+        },
+        {
+          "id": "conn_047_002",
+          "source": "node_047_002",
+          "target": "target_04711",
+          "type": "数据上传",
+          "bandwidth": "10Gbps",
+          "status": "active"
+        },
+        {
+          "id": "conn_047_003",
+          "source": "node_047_003",
+          "target": "target_04711",
+          "type": "气象数据",
+          "bandwidth": "100Mbps",
+          "status": "active"
+        },
+        {
+          "id": "conn_047_004",
+          "source": "node_047_004",
+          "target": "target_04711",
+          "type": "协调通信",
+          "bandwidth": "500Mbps",
+          "status": "standby"
+        }
+      ]
+    }
+  ],
+  "points": [
+    {
+      "id": "target_04111",
+      "name": "北京通信中心",
+      "type": "通信",
+      "longitude": 116.3974,
+      "latitude": 39.9093,
+      "height": 15000,
+      "region": "华北",
+      "province": "北京市",
+      "city": "北京市",
+      "address": "北京市朝阳区",
+      "createdAt": "2024-01-20T08:30:00.000Z"
+    },
+    {
+      "id": "target_02211",
+      "name": "上海雷达站B",
+      "type": "雷达",
+      "longitude": 121.4737,
+      "latitude": 31.2304,
+      "height": 0,
+      "region": "华东",
+      "province": "上海市",
+      "city": "上海市",
+      "address": "上海市浦东新区",
+      "createdAt": "2024-01-20T08:30:00.000Z"
+    },
+    {
+      "id": "target_02311",
+      "name": "广州雷达站C",
+      "type": "雷达",
+      "longitude": 113.2644,
+      "latitude": 23.1291,
+      "height": 0,
+      "region": "华南",
+      "province": "广东省",
+      "city": "广州市",
+      "address": "广州市天河区",
+      "createdAt": "2024-01-20T09:15:00.000Z"
+    },
+    {
+      "id": "target_04311",
+      "name": "广州监控中心",
+      "type": "监控",
+      "longitude": 113.2644,
+      "latitude": 23.1291,
+      "height": 8000,
+      "region": "华南",
+      "province": "广东省",
+      "city": "广州市",
+      "address": "广州市天河区",
+      "createdAt": "2024-01-20T10:00:00.000Z"
+    },
+    {
+      "id": "target_04411",
+      "name": "武汉指挥中心",
+      "type": "指挥",
+      "longitude": 114.3054,
+      "latitude": 30.5928,
+      "height": 10000,
+      "region": "华中",
+      "province": "湖北省",
+      "city": "武汉市",
+      "address": "武汉市武昌区",
+      "createdAt": "2024-01-20T11:00:00.000Z"
+    },
+    {
+      "id": "target_04511",
+      "name": "长沙数据中心",
+      "type": "数据",
+      "longitude": 112.9388,
+      "latitude": 28.2282,
+      "height": 9000,
+      "region": "华中",
+      "province": "湖南省",
+      "city": "长沙市",
+      "address": "长沙市岳麓区",
+      "createdAt": "2024-01-20T12:00:00.000Z"
+    },
+    {
+      "id": "target_04611",
+      "name": "拉萨高原站",
+      "type": "高原",
+      "longitude": 91.1322,
+      "latitude": 29.6544,
+      "height": 25000,
+      "region": "西南",
+      "province": "西藏自治区",
+      "city": "拉萨市",
+      "address": "拉萨市城关区",
+      "createdAt": "2024-01-20T13:00:00.000Z"
+    }
+  ],
+  "relations": [
+    {
+      "id": "circle_connector_001",
+      "description": "北京通信中心到广州雷达站C的圆环连接器",
+      "source_id": "target_04111",
+      "target_id": "target_02311",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "高",
+      "distance": 1876.5,
+      "capacity": "高带宽",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "id": "circle_connector_002",
+      "description": "北京通信中心到上海雷达站B的圆环连接器",
+      "source_id": "target_04111",
+      "target_id": "target_02211",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "高",
+      "distance": 1067.8,
+      "capacity": "高带宽",
+      "createdAt": "2024-01-15T11:00:00.000Z"
+    },
+    {
+      "id": "circle_connector_003",
+      "description": "武汉指挥中心到长沙数据中心的圆环连接器",
+      "source_id": "target_04411",
+      "target_id": "target_04511",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "高",
+      "distance": 294.2,
+      "capacity": "超高带宽",
+      "createdAt": "2024-01-20T14:00:00.000Z"
+    },
+    {
+      "id": "circle_connector_004",
+      "description": "北京通信中心到武汉指挥中心的圆环连接器",
+      "source_id": "target_04111",
+      "target_id": "target_04411",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "高",
+      "distance": 1152.3,
+      "capacity": "高带宽",
+      "createdAt": "2024-01-20T14:15:00.000Z"
+    },
+    {
+      "id": "circle_connector_005",
+      "description": "拉萨高原站到武汉指挥中心的圆环连接器",
+      "source_id": "target_04611",
+      "target_id": "target_04411",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "中",
+      "distance": 1847.6,
+      "capacity": "中带宽",
+      "createdAt": "2024-01-20T14:30:00.000Z"
+    },
+    {
+      "id": "circle_connector_006",
+      "description": "上海雷达站B到长沙数据中心的圆环连接器",
+      "source_id": "target_02211",
+      "target_id": "target_04511",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "中",
+      "distance": 1034.7,
+      "capacity": "高带宽",
+      "createdAt": "2024-01-20T14:45:00.000Z"
+    },
+    {
+      "id": "circle_connector_007",
+      "description": "广州雷达站C到长沙数据中心的圆环连接器",
+      "source_id": "target_02311",
+      "target_id": "target_04511",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "中",
+      "distance": 608.9,
+      "capacity": "高带宽",
+      "createdAt": "2024-01-20T15:00:00.000Z"
+    }
+  ],
+  "trajectories": {
+    "target_04711": [
+      {
+        "timestamp": "2024-01-22T06:00:00.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
       },
       {
-        "id": "circle_connector_002",
-        "description": "北京通信中心到上海雷达站B的圆环连接器",
-        "source_id": "target_041",
-        "target_id": "target_022",
-        "type": "圆环连接",
-        "status": "正常",
-        "priority": "高",
-        "distance": 1067.8,
-        "capacity": "高带宽",
-        "createdAt": "2024-01-15T11:00:00.000Z"
+        "timestamp": "2024-01-22T06:05:21.428Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
       },
       {
-        "id": "circle_connector_003",
-        "description": "武汉指挥中心到长沙数据中心的圆环连接器",
-        "source_id": "target_044",
-        "target_id": "target_045",
-        "type": "圆环连接",
-        "status": "正常",
-        "priority": "高",
-        "distance": 294.2,
-        "capacity": "超高带宽",
-        "createdAt": "2024-01-20T14:00:00.000Z"
+        "timestamp": "2024-01-22T06:10:42.857Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
       },
       {
-        "id": "circle_connector_004",
-        "description": "北京通信中心到武汉指挥中心的圆环连接器",
-        "source_id": "target_041",
-        "target_id": "target_044",
-        "type": "圆环连接",
-        "status": "正常",
-        "priority": "高",
-        "distance": 1152.3,
-        "capacity": "高带宽",
-        "createdAt": "2024-01-20T14:15:00.000Z"
+        "timestamp": "2024-01-22T06:16:04.285Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
       },
       {
-        "id": "circle_connector_005",
-        "description": "拉萨高原站到武汉指挥中心的圆环连接器",
-        "source_id": "target_046",
-        "target_id": "target_044",
-        "type": "圆环连接",
-        "status": "正常",
-        "priority": "中",
-        "distance": 1847.6,
-        "capacity": "中带宽",
-        "createdAt": "2024-01-20T14:30:00.000Z"
+        "timestamp": "2024-01-22T06:21:25.714Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
       },
       {
-        "id": "circle_connector_006",
-        "description": "上海雷达站B到长沙数据中心的圆环连接器",
-        "source_id": "target_022",
-        "target_id": "target_045",
-        "type": "圆环连接",
-        "status": "正常",
-        "priority": "中",
-        "distance": 1034.7,
-        "capacity": "高带宽",
-        "createdAt": "2024-01-20T14:45:00.000Z"
+        "timestamp": "2024-01-22T06:26:47.142Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
       },
       {
-        "id": "circle_connector_007",
-        "description": "广州雷达站C到长沙数据中心的圆环连接器",
-        "source_id": "target_023",
-        "target_id": "target_045",
-        "type": "圆环连接",
-        "status": "正常",
-        "priority": "中",
-        "distance": 608.9,
-        "capacity": "高带宽",
-        "createdAt": "2024-01-20T15:00:00.000Z"
+        "timestamp": "2024-01-22T06:32:08.571Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T06:37:30.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T06:42:51.428Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T06:48:12.857Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T06:53:34.285Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T06:58:55.714Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:04:17.142Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:09:38.571Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:15:00.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:20:21.428Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:25:42.857Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:31:04.285Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:36:25.714Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:41:47.142Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T07:47:08.571Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T07:52:30.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T07:57:51.428Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:03:12.857Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:08:34.285Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:13:55.714Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:19:17.142Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:24:38.571Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:30:00.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 0,
+        "heading": 0,
+        "status": "系统启动",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:30:00.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 2.3,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:37:30.000Z",
+        "longitude": 119.7758,
+        "latitude": 24.569,
+        "altitude": 0,
+        "speed": 2.1,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:45:00.000Z",
+        "longitude": 119.7775,
+        "latitude": 24.5706,
+        "altitude": 0,
+        "speed": 1.8,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T08:52:30.000Z",
+        "longitude": 119.7793,
+        "latitude": 24.5722,
+        "altitude": 0,
+        "speed": 1.8,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T09:00:00.000Z",
+        "longitude": 119.7811,
+        "latitude": 24.5738,
+        "altitude": 0,
+        "speed": 1.9,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T09:07:30.000Z",
+        "longitude": 119.7828,
+        "latitude": 24.5754,
+        "altitude": 0,
+        "speed": 1.8,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T09:15:00.000Z",
+        "longitude": 119.7846,
+        "latitude": 24.577,
+        "altitude": 0,
+        "speed": 1.8,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T09:22:30.000Z",
+        "longitude": 119.7864,
+        "latitude": 24.5786,
+        "altitude": 0,
+        "speed": 2,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T09:30:00.000Z",
+        "longitude": 119.7881,
+        "latitude": 24.5802,
+        "altitude": 0,
+        "speed": 1.7,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T09:37:30.000Z",
+        "longitude": 119.7899,
+        "latitude": 24.5818,
+        "altitude": 0,
+        "speed": 2,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T09:45:00.000Z",
+        "longitude": 119.7916,
+        "latitude": 24.5834,
+        "altitude": 0,
+        "speed": 2.4,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T09:52:30.000Z",
+        "longitude": 119.7934,
+        "latitude": 24.585,
+        "altitude": 0,
+        "speed": 2.2,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:00:00.000Z",
+        "longitude": 119.7952,
+        "latitude": 24.5866,
+        "altitude": 0,
+        "speed": 1.7,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:07:30.000Z",
+        "longitude": 119.7969,
+        "latitude": 24.5882,
+        "altitude": 0,
+        "speed": 2.2,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:15:00.000Z",
+        "longitude": 119.7987,
+        "latitude": 24.5898,
+        "altitude": 0,
+        "speed": 2.2,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:22:30.000Z",
+        "longitude": 119.8005,
+        "latitude": 24.5915,
+        "altitude": 0,
+        "speed": 2.1,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:30:00.000Z",
+        "longitude": 119.8022,
+        "latitude": 24.5931,
+        "altitude": 0,
+        "speed": 1.7,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:37:30.000Z",
+        "longitude": 119.804,
+        "latitude": 24.5947,
+        "altitude": 0,
+        "speed": 1.7,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:45:00.000Z",
+        "longitude": 119.8058,
+        "latitude": 24.5963,
+        "altitude": 0,
+        "speed": 2.1,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T10:52:30.000Z",
+        "longitude": 119.8075,
+        "latitude": 24.5979,
+        "altitude": 0,
+        "speed": 2,
+        "heading": 45,
+        "status": "前往巡逻点",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T11:00:00.000Z",
+        "longitude": 119.8093,
+        "latitude": 24.5995,
+        "altitude": 0,
+        "speed": 2.3,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T11:07:30.000Z",
+        "longitude": 119.8111,
+        "latitude": 24.6011,
+        "altitude": 0,
+        "speed": 2.1,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T11:15:00.000Z",
+        "longitude": 119.8128,
+        "latitude": 24.6027,
+        "altitude": 0,
+        "speed": 1.6,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T11:22:30.000Z",
+        "longitude": 119.8146,
+        "latitude": 24.6043,
+        "altitude": 0,
+        "speed": 1.8,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T11:30:00.000Z",
+        "longitude": 119.8163,
+        "latitude": 24.6059,
+        "altitude": 0,
+        "speed": 2.3,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T11:37:30.000Z",
+        "longitude": 119.8181,
+        "latitude": 24.6075,
+        "altitude": 0,
+        "speed": 2.4,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T11:45:00.000Z",
+        "longitude": 119.8199,
+        "latitude": 24.6091,
+        "altitude": 0,
+        "speed": 2.4,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T11:52:30.000Z",
+        "longitude": 119.8216,
+        "latitude": 24.6107,
+        "altitude": 0,
+        "speed": 2.1,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T12:00:00.000Z",
+        "longitude": 119.8234,
+        "latitude": 24.6123,
+        "altitude": 0,
+        "speed": 2.2,
+        "heading": 45,
+        "status": "正常监控",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T12:00:00.000Z",
+        "longitude": 119.8234,
+        "latitude": 24.6123,
+        "altitude": 0,
+        "speed": 6.4,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T12:08:34.285Z",
+        "longitude": 119.8186,
+        "latitude": 24.6067,
+        "altitude": 0,
+        "speed": 5.7,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T12:17:08.571Z",
+        "longitude": 119.8138,
+        "latitude": 24.6012,
+        "altitude": 0,
+        "speed": 5.4,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T12:25:42.857Z",
+        "longitude": 119.809,
+        "latitude": 24.5956,
+        "altitude": 0,
+        "speed": 6.4,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T12:34:17.142Z",
+        "longitude": 119.8042,
+        "latitude": 24.5901,
+        "altitude": 0,
+        "speed": 5.3,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T12:42:51.428Z",
+        "longitude": 119.7994,
+        "latitude": 24.5845,
+        "altitude": 0,
+        "speed": 5.1,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T12:51:25.714Z",
+        "longitude": 119.7946,
+        "latitude": 24.579,
+        "altitude": 0,
+        "speed": 4.6,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T13:00:00.000Z",
+        "longitude": 119.7898,
+        "latitude": 24.5734,
+        "altitude": 0,
+        "speed": 6.6,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T13:08:34.285Z",
+        "longitude": 119.785,
+        "latitude": 24.5678,
+        "altitude": 0,
+        "speed": 5.5,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T13:17:08.571Z",
+        "longitude": 119.7802,
+        "latitude": 24.5623,
+        "altitude": 0,
+        "speed": 4.4,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T13:25:42.857Z",
+        "longitude": 119.7754,
+        "latitude": 24.5567,
+        "altitude": 0,
+        "speed": 6.4,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T13:34:17.142Z",
+        "longitude": 119.7706,
+        "latitude": 24.5512,
+        "altitude": 0,
+        "speed": 6.3,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T13:42:51.428Z",
+        "longitude": 119.7658,
+        "latitude": 24.5456,
+        "altitude": 0,
+        "speed": 6.5,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T13:51:25.714Z",
+        "longitude": 119.761,
+        "latitude": 24.5401,
+        "altitude": 0,
+        "speed": 5.8,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T14:00:00.000Z",
+        "longitude": 119.7562,
+        "latitude": 24.5345,
+        "altitude": 0,
+        "speed": 5.9,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T14:08:34.285Z",
+        "longitude": 119.7514,
+        "latitude": 24.5289,
+        "altitude": 0,
+        "speed": 5.6,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T14:17:08.571Z",
+        "longitude": 119.7466,
+        "latitude": 24.5234,
+        "altitude": 0,
+        "speed": 6.3,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T14:25:42.857Z",
+        "longitude": 119.7418,
+        "latitude": 24.5178,
+        "altitude": 0,
+        "speed": 4.4,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T14:34:17.142Z",
+        "longitude": 119.737,
+        "latitude": 24.5123,
+        "altitude": 0,
+        "speed": 4.9,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T14:42:51.428Z",
+        "longitude": 119.7322,
+        "latitude": 24.5067,
+        "altitude": 0,
+        "speed": 5.5,
+        "heading": 218,
+        "status": "巡逻中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T14:51:25.714Z",
+        "longitude": 119.7274,
+        "latitude": 24.5012,
+        "altitude": 0,
+        "speed": 5.4,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T15:00:00.000Z",
+        "longitude": 119.7226,
+        "latitude": 24.4956,
+        "altitude": 0,
+        "speed": 5.9,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T15:08:34.285Z",
+        "longitude": 119.7178,
+        "latitude": 24.49,
+        "altitude": 0,
+        "speed": 5.7,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T15:17:08.571Z",
+        "longitude": 119.713,
+        "latitude": 24.4845,
+        "altitude": 0,
+        "speed": 6.4,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T15:25:42.857Z",
+        "longitude": 119.7082,
+        "latitude": 24.4789,
+        "altitude": 0,
+        "speed": 5.8,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T15:34:17.142Z",
+        "longitude": 119.7034,
+        "latitude": 24.4734,
+        "altitude": 0,
+        "speed": 5.4,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T15:42:51.428Z",
+        "longitude": 119.6986,
+        "latitude": 24.4678,
+        "altitude": 0,
+        "speed": 5.3,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T15:51:25.714Z",
+        "longitude": 119.6938,
+        "latitude": 24.4623,
+        "altitude": 0,
+        "speed": 5.4,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T16:00:00.000Z",
+        "longitude": 119.689,
+        "latitude": 24.4567,
+        "altitude": 0,
+        "speed": 6,
+        "heading": 218,
+        "status": "巡逻监测",
+        "location": "海峡北部巡逻"
+      },
+      {
+        "timestamp": "2024-01-22T16:00:00.000Z",
+        "longitude": 119.689,
+        "latitude": 24.4567,
+        "altitude": 0,
+        "speed": 3.3,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T16:08:34.285Z",
+        "longitude": 119.692,
+        "latitude": 24.4607,
+        "altitude": 0,
+        "speed": 4.3,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T16:17:08.571Z",
+        "longitude": 119.6951,
+        "latitude": 24.4646,
+        "altitude": 0,
+        "speed": 3.3,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T16:25:42.857Z",
+        "longitude": 119.6981,
+        "latitude": 24.4686,
+        "altitude": 0,
+        "speed": 3.9,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T16:34:17.142Z",
+        "longitude": 119.7011,
+        "latitude": 24.4725,
+        "altitude": 0,
+        "speed": 3,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T16:42:51.428Z",
+        "longitude": 119.7042,
+        "latitude": 24.4765,
+        "altitude": 0,
+        "speed": 3,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T16:51:25.714Z",
+        "longitude": 119.7072,
+        "latitude": 24.4804,
+        "altitude": 0,
+        "speed": 3.7,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T17:00:00.000Z",
+        "longitude": 119.7103,
+        "latitude": 24.4844,
+        "altitude": 0,
+        "speed": 4.3,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T17:08:34.285Z",
+        "longitude": 119.7133,
+        "latitude": 24.4883,
+        "altitude": 0,
+        "speed": 3.4,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T17:17:08.571Z",
+        "longitude": 119.7163,
+        "latitude": 24.4923,
+        "altitude": 0,
+        "speed": 3.1,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T17:25:42.857Z",
+        "longitude": 119.7194,
+        "latitude": 24.4962,
+        "altitude": 0,
+        "speed": 4.4,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T17:34:17.142Z",
+        "longitude": 119.7224,
+        "latitude": 24.5002,
+        "altitude": 0,
+        "speed": 4.1,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T17:42:51.428Z",
+        "longitude": 119.7254,
+        "latitude": 24.5041,
+        "altitude": 0,
+        "speed": 4.1,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T17:51:25.714Z",
+        "longitude": 119.7285,
+        "latitude": 24.5081,
+        "altitude": 0,
+        "speed": 3.9,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T18:00:00.000Z",
+        "longitude": 119.7315,
+        "latitude": 24.5121,
+        "altitude": 0,
+        "speed": 4.5,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T18:08:34.285Z",
+        "longitude": 119.7345,
+        "latitude": 24.516,
+        "altitude": 0,
+        "speed": 3.6,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T18:17:08.571Z",
+        "longitude": 119.7376,
+        "latitude": 24.52,
+        "altitude": 0,
+        "speed": 3.8,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T18:25:42.857Z",
+        "longitude": 119.7406,
+        "latitude": 24.5239,
+        "altitude": 0,
+        "speed": 4.3,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T18:34:17.142Z",
+        "longitude": 119.7436,
+        "latitude": 24.5279,
+        "altitude": 0,
+        "speed": 3.9,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T18:42:51.428Z",
+        "longitude": 119.7467,
+        "latitude": 24.5318,
+        "altitude": 0,
+        "speed": 3.8,
+        "heading": 35,
+        "status": "返航中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-22T18:51:25.714Z",
+        "longitude": 119.7497,
+        "latitude": 24.5358,
+        "altitude": 0,
+        "speed": 3.2,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T19:00:00.000Z",
+        "longitude": 119.7528,
+        "latitude": 24.5397,
+        "altitude": 0,
+        "speed": 3.8,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T19:08:34.285Z",
+        "longitude": 119.7558,
+        "latitude": 24.5437,
+        "altitude": 0,
+        "speed": 3.4,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T19:17:08.571Z",
+        "longitude": 119.7588,
+        "latitude": 24.5476,
+        "altitude": 0,
+        "speed": 3.1,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T19:25:42.857Z",
+        "longitude": 119.7619,
+        "latitude": 24.5516,
+        "altitude": 0,
+        "speed": 3.6,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T19:34:17.142Z",
+        "longitude": 119.7649,
+        "latitude": 24.5555,
+        "altitude": 0,
+        "speed": 4,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T19:42:51.428Z",
+        "longitude": 119.7679,
+        "latitude": 24.5595,
+        "altitude": 0,
+        "speed": 3.4,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T19:51:25.714Z",
+        "longitude": 119.771,
+        "latitude": 24.5634,
+        "altitude": 0,
+        "speed": 4,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T20:00:00.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 3.7,
+        "heading": 35,
+        "status": "南向巡逻",
+        "location": "海峡南部监控"
+      },
+      {
+        "timestamp": "2024-01-22T20:00:00.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 3,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T20:28:53.333Z",
+        "longitude": 119.7819,
+        "latitude": 24.5756,
+        "altitude": 0,
+        "speed": 2.8,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T20:57:46.666Z",
+        "longitude": 119.7898,
+        "latitude": 24.5838,
+        "altitude": 0,
+        "speed": 3,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T21:26:40.000Z",
+        "longitude": 119.7977,
+        "latitude": 24.592,
+        "altitude": 0,
+        "speed": 3,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T21:55:33.333Z",
+        "longitude": 119.8056,
+        "latitude": 24.6002,
+        "altitude": 0,
+        "speed": 2.6,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T22:24:26.666Z",
+        "longitude": 119.8136,
+        "latitude": 24.6084,
+        "altitude": 0,
+        "speed": 2.3,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T22:53:20.000Z",
+        "longitude": 119.8215,
+        "latitude": 24.6166,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T23:22:13.333Z",
+        "longitude": 119.8294,
+        "latitude": 24.6249,
+        "altitude": 0,
+        "speed": 2.4,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-22T23:51:06.666Z",
+        "longitude": 119.8373,
+        "latitude": 24.6331,
+        "altitude": 0,
+        "speed": 2.9,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T00:20:00.000Z",
+        "longitude": 119.8452,
+        "latitude": 24.6413,
+        "altitude": 0,
+        "speed": 2.4,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T00:48:53.333Z",
+        "longitude": 119.8531,
+        "latitude": 24.6495,
+        "altitude": 0,
+        "speed": 2.3,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T01:17:46.666Z",
+        "longitude": 119.861,
+        "latitude": 24.6577,
+        "altitude": 0,
+        "speed": 2.8,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T01:46:40.000Z",
+        "longitude": 119.8689,
+        "latitude": 24.6659,
+        "altitude": 0,
+        "speed": 2.1,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T02:15:33.333Z",
+        "longitude": 119.8768,
+        "latitude": 24.6741,
+        "altitude": 0,
+        "speed": 2.2,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T02:44:26.666Z",
+        "longitude": 119.8848,
+        "latitude": 24.6823,
+        "altitude": 0,
+        "speed": 2.8,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T03:13:20.000Z",
+        "longitude": 119.8927,
+        "latitude": 24.6905,
+        "altitude": 0,
+        "speed": 2.6,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T03:42:13.333Z",
+        "longitude": 119.9006,
+        "latitude": 24.6987,
+        "altitude": 0,
+        "speed": 2.7,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T04:11:06.666Z",
+        "longitude": 119.9085,
+        "latitude": 24.7069,
+        "altitude": 0,
+        "speed": 2.6,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T04:40:00.000Z",
+        "longitude": 119.9164,
+        "latitude": 24.7151,
+        "altitude": 0,
+        "speed": 2.8,
+        "heading": 41,
+        "status": "待命中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T05:08:53.333Z",
+        "longitude": 119.9243,
+        "latitude": 24.7233,
+        "altitude": 0,
+        "speed": 2.2,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T05:37:46.666Z",
+        "longitude": 119.9322,
+        "latitude": 24.7315,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T06:06:40.000Z",
+        "longitude": 119.9401,
+        "latitude": 24.7398,
+        "altitude": 0,
+        "speed": 3,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T06:35:33.333Z",
+        "longitude": 119.948,
+        "latitude": 24.748,
+        "altitude": 0,
+        "speed": 2.6,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T07:04:26.666Z",
+        "longitude": 119.956,
+        "latitude": 24.7562,
+        "altitude": 0,
+        "speed": 2.6,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T07:33:20.000Z",
+        "longitude": 119.9639,
+        "latitude": 24.7644,
+        "altitude": 0,
+        "speed": 2.4,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T08:02:13.333Z",
+        "longitude": 119.9718,
+        "latitude": 24.7726,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T08:31:06.666Z",
+        "longitude": 119.9797,
+        "latitude": 24.7808,
+        "altitude": 0,
+        "speed": 2.6,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T09:00:00.000Z",
+        "longitude": 119.9876,
+        "latitude": 24.789,
+        "altitude": 0,
+        "speed": 2.2,
+        "heading": 41,
+        "status": "返回基地",
+        "location": "台湾海峡监测站"
+      },
+      {
+        "timestamp": "2024-01-23T09:00:00.000Z",
+        "longitude": 119.9876,
+        "latitude": 24.789,
+        "altitude": 0,
+        "speed": 13.4,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T09:10:00.000Z",
+        "longitude": 119.9711,
+        "latitude": 24.7726,
+        "altitude": 0,
+        "speed": 14.1,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T09:20:00.000Z",
+        "longitude": 119.9547,
+        "latitude": 24.7562,
+        "altitude": 0,
+        "speed": 12.2,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T09:30:00.000Z",
+        "longitude": 119.9382,
+        "latitude": 24.7397,
+        "altitude": 0,
+        "speed": 13.5,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T09:40:00.000Z",
+        "longitude": 119.9218,
+        "latitude": 24.7233,
+        "altitude": 0,
+        "speed": 13.8,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T09:50:00.000Z",
+        "longitude": 119.9053,
+        "latitude": 24.7069,
+        "altitude": 0,
+        "speed": 17.6,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T10:00:00.000Z",
+        "longitude": 119.8888,
+        "latitude": 24.6905,
+        "altitude": 0,
+        "speed": 14.9,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T10:10:00.000Z",
+        "longitude": 119.8724,
+        "latitude": 24.674,
+        "altitude": 0,
+        "speed": 12.2,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T10:20:00.000Z",
+        "longitude": 119.8559,
+        "latitude": 24.6576,
+        "altitude": 0,
+        "speed": 13.4,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T10:30:00.000Z",
+        "longitude": 119.8395,
+        "latitude": 24.6412,
+        "altitude": 0,
+        "speed": 14.1,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T10:40:00.000Z",
+        "longitude": 119.823,
+        "latitude": 24.6248,
+        "altitude": 0,
+        "speed": 16.6,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T10:50:00.000Z",
+        "longitude": 119.8065,
+        "latitude": 24.6084,
+        "altitude": 0,
+        "speed": 16.1,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T11:00:00.000Z",
+        "longitude": 119.7901,
+        "latitude": 24.5919,
+        "altitude": 0,
+        "speed": 17.6,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T11:10:00.000Z",
+        "longitude": 119.7736,
+        "latitude": 24.5755,
+        "altitude": 0,
+        "speed": 12.5,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T11:20:00.000Z",
+        "longitude": 119.7572,
+        "latitude": 24.5591,
+        "altitude": 0,
+        "speed": 12.8,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T11:30:00.000Z",
+        "longitude": 119.7407,
+        "latitude": 24.5427,
+        "altitude": 0,
+        "speed": 14.2,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T11:40:00.000Z",
+        "longitude": 119.7243,
+        "latitude": 24.5262,
+        "altitude": 0,
+        "speed": 13.8,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T11:50:00.000Z",
+        "longitude": 119.7078,
+        "latitude": 24.5098,
+        "altitude": 0,
+        "speed": 15.2,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T12:00:00.000Z",
+        "longitude": 119.6913,
+        "latitude": 24.4934,
+        "altitude": 0,
+        "speed": 13.7,
+        "heading": 222,
+        "status": "紧急航行",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T12:10:00.000Z",
+        "longitude": 119.6749,
+        "latitude": 24.477,
+        "altitude": 0,
+        "speed": 17.6,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T12:20:00.000Z",
+        "longitude": 119.6584,
+        "latitude": 24.4606,
+        "altitude": 0,
+        "speed": 12.8,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T12:30:00.000Z",
+        "longitude": 119.642,
+        "latitude": 24.4441,
+        "altitude": 0,
+        "speed": 13.9,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T12:40:00.000Z",
+        "longitude": 119.6255,
+        "latitude": 24.4277,
+        "altitude": 0,
+        "speed": 14.5,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T12:50:00.000Z",
+        "longitude": 119.609,
+        "latitude": 24.4113,
+        "altitude": 0,
+        "speed": 17.7,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T13:00:00.000Z",
+        "longitude": 119.5926,
+        "latitude": 24.3949,
+        "altitude": 0,
+        "speed": 15.5,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T13:10:00.000Z",
+        "longitude": 119.5761,
+        "latitude": 24.3784,
+        "altitude": 0,
+        "speed": 14.9,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T13:20:00.000Z",
+        "longitude": 119.5597,
+        "latitude": 24.362,
+        "altitude": 0,
+        "speed": 16.1,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T13:30:00.000Z",
+        "longitude": 119.5432,
+        "latitude": 24.3456,
+        "altitude": 0,
+        "speed": 13.7,
+        "heading": 222,
+        "status": "紧急出动",
+        "location": "海峡东部救援"
+      },
+      {
+        "timestamp": "2024-01-23T13:30:00.000Z",
+        "longitude": 119.5432,
+        "latitude": 24.3456,
+        "altitude": 0,
+        "speed": 8,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T13:40:00.000Z",
+        "longitude": 119.5517,
+        "latitude": 24.3538,
+        "altitude": 0,
+        "speed": 6.9,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T13:50:00.000Z",
+        "longitude": 119.5603,
+        "latitude": 24.362,
+        "altitude": 0,
+        "speed": 6.1,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T14:00:00.000Z",
+        "longitude": 119.5688,
+        "latitude": 24.3702,
+        "altitude": 0,
+        "speed": 6.9,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T14:10:00.000Z",
+        "longitude": 119.5774,
+        "latitude": 24.3785,
+        "altitude": 0,
+        "speed": 9,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T14:20:00.000Z",
+        "longitude": 119.5859,
+        "latitude": 24.3867,
+        "altitude": 0,
+        "speed": 8.6,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T14:30:00.000Z",
+        "longitude": 119.5945,
+        "latitude": 24.3949,
+        "altitude": 0,
+        "speed": 6.6,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T14:40:00.000Z",
+        "longitude": 119.603,
+        "latitude": 24.4031,
+        "altitude": 0,
+        "speed": 9,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T14:50:00.000Z",
+        "longitude": 119.6116,
+        "latitude": 24.4113,
+        "altitude": 0,
+        "speed": 6.5,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T15:00:00.000Z",
+        "longitude": 119.6201,
+        "latitude": 24.4195,
+        "altitude": 0,
+        "speed": 8.4,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T15:10:00.000Z",
+        "longitude": 119.6287,
+        "latitude": 24.4277,
+        "altitude": 0,
+        "speed": 7.5,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T15:20:00.000Z",
+        "longitude": 119.6372,
+        "latitude": 24.436,
+        "altitude": 0,
+        "speed": 8.3,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T15:30:00.000Z",
+        "longitude": 119.6458,
+        "latitude": 24.4442,
+        "altitude": 0,
+        "speed": 6.9,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T15:40:00.000Z",
+        "longitude": 119.6543,
+        "latitude": 24.4524,
+        "altitude": 0,
+        "speed": 6.6,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T15:50:00.000Z",
+        "longitude": 119.6629,
+        "latitude": 24.4606,
+        "altitude": 0,
+        "speed": 6.7,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T16:00:00.000Z",
+        "longitude": 119.6714,
+        "latitude": 24.4688,
+        "altitude": 0,
+        "speed": 9,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T16:10:00.000Z",
+        "longitude": 119.68,
+        "latitude": 24.477,
+        "altitude": 0,
+        "speed": 6.1,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T16:20:00.000Z",
+        "longitude": 119.6885,
+        "latitude": 24.4853,
+        "altitude": 0,
+        "speed": 8.9,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T16:30:00.000Z",
+        "longitude": 119.6971,
+        "latitude": 24.4935,
+        "altitude": 0,
+        "speed": 8.1,
+        "heading": 43,
+        "status": "搜救进行中",
+        "location": "航行中"
+      },
+      {
+        "timestamp": "2024-01-23T16:40:00.000Z",
+        "longitude": 119.7056,
+        "latitude": 24.5017,
+        "altitude": 0,
+        "speed": 7.8,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T16:50:00.000Z",
+        "longitude": 119.7142,
+        "latitude": 24.5099,
+        "altitude": 0,
+        "speed": 9,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T17:00:00.000Z",
+        "longitude": 119.7227,
+        "latitude": 24.5181,
+        "altitude": 0,
+        "speed": 9,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T17:10:00.000Z",
+        "longitude": 119.7313,
+        "latitude": 24.5263,
+        "altitude": 0,
+        "speed": 8.7,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T17:20:00.000Z",
+        "longitude": 119.7398,
+        "latitude": 24.5345,
+        "altitude": 0,
+        "speed": 6.9,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T17:30:00.000Z",
+        "longitude": 119.7484,
+        "latitude": 24.5428,
+        "altitude": 0,
+        "speed": 8.7,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T17:40:00.000Z",
+        "longitude": 119.7569,
+        "latitude": 24.551,
+        "altitude": 0,
+        "speed": 8.8,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T17:50:00.000Z",
+        "longitude": 119.7655,
+        "latitude": 24.5592,
+        "altitude": 0,
+        "speed": 6.8,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
+      },
+      {
+        "timestamp": "2024-01-23T18:00:00.000Z",
+        "longitude": 119.774,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 6.6,
+        "heading": 43,
+        "status": "搜救作业",
+        "location": "海峡西部搜救"
       }
-   ]
+    ]
+  }
 }
