@@ -1369,6 +1369,77 @@ const generateVirtualNodes = (target) => {
   return nodes
 }
 
+// 轨迹位置插值函数
+const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
+  if (!trajectory || trajectory.length === 0) {
+    return null
+  }
+  
+  // 如果只有一个点，直接返回该点
+  if (trajectory.length === 1) {
+    return {
+      longitude: trajectory[0].longitude,
+      latitude: trajectory[0].latitude,
+      height: trajectory[0].altitude || trajectory[0].height || 0
+    }
+  }
+  
+  const targetTime = new Date(targetTimeStr).getTime()
+  
+  // 查找时间范围
+  let beforeIndex = -1
+  let afterIndex = -1
+  
+  for (let i = 0; i < trajectory.length - 1; i++) {
+    const currentTime = new Date(trajectory[i].timestamp).getTime()
+    const nextTime = new Date(trajectory[i + 1].timestamp).getTime()
+    
+    if (currentTime <= targetTime && nextTime >= targetTime) {
+      beforeIndex = i
+      afterIndex = i + 1
+      break
+    }
+  }
+  
+  // 如果目标时间在轨迹范围之外
+  if (beforeIndex === -1 || afterIndex === -1) {
+    // 如果目标时间早于轨迹开始时间，返回第一个点
+    if (targetTime < new Date(trajectory[0].timestamp).getTime()) {
+      return {
+        longitude: trajectory[0].longitude,
+        latitude: trajectory[0].latitude,
+        height: trajectory[0].altitude || trajectory[0].height || 0
+      }
+    }
+    // 如果目标时间晚于轨迹结束时间，返回最后一个点
+    if (targetTime > new Date(trajectory[trajectory.length - 1].timestamp).getTime()) {
+      const lastPoint = trajectory[trajectory.length - 1]
+      return {
+        longitude: lastPoint.longitude,
+        latitude: lastPoint.latitude,
+        height: lastPoint.altitude || lastPoint.height || 0
+      }
+    }
+    return null
+  }
+  
+  const beforePoint = trajectory[beforeIndex]
+  const afterPoint = trajectory[afterIndex]
+  
+  // 计算插值因子
+  const beforeTime = new Date(beforePoint.timestamp).getTime()
+  const afterTime = new Date(afterPoint.timestamp).getTime()
+  const factor = (targetTime - beforeTime) / (afterTime - beforeTime)
+  
+  // 线性插值计算位置
+  return {
+    longitude: beforePoint.longitude + (afterPoint.longitude - beforePoint.longitude) * factor,
+    latitude: beforePoint.latitude + (afterPoint.latitude - beforePoint.latitude) * factor,
+    height: (beforePoint.altitude || beforePoint.height || 0) + 
+           ((afterPoint.altitude || afterPoint.height || 0) - (beforePoint.altitude || beforePoint.height || 0)) * factor
+  }
+}
+
 // 生成虚拟节点连线函数
 const generateVirtualRelations = (target, nodes) => {
   console.log('target', target)
@@ -1380,78 +1451,119 @@ const generateVirtualRelations = (target, nodes) => {
   if (originTarget.nodeConnections && Array.isArray(originTarget.nodeConnections)) {
     originTarget.nodeConnections.forEach((connection, index) => {
       // 查找源节点：根据connection.source匹配对应的虚拟节点
-      // connection.source格式为node_001, node_002等
-      // 生成的虚拟节点id格式为target_041-node-0, target_041-node-1等
-      // 需要建立映射关系：node_001对应第0个节点，node_002对应第1个节点
-      console.log('connection', connection)
       const nodeIndex = nodes.findIndex((item) => item.originNode.id === connection.source)
       const sourceNode = nodes[nodeIndex]
 
       console.log('sourceNode====================', sourceNode)
 
-      // 根据connection.target查找实际的点位数据
-      let actualPoint = dataManager.targetLocationManager.findById(connection.target)
-      console.log('actualPoint', actualPoint)
-
-      if (sourceNode && actualPoint) {
-        // 计算距离（简化计算，实际应使用地理距离）
-        const distance =
-          Math.sqrt(
-            Math.pow(actualPoint.longitude - sourceNode.position[0], 2) +
-              Math.pow(actualPoint.latitude - sourceNode.position[1], 2),
-          ) * 111 // 粗略转换为公里
-
-        const relationId = `circle_connector_${String(index + 1).padStart(3, '0')}`
-
-        const cleanTargetId = connection.target
-        const cleanSourceId = connection.source
-        console.log(
-          `连线${index}: source=${connection.source}, target=${connection.target}, 实际点位=${actualPoint.name}, 原target.id=${target.id}`,
-        )
-
-        const relation = {
-          id: relationId,
-          description: connection.description,
-          source_id: cleanSourceId, // 使用清理后的source_id
-          target_id: cleanTargetId, // 使用connection.target
-          type: connection.type || '圆环连接',
-          distance: Math.round(distance * 10) / 10,
-          createdAt: new Date().toISOString(),
-          // 保留原有属性用于兼容
-          name: connection.description || `${sourceNode.name} -> ${connection.target}`,
-          sourceId: cleanSourceId, // 使用清理后的source_id
-          targetId: cleanTargetId, // 使用connection.target
-          sourcePosition: sourceNode.position,
-          targetPosition: [actualPoint.longitude, actualPoint.latitude, actualPoint.height || 0], // 使用实际目标点的位置作为连线终点位置
-          // LineWithLabel组件需要的属性
-          positions: [
-            Cesium.Cartesian3.fromDegrees(...sourceNode.position),
-            Cesium.Cartesian3.fromDegrees(
-              actualPoint.longitude,
-              actualPoint.latitude,
-              actualPoint.height || 0,
-            ),
-          ],
-          width: 2,
-          material: connection.status === 'active' ? Cesium.Color.LIME : Cesium.Color.GRAY,
-          showLabel: false,
-          labelStyle: {
-            text: connection.description || connection.type,
-            font: '10pt sans-serif',
-            fillColor: Cesium.Color.WHITE,
-            outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 1,
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            showBackground: true,
-            backgroundColor: Cesium.Color.BLACK.withAlpha(0.7),
-            backgroundPadding: new Cesium.Cartesian2(8, 4),
-            pixelOffset: new Cesium.Cartesian2(0, -15),
-            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          },
-        }
-        relations.push(relation)
+      if (!sourceNode) {
+        console.warn(`虚拟连线警告: 找不到源节点 ${connection.source}，连线索引: ${index}`)
+        return
       }
+
+      // 检查目标是否为轨迹目标
+      const trajectoryData = dataManager.trajectoryManager.findByTargetId(connection.target)
+      const isTrajectoryTarget = !!(trajectoryData && trajectoryData.trajectory && trajectoryData.trajectory.length > 0)
+      
+      let positions
+      
+      if (isTrajectoryTarget) {
+        // 对于轨迹目标，使用CallbackProperty动态获取位置
+        positions = new Cesium.CallbackProperty((time, result) => {
+          // 尝试从实体中获取轨迹位置
+          const trajectoryEntity = getEntityByIds([
+            connection.target + '@trajectory@' + layerId.value,
+            connection.target + '@point@' + layerId.value,
+          ])
+          
+          let targetPosition
+          if (trajectoryEntity && trajectoryEntity.position) {
+            targetPosition = trajectoryEntity.position.getValue(time)
+          }
+          
+          if (!targetPosition) {
+            // 如果无法从实体获取位置，使用插值计算
+            const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
+            const interpolatedPosition = interpolateTrajectoryPosition(trajectoryData.trajectory, currentTimeStr)
+            
+            if (interpolatedPosition) {
+              targetPosition = Cesium.Cartesian3.fromDegrees(
+                interpolatedPosition.longitude,
+                interpolatedPosition.latitude,
+                interpolatedPosition.height || 0
+              )
+            } else {
+              // 使用最新点位作为备选
+              const latestPoint = trajectoryData.trajectory[trajectoryData.trajectory.length - 1]
+              targetPosition = Cesium.Cartesian3.fromDegrees(
+                latestPoint.longitude,
+                latestPoint.latitude,
+                latestPoint.altitude || latestPoint.height || 0
+              )
+            }
+          }
+          
+          const sourcePosition = Cesium.Cartesian3.fromDegrees(...sourceNode.position)
+          return [sourcePosition, targetPosition]
+        }, false)
+      } else {
+        // 对于静态目标，使用固定位置
+        const actualPoint = dataManager.targetLocationManager.findById(connection.target)
+        if (!actualPoint) {
+          console.warn(`虚拟连线警告: 找不到目标点位 ${connection.target}，既不在目标位置管理器中，也不在轨迹管理器中，连线索引: ${index}`)
+          return
+        }
+        
+        positions = [
+          Cesium.Cartesian3.fromDegrees(...sourceNode.position),
+          Cesium.Cartesian3.fromDegrees(
+            actualPoint.longitude,
+            actualPoint.latitude,
+            actualPoint.height || 0,
+          ),
+        ]
+      }
+
+      const relationId = `circle_connector_${String(index + 1).padStart(3, '0')}`
+      const cleanTargetId = connection.target
+      const cleanSourceId = connection.source
+      
+      console.log(
+        `连线${index}: source=${connection.source}, target=${connection.target}, 是轨迹目标=${isTrajectoryTarget}`,
+      )
+
+      const relation = {
+        id: relationId,
+        description: connection.description,
+        source_id: cleanSourceId,
+        target_id: cleanTargetId,
+        type: connection.type || '圆环连接',
+        createdAt: new Date().toISOString(),
+        name: connection.description || `${sourceNode.name} -> ${connection.target}`,
+        sourceId: cleanSourceId,
+        targetId: cleanTargetId,
+        sourcePosition: sourceNode.position,
+        // LineWithLabel组件需要的属性
+        positions: positions,
+        width: 2,
+        material: connection.status === 'active' ? Cesium.Color.LIME : Cesium.Color.GRAY,
+        showLabel: false,
+        labelStyle: {
+          text: connection.description || connection.type,
+          font: '10pt sans-serif',
+          fillColor: Cesium.Color.WHITE,
+          outlineColor: Cesium.Color.BLACK,
+          outlineWidth: 1,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          showBackground: true,
+          backgroundColor: Cesium.Color.BLACK.withAlpha(0.7),
+          backgroundPadding: new Cesium.Cartesian2(8, 4),
+          pixelOffset: new Cesium.Cartesian2(0, -15),
+          horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        },
+      }
+      relations.push(relation)
     })
   }
 
@@ -1572,6 +1684,7 @@ const onEventLeave = debounceEvent((data, event) => {
 // 组件挂载时确保处理初始数据
 onMounted(() => {
   console.log('🎯 DataVisualization - 组件已挂载，开始处理初始数据')
+  
   // 确保在组件挂载后处理所有初始数据
   nextTick(() => {
     if (props.points && props.points.length > 0) {
