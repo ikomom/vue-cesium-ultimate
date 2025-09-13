@@ -47,11 +47,7 @@
           "icon": "/icons/alert.svg",
           "color": "#ffff00",
           "status": "active",
-          "sensors": [
-            "温度",
-            "湿度",
-            "电压"
-          ],
+          "sensors": ["温度", "湿度", "电压"],
           "alertLevel": "normal",
           "description": "环境监控节点"
         },
@@ -177,12 +173,7 @@
           "icon": "/icons/alert.svg",
           "color": "#ffff00",
           "status": "active",
-          "sensors": [
-            "温度",
-            "湿度",
-            "气压",
-            "风速"
-          ],
+          "sensors": ["温度", "湿度", "气压", "风速"],
           "alertLevel": "normal",
           "description": "环境参数监控节点"
         },
@@ -226,11 +217,7 @@
           "icon": "/icons/warning.svg",
           "color": "#ff4500",
           "status": "active",
-          "alertTypes": [
-            "critical",
-            "warning",
-            "info"
-          ],
+          "alertTypes": ["critical", "warning", "info"],
           "responseTime": "<30s",
           "description": "集中告警处理中心"
         }
@@ -550,11 +537,118 @@
           "icon": "/icons/alert.svg",
           "color": "#ffd700",
           "status": "active",
-          "sensors": [
-            "风速",
-            "海浪",
-            "能见度"
-          ],
+          "sensors": ["风速", "海浪", "能见度"],
+          "description": "海峡气象监测点"
+        },
+        {
+          "id": "node_047_004",
+          "name": "救援协调",
+          "type": "应急救援",
+          "icon": "/icons/patrol.svg",
+          "color": "#ff6347",
+          "status": "standby",
+          "coverage": "台湾海峡全域",
+          "description": "海上救援协调中心"
+        },
+        {
+          "id": "node_047_005",
+          "name": "航道管制",
+          "type": "交通管制",
+          "icon": "/icons/port.svg",
+          "color": "#9370db",
+          "status": "active",
+          "jurisdiction": "主航道",
+          "description": "海峡航道交通管制"
+        },
+        {
+          "id": "node_047_006",
+          "name": "数据中心",
+          "type": "数据处理",
+          "icon": "/icons/communication.svg",
+          "color": "#ff1493",
+          "status": "active",
+          "capacity": "大数据处理",
+          "description": "海峡监测数据处理中心"
+        }
+      ],
+      "nodeConnections": [
+        {
+          "id": "conn_047_001",
+          "source": "node_047_001",
+          "target": "target_04711",
+          "type": "数据传输",
+          "bandwidth": "1Gbps",
+          "status": "active"
+        },
+        {
+          "id": "conn_047_002",
+          "source": "node_047_002",
+          "target": "target_04711",
+          "type": "数据上传",
+          "bandwidth": "10Gbps",
+          "status": "active"
+        },
+        {
+          "id": "conn_047_003",
+          "source": "node_047_003",
+          "target": "target_04711",
+          "type": "气象数据",
+          "bandwidth": "100Mbps",
+          "status": "active"
+        },
+        {
+          "id": "conn_047_004",
+          "source": "node_047_004",
+          "target": "target_04711",
+          "type": "协调通信",
+          "bandwidth": "500Mbps",
+          "status": "standby"
+        }
+      ]
+    },
+    {
+      "id": "target_04811",
+      "name": "台湾海峡捕鱼船",
+      "type": "海事监控",
+      "longitude": 121.774,
+      "latitude": 24.5674,
+      "height": 0,
+      "region": "东南沿海",
+      "province": "福建省",
+      "city": "厦门市",
+      "address": "台湾海峡中部海域",
+      "createdAt": "2024-01-22T10:30:00.000Z",
+      "virtualNodes": [
+        {
+          "id": "node_047_001",
+          "name": "海事雷达",
+          "type": "radar",
+          "icon": "/icons/radar.svg",
+          "color": "#00bfff",
+          "status": "active",
+          "range": "80km",
+          "frequency": "S波段",
+          "description": "海峡船只监控雷达"
+        },
+        {
+          "id": "node_047_002",
+          "name": "通信中继",
+          "type": "通信链路",
+          "icon": "/icons/communication.svg",
+          "color": "#32cd32",
+          "status": "active",
+          "capacity": "超高带宽",
+          "frequency": "5G",
+          "description": "海峡通信中继站"
+        },
+        {
+          "id": "node_047_003",
+          "name": "气象监测",
+          "type": "环境监控",
+          "icon": "/icons/alert.svg",
+          "color": "#ffd700",
+          "status": "active",
+          "sensors": ["风速", "海浪", "能见度"],
           "description": "海峡气象监测点"
         },
         {
@@ -2804,6 +2898,2008 @@
         "heading": 43,
         "status": "搜救作业",
         "location": "海峡西部搜救"
+      }
+    ],
+    "target_04811": [
+      {
+        "timestamp": "2024-01-23T08:00:00.000Z",
+        "longitude": 121.62,
+        "latitude": 24.45,
+        "altitude": 0,
+        "speed": 3.5,
+        "heading": 85,
+        "status": "出港",
+        "location": "港口"
+      },
+      {
+        "timestamp": "2024-01-23T08:03:36.000Z",
+        "longitude": 121.625,
+        "latitude": 24.452,
+        "altitude": 0,
+        "speed": 3.7,
+        "heading": 83,
+        "status": "出港",
+        "location": "港口"
+      },
+      {
+        "timestamp": "2024-01-23T08:07:12.000Z",
+        "longitude": 121.63,
+        "latitude": 24.454,
+        "altitude": 0,
+        "speed": 3.9,
+        "heading": 81,
+        "status": "出港",
+        "location": "港口"
+      },
+      {
+        "timestamp": "2024-01-23T08:10:48.000Z",
+        "longitude": 121.635,
+        "latitude": 24.456,
+        "altitude": 0,
+        "speed": 4.1,
+        "heading": 79,
+        "status": "出港",
+        "location": "港口"
+      },
+      {
+        "timestamp": "2024-01-23T08:14:24.000Z",
+        "longitude": 121.64,
+        "latitude": 24.458,
+        "altitude": 0,
+        "speed": 4.3,
+        "heading": 77,
+        "status": "出港",
+        "location": "港口"
+      },
+      {
+        "timestamp": "2024-01-23T08:18:00.000Z",
+        "longitude": 121.645,
+        "latitude": 24.46,
+        "altitude": 0,
+        "speed": 4.5,
+        "heading": 75,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:21:36.000Z",
+        "longitude": 121.65,
+        "latitude": 24.462,
+        "altitude": 0,
+        "speed": 4.7,
+        "heading": 73,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:25:12.000Z",
+        "longitude": 121.655,
+        "latitude": 24.464,
+        "altitude": 0,
+        "speed": 4.9,
+        "heading": 71,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:28:48.000Z",
+        "longitude": 121.66,
+        "latitude": 24.466,
+        "altitude": 0,
+        "speed": 5.1,
+        "heading": 69,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:32:24.000Z",
+        "longitude": 121.665,
+        "latitude": 24.468,
+        "altitude": 0,
+        "speed": 5.3,
+        "heading": 67,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:36:00.000Z",
+        "longitude": 121.67,
+        "latitude": 24.47,
+        "altitude": 0,
+        "speed": 5.5,
+        "heading": 65,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:39:36.000Z",
+        "longitude": 121.675,
+        "latitude": 24.472,
+        "altitude": 0,
+        "speed": 5.7,
+        "heading": 63,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:43:12.000Z",
+        "longitude": 121.68,
+        "latitude": 24.474,
+        "altitude": 0,
+        "speed": 5.9,
+        "heading": 61,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:46:48.000Z",
+        "longitude": 121.685,
+        "latitude": 24.476,
+        "altitude": 0,
+        "speed": 6.1,
+        "heading": 59,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:50:24.000Z",
+        "longitude": 121.69,
+        "latitude": 24.478,
+        "altitude": 0,
+        "speed": 6.3,
+        "heading": 57,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:54:00.000Z",
+        "longitude": 121.695,
+        "latitude": 24.48,
+        "altitude": 0,
+        "speed": 6.5,
+        "heading": 55,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T08:57:36.000Z",
+        "longitude": 121.7,
+        "latitude": 24.482,
+        "altitude": 0,
+        "speed": 6.7,
+        "heading": 53,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:01:12.000Z",
+        "longitude": 121.705,
+        "latitude": 24.484,
+        "altitude": 0,
+        "speed": 6.9,
+        "heading": 51,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:04:48.000Z",
+        "longitude": 121.71,
+        "latitude": 24.486,
+        "altitude": 0,
+        "speed": 7.1,
+        "heading": 49,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:08:24.000Z",
+        "longitude": 121.715,
+        "latitude": 24.488,
+        "altitude": 0,
+        "speed": 7.3,
+        "heading": 47,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:12:00.000Z",
+        "longitude": 121.72,
+        "latitude": 24.49,
+        "altitude": 0,
+        "speed": 7.5,
+        "heading": 45,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:15:36.000Z",
+        "longitude": 121.725,
+        "latitude": 24.492,
+        "altitude": 0,
+        "speed": 7.7,
+        "heading": 43,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:19:12.000Z",
+        "longitude": 121.73,
+        "latitude": 24.494,
+        "altitude": 0,
+        "speed": 7.9,
+        "heading": 41,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:22:48.000Z",
+        "longitude": 121.735,
+        "latitude": 24.496,
+        "altitude": 0,
+        "speed": 8.1,
+        "heading": 39,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:26:24.000Z",
+        "longitude": 121.74,
+        "latitude": 24.498,
+        "altitude": 0,
+        "speed": 8.3,
+        "heading": 37,
+        "status": "航行中",
+        "location": "前往渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:30:00.000Z",
+        "longitude": 121.745,
+        "latitude": 24.5,
+        "altitude": 0,
+        "speed": 8.0,
+        "heading": 50,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:33:36.000Z",
+        "longitude": 121.747,
+        "latitude": 24.504,
+        "altitude": 0,
+        "speed": 7.7,
+        "heading": 52,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:37:12.000Z",
+        "longitude": 121.749,
+        "latitude": 24.508,
+        "altitude": 0,
+        "speed": 7.4,
+        "heading": 54,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:40:48.000Z",
+        "longitude": 121.751,
+        "latitude": 24.512,
+        "altitude": 0,
+        "speed": 7.1,
+        "heading": 56,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:44:24.000Z",
+        "longitude": 121.753,
+        "latitude": 24.516,
+        "altitude": 0,
+        "speed": 6.8,
+        "heading": 58,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:48:00.000Z",
+        "longitude": 121.755,
+        "latitude": 24.52,
+        "altitude": 0,
+        "speed": 6.5,
+        "heading": 60,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:51:36.000Z",
+        "longitude": 121.757,
+        "latitude": 24.524,
+        "altitude": 0,
+        "speed": 6.2,
+        "heading": 62,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:55:12.000Z",
+        "longitude": 121.759,
+        "latitude": 24.528,
+        "altitude": 0,
+        "speed": 5.9,
+        "heading": 64,
+        "status": "减速",
+        "location": "接近渔场"
+      },
+      {
+        "timestamp": "2024-01-23T09:58:48.000Z",
+        "longitude": 121.761,
+        "latitude": 24.532,
+        "altitude": 0,
+        "speed": 5.6,
+        "heading": 66,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:02:24.000Z",
+        "longitude": 121.763,
+        "latitude": 24.536,
+        "altitude": 0,
+        "speed": 5.3,
+        "heading": 68,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:06:00.000Z",
+        "longitude": 121.765,
+        "latitude": 24.54,
+        "altitude": 0,
+        "speed": 5.0,
+        "heading": 70,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:09:36.000Z",
+        "longitude": 121.767,
+        "latitude": 24.544,
+        "altitude": 0,
+        "speed": 4.7,
+        "heading": 72,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:13:12.000Z",
+        "longitude": 121.769,
+        "latitude": 24.548,
+        "altitude": 0,
+        "speed": 4.4,
+        "heading": 74,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:16:48.000Z",
+        "longitude": 121.771,
+        "latitude": 24.552,
+        "altitude": 0,
+        "speed": 4.1,
+        "heading": 76,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:20:24.000Z",
+        "longitude": 121.773,
+        "latitude": 24.556,
+        "altitude": 0,
+        "speed": 3.8,
+        "heading": 78,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:24:00.000Z",
+        "longitude": 121.775,
+        "latitude": 24.56,
+        "altitude": 0,
+        "speed": 3.5,
+        "heading": 80,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:27:36.000Z",
+        "longitude": 121.777,
+        "latitude": 24.564,
+        "altitude": 0,
+        "speed": 3.2,
+        "heading": 82,
+        "status": "准备作业",
+        "location": "渔场边缘"
+      },
+      {
+        "timestamp": "2024-01-23T10:31:12.000Z",
+        "longitude": 121.784,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 0,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T10:34:48.000Z",
+        "longitude": 121.7841,
+        "latitude": 24.5701,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 15,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T10:38:24.000Z",
+        "longitude": 121.7835,
+        "latitude": 24.5729,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 30,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T10:42:00.000Z",
+        "longitude": 121.7821,
+        "latitude": 24.5755,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 45,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T10:45:36.000Z",
+        "longitude": 121.78,
+        "latitude": 24.5778,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 60,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T10:49:12.000Z",
+        "longitude": 121.7772,
+        "latitude": 24.5795,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 75,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T10:52:48.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5804,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 90,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T10:56:24.000Z",
+        "longitude": 121.7705,
+        "latitude": 24.5804,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 105,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:00:00.000Z",
+        "longitude": 121.767,
+        "latitude": 24.5795,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 120,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:03:36.000Z",
+        "longitude": 121.7637,
+        "latitude": 24.5777,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 135,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:07:12.000Z",
+        "longitude": 121.761,
+        "latitude": 24.5749,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 150,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:10:48.000Z",
+        "longitude": 121.759,
+        "latitude": 24.5714,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 165,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:14:24.000Z",
+        "longitude": 121.758,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 180,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:18:00.000Z",
+        "longitude": 121.7581,
+        "latitude": 24.5631,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 195,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:21:36.000Z",
+        "longitude": 121.7593,
+        "latitude": 24.5589,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 210,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:25:12.000Z",
+        "longitude": 121.7616,
+        "latitude": 24.555,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 225,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:28:48.000Z",
+        "longitude": 121.765,
+        "latitude": 24.5518,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 240,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:32:24.000Z",
+        "longitude": 121.7692,
+        "latitude": 24.5495,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 255,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:36:00.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5484,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 270,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:39:36.000Z",
+        "longitude": 121.779,
+        "latitude": 24.5486,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 285,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:43:12.000Z",
+        "longitude": 121.779,
+        "latitude": 24.5587,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 300,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:46:48.000Z",
+        "longitude": 121.7814,
+        "latitude": 24.56,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 315,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:50:24.000Z",
+        "longitude": 121.7835,
+        "latitude": 24.5619,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 330,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:54:00.000Z",
+        "longitude": 121.7851,
+        "latitude": 24.5644,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 345,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T11:57:36.000Z",
+        "longitude": 121.786,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 0,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:01:12.000Z",
+        "longitude": 121.7861,
+        "latitude": 24.5706,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 15,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:04:48.000Z",
+        "longitude": 121.7853,
+        "latitude": 24.5739,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 30,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:08:24.000Z",
+        "longitude": 121.7835,
+        "latitude": 24.5769,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 45,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:12:00.000Z",
+        "longitude": 121.781,
+        "latitude": 24.5795,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 60,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:15:36.000Z",
+        "longitude": 121.7778,
+        "latitude": 24.5814,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 75,
+        "status": "捕鱼作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:19:12.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5824,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 90,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:22:48.000Z",
+        "longitude": 121.77,
+        "latitude": 24.5824,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 105,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:26:24.000Z",
+        "longitude": 121.766,
+        "latitude": 24.5813,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 120,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:30:00.000Z",
+        "longitude": 121.7623,
+        "latitude": 24.5791,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 135,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:33:36.000Z",
+        "longitude": 121.7593,
+        "latitude": 24.5759,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 150,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:37:12.000Z",
+        "longitude": 121.7571,
+        "latitude": 24.5719,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 165,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:40:48.000Z",
+        "longitude": 121.756,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 180,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:44:24.000Z",
+        "longitude": 121.7561,
+        "latitude": 24.5626,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 195,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:48:00.000Z",
+        "longitude": 121.7575,
+        "latitude": 24.5579,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 210,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:51:36.000Z",
+        "longitude": 121.7602,
+        "latitude": 24.5536,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 225,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:55:12.000Z",
+        "longitude": 121.769,
+        "latitude": 24.5587,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 240,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T12:58:48.000Z",
+        "longitude": 121.7713,
+        "latitude": 24.5573,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 255,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:02:24.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5564,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 270,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:06:00.000Z",
+        "longitude": 121.777,
+        "latitude": 24.5563,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 285,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:09:36.000Z",
+        "longitude": 121.78,
+        "latitude": 24.557,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 300,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:13:12.000Z",
+        "longitude": 121.7828,
+        "latitude": 24.5586,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 315,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:16:48.000Z",
+        "longitude": 121.7853,
+        "latitude": 24.5609,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 330,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:20:24.000Z",
+        "longitude": 121.787,
+        "latitude": 24.5639,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 345,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:24:00.000Z",
+        "longitude": 121.788,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 0,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:27:36.000Z",
+        "longitude": 121.788,
+        "latitude": 24.5712,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 15,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:31:12.000Z",
+        "longitude": 121.787,
+        "latitude": 24.5749,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 30,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:34:48.000Z",
+        "longitude": 121.785,
+        "latitude": 24.5784,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 45,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:38:24.000Z",
+        "longitude": 121.782,
+        "latitude": 24.5813,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 60,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:42:00.000Z",
+        "longitude": 121.7783,
+        "latitude": 24.5833,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 75,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:45:36.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5844,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 90,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:49:12.000Z",
+        "longitude": 121.7695,
+        "latitude": 24.5843,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 105,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:52:48.000Z",
+        "longitude": 121.765,
+        "latitude": 24.583,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 120,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T13:56:24.000Z",
+        "longitude": 121.7609,
+        "latitude": 24.5805,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 135,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:00:00.000Z",
+        "longitude": 121.7575,
+        "latitude": 24.5769,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 150,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:03:36.000Z",
+        "longitude": 121.7552,
+        "latitude": 24.5724,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 165,
+        "status": "拖网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:07:12.000Z",
+        "longitude": 121.764,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 180,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:10:48.000Z",
+        "longitude": 121.7639,
+        "latitude": 24.5647,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 195,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:14:24.000Z",
+        "longitude": 121.7645,
+        "latitude": 24.5619,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 210,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:18:00.000Z",
+        "longitude": 121.7659,
+        "latitude": 24.5593,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 225,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:21:36.000Z",
+        "longitude": 121.768,
+        "latitude": 24.557,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 240,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:25:12.000Z",
+        "longitude": 121.7708,
+        "latitude": 24.5553,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 255,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:28:48.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5544,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 270,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:32:24.000Z",
+        "longitude": 121.7775,
+        "latitude": 24.5544,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 285,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:36:00.000Z",
+        "longitude": 121.781,
+        "latitude": 24.5553,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 300,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:39:36.000Z",
+        "longitude": 121.7843,
+        "latitude": 24.5571,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 315,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:43:12.000Z",
+        "longitude": 121.787,
+        "latitude": 24.5599,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 330,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:46:48.000Z",
+        "longitude": 121.789,
+        "latitude": 24.5634,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 345,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:50:24.000Z",
+        "longitude": 121.79,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 0,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:54:00.000Z",
+        "longitude": 121.7899,
+        "latitude": 24.5717,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 15,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T14:57:36.000Z",
+        "longitude": 121.7887,
+        "latitude": 24.5759,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 30,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:01:12.000Z",
+        "longitude": 121.7864,
+        "latitude": 24.5798,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 45,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:04:48.000Z",
+        "longitude": 121.783,
+        "latitude": 24.583,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 60,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:08:24.000Z",
+        "longitude": 121.7788,
+        "latitude": 24.5853,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 75,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:12:00.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5864,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 90,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:15:36.000Z",
+        "longitude": 121.769,
+        "latitude": 24.5862,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 105,
+        "status": "收网准备",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:19:12.000Z",
+        "longitude": 121.769,
+        "latitude": 24.5761,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 120,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:22:48.000Z",
+        "longitude": 121.7666,
+        "latitude": 24.5748,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 135,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:26:24.000Z",
+        "longitude": 121.7645,
+        "latitude": 24.5729,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 150,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:30:00.000Z",
+        "longitude": 121.7629,
+        "latitude": 24.5704,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 165,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:33:36.000Z",
+        "longitude": 121.762,
+        "latitude": 24.5674,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 180,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:37:12.000Z",
+        "longitude": 121.7619,
+        "latitude": 24.5642,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 195,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:40:48.000Z",
+        "longitude": 121.7627,
+        "latitude": 24.5609,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 210,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:44:24.000Z",
+        "longitude": 121.7645,
+        "latitude": 24.5579,
+        "altitude": 0,
+        "speed": 2.0,
+        "heading": 225,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:48:00.000Z",
+        "longitude": 121.767,
+        "latitude": 24.5553,
+        "altitude": 0,
+        "speed": 2.5,
+        "heading": 240,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:51:36.000Z",
+        "longitude": 121.7702,
+        "latitude": 24.5534,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 255,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:55:12.000Z",
+        "longitude": 121.774,
+        "latitude": 24.5524,
+        "altitude": 0,
+        "speed": 1.0,
+        "heading": 270,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T15:58:48.000Z",
+        "longitude": 121.778,
+        "latitude": 24.5524,
+        "altitude": 0,
+        "speed": 1.5,
+        "heading": 285,
+        "status": "收网作业",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:02:24.000Z",
+        "longitude": 121.74,
+        "latitude": 24.57,
+        "altitude": 0,
+        "speed": 3.0,
+        "heading": 210,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:06:00.000Z",
+        "longitude": 121.739,
+        "latitude": 24.569,
+        "altitude": 0,
+        "speed": 3.2,
+        "heading": 205,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:09:36.000Z",
+        "longitude": 121.738,
+        "latitude": 24.568,
+        "altitude": 0,
+        "speed": 3.4,
+        "heading": 200,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:13:12.000Z",
+        "longitude": 121.737,
+        "latitude": 24.567,
+        "altitude": 0,
+        "speed": 3.6,
+        "heading": 195,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:16:48.000Z",
+        "longitude": 121.736,
+        "latitude": 24.566,
+        "altitude": 0,
+        "speed": 3.8,
+        "heading": 190,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:20:24.000Z",
+        "longitude": 121.735,
+        "latitude": 24.565,
+        "altitude": 0,
+        "speed": 4.0,
+        "heading": 185,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:24:00.000Z",
+        "longitude": 121.734,
+        "latitude": 24.564,
+        "altitude": 0,
+        "speed": 4.2,
+        "heading": 180,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:27:36.000Z",
+        "longitude": 121.733,
+        "latitude": 24.563,
+        "altitude": 0,
+        "speed": 4.4,
+        "heading": 175,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:31:12.000Z",
+        "longitude": 121.732,
+        "latitude": 24.562,
+        "altitude": 0,
+        "speed": 4.6,
+        "heading": 170,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:34:48.000Z",
+        "longitude": 121.731,
+        "latitude": 24.561,
+        "altitude": 0,
+        "speed": 4.8,
+        "heading": 165,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:38:24.000Z",
+        "longitude": 121.73,
+        "latitude": 24.56,
+        "altitude": 0,
+        "speed": 5.0,
+        "heading": 160,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:42:00.000Z",
+        "longitude": 121.729,
+        "latitude": 24.559,
+        "altitude": 0,
+        "speed": 5.2,
+        "heading": 155,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:45:36.000Z",
+        "longitude": 121.728,
+        "latitude": 24.558,
+        "altitude": 0,
+        "speed": 5.4,
+        "heading": 150,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:49:12.000Z",
+        "longitude": 121.727,
+        "latitude": 24.557,
+        "altitude": 0,
+        "speed": 5.6,
+        "heading": 145,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:52:48.000Z",
+        "longitude": 121.726,
+        "latitude": 24.556,
+        "altitude": 0,
+        "speed": 5.8,
+        "heading": 140,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T16:56:24.000Z",
+        "longitude": 121.725,
+        "latitude": 24.555,
+        "altitude": 0,
+        "speed": 6.0,
+        "heading": 135,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:00:00.000Z",
+        "longitude": 121.724,
+        "latitude": 24.554,
+        "altitude": 0,
+        "speed": 6.2,
+        "heading": 130,
+        "status": "整理渔获",
+        "location": "主渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:03:36.000Z",
+        "longitude": 121.74,
+        "latitude": 24.57,
+        "altitude": 0,
+        "speed": 7.0,
+        "heading": 180,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:07:12.000Z",
+        "longitude": 121.737,
+        "latitude": 24.567,
+        "altitude": 0,
+        "speed": 7.1,
+        "heading": 182,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:10:48.000Z",
+        "longitude": 121.735,
+        "latitude": 24.565,
+        "altitude": 0,
+        "speed": 7.2,
+        "heading": 184,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:14:24.000Z",
+        "longitude": 121.733,
+        "latitude": 24.562,
+        "altitude": 0,
+        "speed": 7.3,
+        "heading": 186,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:18:00.000Z",
+        "longitude": 121.73,
+        "latitude": 24.56,
+        "altitude": 0,
+        "speed": 7.4,
+        "heading": 188,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:21:36.000Z",
+        "longitude": 121.727,
+        "latitude": 24.558,
+        "altitude": 0,
+        "speed": 7.5,
+        "heading": 190,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:25:12.000Z",
+        "longitude": 121.725,
+        "latitude": 24.555,
+        "altitude": 0,
+        "speed": 7.6,
+        "heading": 192,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:28:48.000Z",
+        "longitude": 121.722,
+        "latitude": 24.552,
+        "altitude": 0,
+        "speed": 7.7,
+        "heading": 194,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:32:24.000Z",
+        "longitude": 121.72,
+        "latitude": 24.55,
+        "altitude": 0,
+        "speed": 7.8,
+        "heading": 196,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:36:00.000Z",
+        "longitude": 121.718,
+        "latitude": 24.547,
+        "altitude": 0,
+        "speed": 7.9,
+        "heading": 198,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:39:36.000Z",
+        "longitude": 121.715,
+        "latitude": 24.545,
+        "altitude": 0,
+        "speed": 8.0,
+        "heading": 180,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:43:12.000Z",
+        "longitude": 121.712,
+        "latitude": 24.543,
+        "altitude": 0,
+        "speed": 8.1,
+        "heading": 182,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:46:48.000Z",
+        "longitude": 121.71,
+        "latitude": 24.54,
+        "altitude": 0,
+        "speed": 8.2,
+        "heading": 184,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:50:24.000Z",
+        "longitude": 121.707,
+        "latitude": 24.538,
+        "altitude": 0,
+        "speed": 8.3,
+        "heading": 186,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:54:00.000Z",
+        "longitude": 121.705,
+        "latitude": 24.535,
+        "altitude": 0,
+        "speed": 8.4,
+        "heading": 188,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T17:57:36.000Z",
+        "longitude": 121.703,
+        "latitude": 24.532,
+        "altitude": 0,
+        "speed": 8.5,
+        "heading": 190,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T18:01:12.000Z",
+        "longitude": 121.7,
+        "latitude": 24.53,
+        "altitude": 0,
+        "speed": 8.6,
+        "heading": 192,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T18:04:48.000Z",
+        "longitude": 121.698,
+        "latitude": 24.527,
+        "altitude": 0,
+        "speed": 8.7,
+        "heading": 194,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T18:08:24.000Z",
+        "longitude": 121.695,
+        "latitude": 24.525,
+        "altitude": 0,
+        "speed": 8.8,
+        "heading": 196,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T18:12:00.000Z",
+        "longitude": 121.692,
+        "latitude": 24.523,
+        "altitude": 0,
+        "speed": 8.9,
+        "heading": 198,
+        "status": "返航",
+        "location": "离开渔场"
+      },
+      {
+        "timestamp": "2024-01-23T18:15:36.000Z",
+        "longitude": 121.69,
+        "latitude": 24.52,
+        "altitude": 0,
+        "speed": 9.4,
+        "heading": 180,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:19:12.000Z",
+        "longitude": 121.688,
+        "latitude": 24.517,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 182,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:22:48.000Z",
+        "longitude": 121.685,
+        "latitude": 24.515,
+        "altitude": 0,
+        "speed": 9.2,
+        "heading": 184,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:26:24.000Z",
+        "longitude": 121.683,
+        "latitude": 24.512,
+        "altitude": 0,
+        "speed": 9.4,
+        "heading": 186,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:30:00.000Z",
+        "longitude": 121.68,
+        "latitude": 24.51,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 188,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:33:36.000Z",
+        "longitude": 121.677,
+        "latitude": 24.508,
+        "altitude": 0,
+        "speed": 9.2,
+        "heading": 190,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:37:12.000Z",
+        "longitude": 121.675,
+        "latitude": 24.505,
+        "altitude": 0,
+        "speed": 9.4,
+        "heading": 192,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:40:48.000Z",
+        "longitude": 121.672,
+        "latitude": 24.503,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 194,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:44:24.000Z",
+        "longitude": 121.67,
+        "latitude": 24.5,
+        "altitude": 0,
+        "speed": 9.2,
+        "heading": 196,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:48:00.000Z",
+        "longitude": 121.668,
+        "latitude": 24.497,
+        "altitude": 0,
+        "speed": 9.4,
+        "heading": 198,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:51:36.000Z",
+        "longitude": 121.665,
+        "latitude": 24.495,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 180,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:55:12.000Z",
+        "longitude": 121.662,
+        "latitude": 24.492,
+        "altitude": 0,
+        "speed": 9.2,
+        "heading": 182,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T18:58:48.000Z",
+        "longitude": 121.66,
+        "latitude": 24.49,
+        "altitude": 0,
+        "speed": 9.4,
+        "heading": 184,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:02:24.000Z",
+        "longitude": 121.657,
+        "latitude": 24.488,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 186,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:06:00.000Z",
+        "longitude": 121.655,
+        "latitude": 24.485,
+        "altitude": 0,
+        "speed": 9.2,
+        "heading": 188,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:09:36.000Z",
+        "longitude": 121.653,
+        "latitude": 24.482,
+        "altitude": 0,
+        "speed": 9.4,
+        "heading": 190,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:13:12.000Z",
+        "longitude": 121.65,
+        "latitude": 24.48,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 192,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:16:48.000Z",
+        "longitude": 121.648,
+        "latitude": 24.477,
+        "altitude": 0,
+        "speed": 9.2,
+        "heading": 194,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:20:24.000Z",
+        "longitude": 121.645,
+        "latitude": 24.475,
+        "altitude": 0,
+        "speed": 9.4,
+        "heading": 196,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:24:00.000Z",
+        "longitude": 121.642,
+        "latitude": 24.473,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 198,
+        "status": "返航",
+        "location": "返港航行"
+      },
+      {
+        "timestamp": "2024-01-23T19:27:36.000Z",
+        "longitude": 121.64,
+        "latitude": 24.47,
+        "altitude": 0,
+        "speed": 9.0,
+        "heading": 180,
+        "status": "减速进港",
+        "location": "接近港口"
+      },
+      {
+        "timestamp": "2024-01-23T19:31:12.000Z",
+        "longitude": 121.638,
+        "latitude": 24.468,
+        "altitude": 0,
+        "speed": 8.7,
+        "heading": 182,
+        "status": "减速进港",
+        "location": "接近港口"
+      },
+      {
+        "timestamp": "2024-01-23T19:34:48.000Z",
+        "longitude": 121.635,
+        "latitude": 24.465,
+        "altitude": 0,
+        "speed": 8.4,
+        "heading": 184,
+        "status": "减速进港",
+        "location": "接近港口"
+      },
+      {
+        "timestamp": "2024-01-23T19:38:24.000Z",
+        "longitude": 121.633,
+        "latitude": 24.462,
+        "altitude": 0,
+        "speed": 8.1,
+        "heading": 186,
+        "status": "减速进港",
+        "location": "接近港口"
+      },
+      {
+        "timestamp": "2024-01-23T19:42:00.000Z",
+        "longitude": 121.63,
+        "latitude": 24.46,
+        "altitude": 0,
+        "speed": 7.8,
+        "heading": 188,
+        "status": "减速进港",
+        "location": "接近港口"
+      },
+      {
+        "timestamp": "2024-01-23T19:45:36.000Z",
+        "longitude": 121.627,
+        "latitude": 24.457,
+        "altitude": 0,
+        "speed": 7.5,
+        "heading": 190,
+        "status": "进港",
+        "location": "港口入口"
+      },
+      {
+        "timestamp": "2024-01-23T19:49:12.000Z",
+        "longitude": 121.625,
+        "latitude": 24.455,
+        "altitude": 0,
+        "speed": 7.2,
+        "heading": 192,
+        "status": "进港",
+        "location": "港口入口"
+      },
+      {
+        "timestamp": "2024-01-23T19:52:48.000Z",
+        "longitude": 121.623,
+        "latitude": 24.453,
+        "altitude": 0,
+        "speed": 6.9,
+        "heading": 194,
+        "status": "进港",
+        "location": "港口入口"
+      },
+      {
+        "timestamp": "2024-01-23T19:56:24.000Z",
+        "longitude": 121.62,
+        "latitude": 24.45,
+        "altitude": 0,
+        "speed": 6.6,
+        "heading": 196,
+        "status": "进港",
+        "location": "港口入口"
       }
     ]
   }
