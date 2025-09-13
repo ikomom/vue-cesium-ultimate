@@ -608,7 +608,7 @@
         {
           "id": "conn_047_004",
           "source": "node_047_004",
-          "target": "target_02211",
+          "target": "target_04811",
           "type": "协调通信",
           "bandwidth": "500Mbps",
           "status": "standby"
