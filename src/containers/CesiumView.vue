@@ -18,6 +18,7 @@
           <!-- 数据可视化组件 - 纯UI组件 -->
           <DataVisualization
             :data-manager="layer.dataManager"
+            :viewer="viewer"
             :layer-id="layer.id"
             :layer-name="layer.name"
             :targets="layer.data.targets"
@@ -93,6 +94,8 @@ const tooltipData = ref(null)
 const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
 const contextMenuItems = ref([])
+
+const viewer = ref(null)
 
 
 // 工具函数
@@ -300,6 +303,7 @@ const onEventLeave = () => {
 function onViewerReady({ viewer, Cesium }) {
   console.log('onViewerReady', viewer)
   globalLayerManager.setViewer(viewer)
+  viewer.value = viewer
   window.viewer = viewer
   window.Cesium = Cesium
   ready.value = true

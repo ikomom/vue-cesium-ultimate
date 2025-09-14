@@ -70,11 +70,11 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       zIndex: 1,
       visible: false,
     })
-    targetBaseLayer.updateAllData({
-      targets: targetBaseData.value,
-      points: targetLocationData.value.slice(0, 20),
-      relations: relationData.value.slice(0, 6),
-    })
+    // targetBaseLayer.updateAllData({
+    //   targets: targetBaseData.value,
+    //   points: targetLocationData.value.slice(0, 20),
+    //   relations: relationData.value.slice(0, 6),
+    // })
 
     // 创建目标位置数据图层
     const targetLocationLayer = globalLayerManager.createLayer({
@@ -82,11 +82,11 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       zIndex: 2,
       visible: false,
     })
-    targetLocationLayer.updateAllData({
-      targets: targetBaseData.value,
-      points: targetLocationData.value.slice(20),
-      relations: relationData.value.slice(6),
-    })
+    // targetLocationLayer.updateAllData({
+    //   targets: targetBaseData.value,
+    //   points: targetLocationData.value.slice(20),
+    //   relations: relationData.value.slice(6),
+    // })
 
     // 创建关系连线图层
     const relationLayer = globalLayerManager.createLayer({
@@ -94,10 +94,10 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       zIndex: 3,
       visible: false,
     })
-    relationLayer.updateAllData({
-      targets: targetBaseData.value,
-      trajectories: trajectoryData.value,
-    })
+    // relationLayer.updateAllData({
+    //   targets: targetBaseData.value,
+    //   trajectories: trajectoryData.value,
+    // })
     // 创建圆环连接器数据图层
     const circleConnectorLayer = globalLayerManager.createLayer({
       name: '圆环连接器',
@@ -108,7 +108,6 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     // 设置显示控制 - 启用关系连线显示
     circleConnectorLayer.setShowControl('showRelation', true)
 
-    console.log('圆环连接器数据!!!!!!!!!!!!!!!!!!!!!', circleConnectorData.value)
     circleConnectorLayer.updateAllData({
       targets: circleConnectorData.value.targets || [],
       points: circleConnectorData.value.points || [],
@@ -123,14 +122,14 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       visible: false,
     })
 
-    allDataLayer.updateAllData({
-      targets: targetBaseData.value,
-      trajectories: trajectoryData.value,
-      points: targetLocationData.value,
-      relations: relationData.value,
-      events: eventData.value,
-      targetStatuses: targetStatusData.value,
-    })
+    // allDataLayer.updateAllData({
+    //   targets: targetBaseData.value,
+    //   trajectories: trajectoryData.value,
+    //   points: targetLocationData.value,
+    //   relations: relationData.value,
+    //   events: eventData.value,
+    //   targetStatuses: targetStatusData.value,
+    // })
 
     // 全局时间轴更新
     globalLayerManager.updateGlobalTimeline()

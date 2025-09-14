@@ -154,6 +154,7 @@ import {
   toRaw,
   nextTick,
   onMounted,
+  readonly,
 } from 'vue'
 import { debounce } from 'lodash-es'
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
@@ -276,6 +277,9 @@ const activeRings = ref(new Map()) // 存储活跃的圆环实体
 const virtualNodes = ref(new Map()) // 存储虚拟节点
 const virtualRelations = ref(new Map()) // 虚拟节点上的连线
 const virtualEvents = ref(new Map()) // 虚拟节点上的事件
+
+// 轨迹时间记录管理
+const trajectoryTimeLog = ref(new Map()) // 存储每个轨迹的开始时间和消失时间
 
 // 缓存配置对象，避免重复计算
 const distanceConfigs = getDistanceConfigs()
@@ -581,9 +585,9 @@ const processPoint = logFuncWrap(() => {
       }
 
       // 获取目标的所有状态数据并确保按时间排序（用于二分查找优化）
-      const allTargetStatus = (
-        dataManager.targetStatusManager?.findById(target.id) || []
-      ).sort((a, b) => a.startTime.localeCompare(b.startTime))
+      const allTargetStatus = (dataManager.targetStatusManager?.findById(target.id) || []).sort(
+        (a, b) => a.startTime.localeCompare(b.startTime),
+      )
 
       // 性能优化：状态缓存机制 - 避免重复计算
       // 由于 CallbackProperty 会频繁调用，缓存可以显著提升性能
@@ -1058,7 +1062,10 @@ const processTrajectory = logFuncWrap(() => {
       const positionSamples = []
       const timePositionProperty = new window.Cesium.SampledPositionProperty()
 
-      trajectory.trajectory.forEach((point) => {
+      // 轨迹ID
+      const trajectoryId = trajectory.target_id
+
+      trajectory.trajectory.forEach((point, index) => {
         // 确保timestamp是字符串格式
         const timestampStr =
           typeof point.timestamp === 'string' ? point.timestamp : String(point.timestamp)
@@ -1078,6 +1085,27 @@ const processTrajectory = logFuncWrap(() => {
             speed: point.speed,
             status: point.status,
           })
+
+          // 记录轨迹时间范围（只在第一个和最后一个点时记录）
+          if (index === 0) {
+            // 记录轨迹开始时间
+            if (!trajectoryTimeLog.value.has(trajectoryId)) {
+              trajectoryTimeLog.value.set(trajectoryId, {
+                trajectoryId: trajectoryId,
+                startTime: timestampStr,
+                endTime: null,
+                isVisible: false,
+              })
+            }
+          }
+
+          if (index === trajectory.trajectory.length - 1) {
+            // 记录轨迹结束时间
+            const timeRecord = trajectoryTimeLog.value.get(trajectoryId)
+            if (timeRecord) {
+              timeRecord.endTime = timestampStr
+            }
+          }
         } catch (error) {
           console.warn(`轨迹时间错误 时间格式转换失败: ${timestampStr}`, error)
         }
@@ -1144,6 +1172,62 @@ const processTrajectory = logFuncWrap(() => {
     .filter(Boolean)
   // console.log('轨迹数据', { renderTrajectory: toRaw(renderTrajectory.value) })
 }, '轨迹数据')
+
+/**
+ * 更新轨迹的可见性状态
+ * @param {string} trajectoryId - 轨迹ID
+ * @param {boolean} isVisible - 是否可见
+ * @param {string} currentTime - 当前时间（ISO8601格式）
+ */
+const updateTrajectoryVisibility = (trajectoryId, isVisible, currentTime) => {
+  const timeRecord = trajectoryTimeLog.value.get(trajectoryId)
+  if (!timeRecord) {
+    return
+  }
+
+  const wasVisible = timeRecord.isVisible
+
+  // 如果可见性发生变化，记录变化
+  if (wasVisible !== isVisible) {
+    timeRecord.isVisible = isVisible
+
+    console.log(
+      `轨迹可见性变化: ${trajectoryId} ${wasVisible ? '可见' : '不可见'} -> ${isVisible ? '可见' : '不可见'} at ${currentTime}`,
+    )
+  }
+}
+
+/**
+ * 获取轨迹的时间记录
+ * @param {string} trajectoryId - 轨迹ID
+ * @returns {Object|null} 轨迹时间记录对象
+ */
+const getTrajectoryTimeRecord = (trajectoryId) => {
+  return trajectoryTimeLog.value.get(trajectoryId) || null
+}
+
+/**
+ * 获取所有轨迹的时间记录
+ * @returns {Map} 所有轨迹时间记录
+ */
+const getAllTrajectoryTimeRecords = () => {
+  return trajectoryTimeLog.value
+}
+
+/**
+ * 检查轨迹在指定时间是否应该可见
+ * @param {string} trajectoryId - 轨迹ID
+ * @param {string} currentTime - 当前时间（ISO8601格式）
+ * @returns {boolean} 是否应该可见
+ */
+const isTrajectoryVisibleAtTime = (trajectoryId, currentTime) => {
+  const timeRecord = getTrajectoryTimeRecord(trajectoryId)
+  if (!timeRecord || !timeRecord.startTime || !timeRecord.endTime) {
+    return false
+  }
+
+  return currentTime >= timeRecord.startTime && currentTime <= timeRecord.endTime
+}
 
 // 处理事件数据
 const processEvent = logFuncWrap(() => {
@@ -1646,8 +1730,6 @@ const interpolateTrajectoryPosition = (trajectory, targetTimeStr) => {
         factor,
   }
 }
-
-
 
 // 生成虚拟节点连线函数
 const generateVirtualRelations = (target, nodes) => {
@@ -2200,14 +2282,12 @@ const generateTrajectoryVirtualNodeEvents = (trajectory, nodes) => {
 
       if (eventData.source_id) {
         // 方法1：通过originNode.id匹配
-        sourceNode = nodes.find(
-          (node) => node.originNode?.id === eventData.source_id
-        )
+        sourceNode = nodes.find((node) => node.originNode?.id === eventData.source_id)
 
         // 方法2：如果方法1失败，通过base.virtualNodes的索引匹配
         if (!sourceNode && base.virtualNodes && Array.isArray(base.virtualNodes)) {
           const virtualNodeIndex = base.virtualNodes.findIndex(
-            (vNode) => vNode.id === eventData.source_id
+            (vNode) => vNode.id === eventData.source_id,
           )
           if (virtualNodeIndex >= 0 && virtualNodeIndex < nodes.length) {
             sourceNode = nodes[virtualNodeIndex]
@@ -2223,7 +2303,7 @@ const generateTrajectoryVirtualNodeEvents = (trajectory, nodes) => {
       if (!sourceNode) {
         console.warn(
           `轨迹虚拟节点事件警告: 找不到源节点 ${eventData.source_id}，事件索引: ${index}，可用节点:`,
-          nodes.map(n => ({ id: n.id, originNodeId: n.originNode?.id }))
+          nodes.map((n) => ({ id: n.id, originNodeId: n.originNode?.id })),
         )
         return
       }
@@ -2622,6 +2702,50 @@ onMounted(() => {
       processTrajectory()
     }
   })
+
+  // 等待viewer初始化完成后添加时间轴监听器
+  watchEffect(() => {
+    console.log('🎯 viewer.value', viewer.value)
+    if (viewer.value && viewer.value.clock) {
+      console.log('🎯 viewer已初始化，添加时间轴监听器')
+      viewer.value.clock.onTick.addEventListener((clock) => {
+        const currentTime = clock.currentTime
+        const currentTimeStr = window.Cesium.JulianDate.toIso8601(currentTime)
+
+        // 遍历所有轨迹记录，检查可见性变化
+        trajectoryTimeLog.value.forEach((timeRecord, trajectoryId) => {
+          if (timeRecord.startTime && timeRecord.endTime) {
+            const startTime = window.Cesium.JulianDate.fromIso8601(timeRecord.startTime)
+            const endTime = window.Cesium.JulianDate.fromIso8601(timeRecord.endTime)
+
+            // 判断当前时间是否在轨迹的可见时间范围内
+            const shouldBeVisible =
+              window.Cesium.JulianDate.greaterThanOrEquals(currentTime, startTime) &&
+              window.Cesium.JulianDate.lessThanOrEquals(currentTime, endTime)
+
+            // 更新可见性状态
+            if (timeRecord.isVisible !== shouldBeVisible) {
+              updateTrajectoryVisibility(trajectoryId, shouldBeVisible, currentTimeStr)
+            }
+          }
+        })
+      })
+    }
+  })
+})
+
+// 暴露轨迹时间记录相关函数供外部调用
+defineExpose({
+  // 原有的暴露函数...
+
+  // 轨迹时间记录相关函数
+  getTrajectoryTimeRecord,
+  getAllTrajectoryTimeRecords,
+  isTrajectoryVisibleAtTime,
+  updateTrajectoryVisibility,
+
+  // 获取轨迹时间记录的响应式数据
+  trajectoryTimeLog: readonly(trajectoryTimeLog),
 })
 </script>
 
