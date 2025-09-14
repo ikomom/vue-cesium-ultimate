@@ -1820,6 +1820,25 @@ const generateVirtualRelations = (target, nodes) => {
       if (isTrajectoryTarget) {
         // 对于轨迹目标，使用CallbackProperty动态获取位置
         positions = new Cesium.CallbackProperty((time, result) => {
+          // 检查轨迹数据是否仍然有效
+          const currentTrajectoryData = dataManager.trajectoryManager.findById(connection.target_id)
+          console.log('currentTrajectoryData', currentTrajectoryData)
+          if (!currentTrajectoryData || !currentTrajectoryData.trajectory || currentTrajectoryData.trajectory.length === 0) {
+            // 轨迹消失时返回null，隐藏连线
+            return null
+          }
+
+          // 检查当前时间是否在轨迹时间范围内
+          const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
+          const trajectory = currentTrajectoryData.trajectory
+          const firstTimestamp = trajectory[0].timestamp
+          const lastTimestamp = trajectory[trajectory.length - 1].timestamp
+          
+          if (currentTimeStr < firstTimestamp || currentTimeStr > lastTimestamp) {
+            // 当前时间超出轨迹时间范围，隐藏连线
+            return null
+          }
+
           // 尝试从实体中获取轨迹位置
           let trajectoryEntity
           // const trajectoryEntity = getEntityByIds([
@@ -1838,7 +1857,7 @@ const generateVirtualRelations = (target, nodes) => {
             // 如果无法从实体获取位置，使用插值计算
             const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
             const interpolatedPosition = interpolateTrajectoryPosition(
-              trajectoryData.trajectory,
+              currentTrajectoryData.trajectory,
               currentTimeStr,
             )
 
@@ -1850,7 +1869,7 @@ const generateVirtualRelations = (target, nodes) => {
               )
             } else {
               // 使用最新点位作为备选
-              const latestPoint = trajectoryData.trajectory[trajectoryData.trajectory.length - 1]
+              const latestPoint = currentTrajectoryData.trajectory[currentTrajectoryData.trajectory.length - 1]
               targetPosition = Cesium.Cartesian3.fromDegrees(
                 latestPoint.longitude,
                 latestPoint.latitude,
@@ -2166,6 +2185,24 @@ const generateVirtualNodeEvents = (target, nodes) => {
       if (isTrajectoryTarget) {
         // 对于轨迹目标，使用CallbackProperty动态获取位置
         positions = new Cesium.CallbackProperty((time, result) => {
+          // 检查轨迹数据是否仍然有效
+          const currentTrajectoryData = dataManager.trajectoryManager.findById(targetId)
+          if (!currentTrajectoryData || !currentTrajectoryData.trajectory || currentTrajectoryData.trajectory.length === 0) {
+            // 轨迹消失时返回null，隐藏连线
+            return null
+          }
+
+          // 检查当前时间是否在轨迹时间范围内
+          const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
+          const trajectory = currentTrajectoryData.trajectory
+          const firstTimestamp = trajectory[0].timestamp
+          const lastTimestamp = trajectory[trajectory.length - 1].timestamp
+          
+          if (currentTimeStr < firstTimestamp || currentTimeStr > lastTimestamp) {
+            // 当前时间超出轨迹时间范围，隐藏连线
+            return null
+          }
+
           // 尝试从实体中获取轨迹位置
           let trajectoryEntity
           // const trajectoryEntity = getEntityByIds([
@@ -2180,9 +2217,8 @@ const generateVirtualNodeEvents = (target, nodes) => {
 
           if (!targetPosition) {
             // 如果无法从实体获取位置，使用插值计算
-            const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
             const interpolatedPosition = interpolateTrajectoryPosition(
-              trajectoryData.trajectory,
+              currentTrajectoryData.trajectory,
               currentTimeStr,
             )
 
@@ -2194,7 +2230,7 @@ const generateVirtualNodeEvents = (target, nodes) => {
               )
             } else {
               // 使用最新点位作为备选
-              const latestPoint = trajectoryData.trajectory[trajectoryData.trajectory.length - 1]
+              const latestPoint = currentTrajectoryData.trajectory[currentTrajectoryData.trajectory.length - 1]
               targetPosition = Cesium.Cartesian3.fromDegrees(
                 latestPoint.longitude,
                 latestPoint.latitude,
