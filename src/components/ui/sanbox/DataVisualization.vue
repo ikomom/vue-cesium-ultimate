@@ -1452,11 +1452,28 @@ const onTargetClick = (target, event) => {
 
 // 生成轨迹动态虚拟节点函数
 const generateTrajectoryVirtualNodes = (trajectory) => {
-  const { originTarget } = trajectory
+  const { originTarget, trajectoryData } = trajectory
   console.log('轨迹虚拟节点 - originTarget:', originTarget)
+
+  // 检查轨迹数据有效性，防止轨迹消失时出现数组长度错误
+  if (!trajectoryData || !trajectoryData.trajectory || trajectoryData.trajectory.length === 0) {
+    console.warn('轨迹数据无效或已消失，跳过虚拟节点生成:', trajectory.id)
+    return []
+  }
+
+  // 检查originTarget和virtualNodes的有效性
+  if (!originTarget || !originTarget.virtualNodes || !Array.isArray(originTarget.virtualNodes)) {
+    console.warn('轨迹目标缺少虚拟节点配置，跳过虚拟节点生成:', trajectory.id)
+    return []
+  }
 
   const nodes = []
   const nodeCount = originTarget.virtualNodes.length || 0
+
+  // 如果节点数量为0，直接返回空数组
+  if (nodeCount === 0) {
+    return []
+  }
 
   const radius = originTarget.ringRadius || 50000
 
@@ -1467,6 +1484,11 @@ const generateTrajectoryVirtualNodes = (trajectory) => {
     // 为轨迹虚拟节点创建动态位置
     const dynamicNodePosition = new window.Cesium.CallbackProperty((time) => {
       try {
+        // 首先检查轨迹数据在当前时间是否有效
+        if (!trajectoryData || !trajectoryData.trajectory || trajectoryData.trajectory.length === 0) {
+          return null // 轨迹数据无效时返回null，让Cesium处理
+        }
+
         const viewer = window.viewer || window.cesiumViewer
         if (viewer) {
           const trajectoryEntity = viewer.entities.getById(trajectory.id)
@@ -1508,10 +1530,11 @@ const generateTrajectoryVirtualNodes = (trajectory) => {
         }
       } catch (error) {
         console.warn('获取轨迹虚拟节点位置失败:', error)
+        // 当轨迹在时间轴移动时消失，返回null让Cesium隐藏节点
+        return null
       }
-      // 如果获取失败，返回默认位置的Cartesian3
-      const defaultPos = trajectory.position || [121.774, 24.5674, 0]
-      return window.Cesium.Cartesian3.fromDegrees(defaultPos[0], defaultPos[1], defaultPos[2] || 0)
+      // 如果轨迹实体不存在或位置无效，返回null让Cesium处理
+      return null
     }, false)
 
     // 获取对应的virtualNode配置数据
@@ -1910,6 +1933,18 @@ const generateTrajectoryVirtualRelations = (trajectory, nodes) => {
   const { trajectoryData } = trajectory
   const relations = []
 
+  // 检查nodes数组有效性，防止数组长度错误
+  if (!nodes || !Array.isArray(nodes) || nodes.length === 0) {
+    console.warn('轨迹虚拟节点数组无效，跳过连线生成:', trajectory.id)
+    return []
+  }
+
+  // 检查轨迹数据有效性
+  if (!trajectoryData || !trajectoryData.target_id) {
+    console.warn('轨迹数据无效，跳过连线生成:', trajectory.id)
+    return []
+  }
+
   // 获取目标基础数据
   const base = dataManager.targetBaseManager.findById(trajectoryData.target_id)
 
@@ -2034,6 +2069,11 @@ const generateTrajectoryVirtualRelations = (trajectory, nodes) => {
           targetPosition: isTrajectoryTarget
             ? new window.Cesium.CallbackProperty((time) => {
                 try {
+                  // 检查轨迹数据在当前时间是否有效
+                  if (!trajectoryData || !trajectoryData.trajectory || trajectoryData.trajectory.length === 0) {
+                    return null // 轨迹数据无效时返回null
+                  }
+
                   const viewer = window.viewer || window.cesiumViewer
                   if (viewer) {
                     // 使用正确的轨迹实体ID格式
@@ -2669,16 +2709,22 @@ const onTrajectoryDblClick = (trajectory, event) => {
       // 如果轨迹目标包含virtualNodes属性，生成动态虚拟节点
       if (base.virtualNodes && base.virtualNodes.length > 0) {
         const nodes = generateTrajectoryVirtualNodes(trajectory)
-        virtualNodes.value.set(nodesId, nodes)
+        
+        // 只有在成功生成虚拟节点时才继续处理连线
+        if (nodes && nodes.length > 0) {
+          virtualNodes.value.set(nodesId, nodes)
 
-        // 生成轨迹动态虚拟节点连线
-        const relations = generateTrajectoryVirtualRelations(trajectory, nodes)
-        virtualRelations.value.set(nodesId, relations)
+          // 生成轨迹动态虚拟节点连线
+          const relations = generateTrajectoryVirtualRelations(trajectory, nodes)
+          virtualRelations.value.set(nodesId, relations)
 
-        // 生成轨迹虚拟节点连线
-        const connections = generateTrajectoryVirtualNodeEvents(trajectory, nodes)
-        virtualEvents.value.set(nodesId, connections)
-        console.log('创建轨迹虚拟节点连线:', nodesId, connections)
+          // 生成轨迹虚拟节点连线
+          // const connections = generateTrajectoryVirtualNodeEvents(trajectory, nodes)
+          // virtualEvents.value.set(nodesId, connections)
+          console.log('创建轨迹虚拟节点连线:', nodesId, relations)
+        } else {
+          console.warn('轨迹虚拟节点生成失败，跳过连线创建:', trajectory.id)
+        }
       }
     }
   } else {
