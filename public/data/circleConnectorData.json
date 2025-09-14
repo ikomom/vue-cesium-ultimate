@@ -88,8 +88,8 @@
       "nodeConnections": [
         {
           "id": "conn_001",
-          "source": "node_001",
-          "target": "target_04711",
+          "source_id": "node_001",
+          "target_id": "target_04711",
           "type": "通信链路",
           "bandwidth": "100Mbps",
           "protocol": "TCP/IP",
@@ -98,8 +98,8 @@
         },
         {
           "id": "conn_002",
-          "source": "node_002",
-          "target": "target_04611",
+          "source_id": "node_002",
+          "target_id": "target_04611",
           "type": "圆环连接",
           "bandwidth": "200Mbps",
           "protocol": "UDP",
@@ -108,8 +108,8 @@
         },
         {
           "id": "conn_003",
-          "source": "node_003",
-          "target": "target_04611",
+          "source_id": "node_003",
+          "target_id": "target_04611",
           "type": "monitoring",
           "bandwidth": "10Mbps",
           "protocol": "SNMP",
@@ -118,8 +118,8 @@
         },
         {
           "id": "conn_004",
-          "source": "node_004",
-          "target": "target_04311",
+          "source_id": "node_004",
+          "target_id": "target_04311",
           "type": "数据传输",
           "bandwidth": "500Mbps",
           "protocol": "HTTPS",
@@ -128,8 +128,8 @@
         },
         {
           "id": "conn_005",
-          "source": "node_005",
-          "target": "target_04311",
+          "source_id": "node_005",
+          "target_id": "target_04311",
           "type": "军事协防",
           "bandwidth": "50Mbps",
           "protocol": "SSL/TLS",
@@ -138,8 +138,8 @@
         },
         {
           "id": "conn_006",
-          "source": "node_006",
-          "target": "target_04711",
+          "source_id": "node_006",
+          "target_id": "target_04711",
           "type": "数据传输",
           "bandwidth": "200Mbps",
           "protocol": "RSYNC",
@@ -315,8 +315,8 @@
       "nodeConnections": [
         {
           "id": "conn_gz01",
-          "source": "node_gz01",
-          "target": "target_04311",
+          "source_id": "node_gz01",
+          "target_id": "target_04311",
           "type": "雷达覆盖",
           "bandwidth": "50Mbps",
           "protocol": "MQTT",
@@ -325,8 +325,8 @@
         },
         {
           "id": "conn_gz02",
-          "source": "node_gz02",
-          "target": "target_04311",
+          "source_id": "node_gz02",
+          "target_id": "target_04311",
           "type": "军事协防",
           "bandwidth": "2Gbps",
           "protocol": "RTSP",
@@ -335,8 +335,8 @@
         },
         {
           "id": "conn_gz03",
-          "source": "node_gz03",
-          "target": "target_04311",
+          "source_id": "node_gz03",
+          "target_id": "target_04311",
           "type": "通信链路",
           "bandwidth": "100Mbps",
           "protocol": "SNMP",
@@ -345,8 +345,8 @@
         },
         {
           "id": "conn_gz04",
-          "source": "node_gz04",
-          "target": "target_04311",
+          "source_id": "node_gz04",
+          "target_id": "target_04311",
           "type": "雷达覆盖",
           "bandwidth": "80Mbps",
           "protocol": "HTTP/2",
@@ -355,8 +355,8 @@
         },
         {
           "id": "conn_gz05",
-          "source": "node_gz05",
-          "target": "target_04311",
+          "source_id": "node_gz05",
+          "target_id": "target_04311",
           "type": "军事协防",
           "bandwidth": "20Mbps",
           "protocol": "WebSocket",
@@ -489,8 +489,8 @@
       "nodeConnections": [
         {
           "id": "conn_wh01",
-          "source": "node_wh01",
-          "target": "target_04411",
+          "source_id": "node_wh01",
+          "target_id": "target_04411",
           "type": "军事协防",
           "bandwidth": "1Gbps",
           "protocol": "TCP/IP",
@@ -499,8 +499,8 @@
         },
         {
           "id": "conn_wh02",
-          "source": "node_wh02",
-          "target": "target_04411",
+          "source_id": "node_wh02",
+          "target_id": "target_04411",
           "type": "communication",
           "bandwidth": "5Gbps",
           "protocol": "Multi-Protocol",
@@ -509,8 +509,8 @@
         },
         {
           "id": "conn_wh03",
-          "source": "node_wh03",
-          "target": "target_04411",
+          "source_id": "node_wh03",
+          "target_id": "target_04411",
           "type": "军事协防",
           "bandwidth": "800Mbps",
           "protocol": "HTTPS",
@@ -519,8 +519,8 @@
         },
         {
           "id": "conn_wh04",
-          "source": "node_wh04",
-          "target": "target_04411",
+          "source_id": "node_wh04",
+          "target_id": "target_04411",
           "type": "数据传输",
           "bandwidth": "200Mbps",
           "protocol": "HTTP/2",
@@ -529,8 +529,8 @@
         },
         {
           "id": "conn_wh05",
-          "source": "node_wh05",
-          "target": "target_04411",
+          "source_id": "node_wh05",
+          "target_id": "target_04411",
           "type": "technical_support",
           "bandwidth": "300Mbps",
           "protocol": "SSH/SFTP",
@@ -539,8 +539,8 @@
         },
         {
           "id": "conn_wh06",
-          "source": "node_wh06",
-          "target": "target_04411",
+          "source_id": "node_wh06",
+          "target_id": "target_04411",
           "type": "军事协防",
           "bandwidth": "100Mbps",
           "protocol": "WebSocket",
@@ -673,32 +673,32 @@
       "nodeConnections": [
         {
           "id": "conn_047_001",
-          "source": "node_047_001",
-          "target": "target_04111",
+          "source_id": "node_047_001",
+          "target_id": "target_04111",
           "type": "数据传输",
           "bandwidth": "1Gbps",
           "status": "active"
         },
         {
           "id": "conn_047_002",
-          "source": "node_047_002",
-          "target": "target_04111",
+          "source_id": "node_047_002",
+          "target_id": "target_04111",
           "type": "数据上传",
           "bandwidth": "10Gbps",
           "status": "active"
         },
         {
           "id": "conn_047_003",
-          "source": "node_047_003",
-          "target": "target_02211",
+          "source_id": "node_047_003",
+          "target_id": "target_02211",
           "type": "气象数据",
           "bandwidth": "100Mbps",
           "status": "active"
         },
         {
           "id": "conn_047_004",
-          "source": "node_047_004",
-          "target": "target_04811",
+          "source_id": "node_047_004",
+          "target_id": "target_04811",
           "type": "协调通信",
           "bandwidth": "500Mbps",
           "status": "standby"
@@ -883,32 +883,32 @@
       "nodeConnections": [
         {
           "id": "conn_047_001",
-          "source": "node_047_001",
-          "target": "target_02211",
+          "source_id": "node_047_001",
+          "target_id": "target_02211",
           "type": "数据传输",
           "bandwidth": "1Gbps",
           "status": "active"
         },
         {
           "id": "conn_047_002",
-          "source": "node_047_002",
-          "target": "target_02211",
+          "source_id": "node_047_002",
+          "target_id": "target_02211",
           "type": "数据上传",
           "bandwidth": "10Gbps",
           "status": "active"
         },
         {
           "id": "conn_047_003",
-          "source": "node_047_003",
-          "target": "target_04111",
+          "source_id": "node_047_003",
+          "target_id": "target_04111",
           "type": "气象数据",
           "bandwidth": "100Mbps",
           "status": "active"
         },
         {
           "id": "conn_047_004",
-          "source": "node_047_004",
-          "target": "target_04111",
+          "source_id": "node_047_004",
+          "target_id": "target_04111",
           "type": "协调通信",
           "bandwidth": "500Mbps",
           "status": "standby"
