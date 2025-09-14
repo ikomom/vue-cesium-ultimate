@@ -108,7 +108,7 @@
   </template>
 
   <!-- 虚拟节点连线渲染 -->
-  <template v-for="[relationsId, relations] in virtualRelations" :key="relationsId">
+  <!-- <template v-for="[relationsId, relations] in virtualRelations" :key="relationsId">
     <template v-for="relation in relations" :key="relation.id">
       <LineWithLabel
         :id="relation.id"
@@ -120,6 +120,24 @@
         :label-style="relation.labelStyle"
         :source-position="relation.sourcePosition"
         :target-position="relation.targetPosition"
+      />
+    </template>
+  </template> -->
+
+  <!-- 虚拟节点事件渲染 -->
+  <template v-for="[eventsId, events] in virtualEvents" :key="eventsId">
+    <template v-for="event in events" :key="event.id">
+      <LineWithLabel
+        :id="event.id"
+        :show="true"
+        :positions="event.positions"
+        :width="event.width"
+        :material="event.material"
+        :availability="event.availability"
+        :show-label="event.showLabel"
+        :label-style="event.labelStyle"
+        :source-position="event.sourcePosition"
+        :target-position="event.targetPosition"
       />
     </template>
   </template>
@@ -257,6 +275,7 @@ const renderEvents = shallowRef([])
 const activeRings = ref(new Map()) // 存储活跃的圆环实体
 const virtualNodes = ref(new Map()) // 存储虚拟节点
 const virtualRelations = ref(new Map()) // 虚拟节点上的连线
+const virtualEvents = ref(new Map()) // 虚拟节点上的事件
 
 // 缓存配置对象，避免重复计算
 const distanceConfigs = getDistanceConfigs()
@@ -1072,18 +1091,18 @@ const processTrajectory = logFuncWrap(() => {
       })
 
       // 计算轨迹的时间范围
-      const trajectoryTimes = positionSamples.map(sample => sample.time).sort((a, b) => 
-        window.Cesium.JulianDate.compare(a, b)
-      )
+      const trajectoryTimes = positionSamples
+        .map((sample) => sample.time)
+        .sort((a, b) => window.Cesium.JulianDate.compare(a, b))
       const startTime = trajectoryTimes[0]
       const endTime = trajectoryTimes[trajectoryTimes.length - 1]
-      
+
       // 创建时间可用性区间
       const availability = new window.Cesium.TimeIntervalCollection([
         new window.Cesium.TimeInterval({
           start: startTime,
-          stop: endTime
-        })
+          stop: endTime,
+        }),
       ])
 
       return {
@@ -1146,12 +1165,47 @@ const processEvent = logFuncWrap(() => {
     // 标签文本优先级：描述 > 名称 > 类型
     const labelText = event.description || '事件'
 
+    // 创建事件时间可用性区间
+    let availability = null
+    if (event.startTime) {
+      const startTime = window.Cesium.JulianDate.fromIso8601(event.startTime)
+      let endTime = startTime
+
+      // 如果有结束时间，使用结束时间；否则使用开始时间加上持续时间或默认持续时间
+      if (event.endTime) {
+        endTime = window.Cesium.JulianDate.fromIso8601(event.endTime)
+      } else if (event.duration) {
+        // duration是分钟数，转换为秒
+        endTime = window.Cesium.JulianDate.addSeconds(
+          startTime,
+          event.duration * 60,
+          new window.Cesium.JulianDate(),
+        )
+      } else {
+        // 默认事件持续1小时
+        endTime = window.Cesium.JulianDate.addSeconds(
+          startTime,
+          3600,
+          new window.Cesium.JulianDate(),
+        )
+      }
+
+      availability = new window.Cesium.TimeIntervalCollection([
+        new window.Cesium.TimeInterval({
+          start: startTime,
+          stop: endTime,
+        }),
+      ])
+    }
+
     return {
       id: event.id + '@event@' + layerId.value,
       name: event.name,
       type: event.type,
       target,
       source,
+      // 设置时间可用性
+      availability: availability,
       // EventLine组件属性
       positions,
       width: styleConfig.width,
@@ -1174,6 +1228,8 @@ const processEvent = logFuncWrap(() => {
         height: styleConfig.curve?.height || 100000,
       },
       materialType: styleConfig.material,
+      // 原始事件数据
+      eventData: event,
     }
   })
   // console.log('事件数据', { renderEvents: toRaw(renderEvents.value) })
@@ -1462,7 +1518,7 @@ const generateVirtualNodes = (target) => {
       target.nodeConnections && target.nodeConnections[i]
         ? target.nodeConnections[i].target
         : target.id
-    console.log(`节点${i}: 原target.id=${target.id}, 连接目标=${connectionTarget}`)
+    // console.log(`节点${i}: 原target.id=${target.id}, 连接目标=${connectionTarget}`)
 
     // 参考DataVisualization.vue中renderPoints的结构，创建完整的节点配置
     const node = {
@@ -1737,7 +1793,7 @@ const generateTrajectoryVirtualRelations = (trajectory, nodes) => {
                     if (trajectoryEntity && trajectoryEntity.position) {
                       return trajectoryEntity.position.getValue(time)
                     }
-                    
+
                     // 如果轨迹实体没有找到，尝试查找点实体
                     const pointEntityId = connection.target + '@point@' + layerId.value
                     const pointEntity = viewer.entities.getById(pointEntityId)
@@ -1781,7 +1837,7 @@ const generateVirtualRelations = (target, nodes) => {
       const nodeIndex = nodes.findIndex((item) => item.originNode.id === connection.source)
       const sourceNode = nodes[nodeIndex]
 
-      console.log('sourceNode====================', sourceNode)
+      // console.log('sourceNode====================', sourceNode)
 
       if (!sourceNode) {
         console.warn(`虚拟连线警告: 找不到源节点 ${connection.source}，连线索引: ${index}`)
@@ -1872,9 +1928,9 @@ const generateVirtualRelations = (target, nodes) => {
       const cleanTargetId = connection.target
       const cleanSourceId = connection.source
 
-      console.log(
-        `连线${index}: source=${connection.source}, target=${connection.target}, 是轨迹目标=${isTrajectoryTarget}`,
-      )
+      // console.log(
+      //   `连线${index}: source=${connection.source}, target=${connection.target}, 是轨迹目标=${isTrajectoryTarget}`,
+      // )
 
       const relation = {
         id: relationId,
@@ -1914,6 +1970,406 @@ const generateVirtualRelations = (target, nodes) => {
   return relations
 }
 
+// 生成虚拟节点连线函数
+const generateVirtualNodeEvents = (target, nodes) => {
+  const { originTarget } = target
+  const connections = []
+  console.log('originTarget', originTarget)
+
+  // 从target的nodeEvents生成连线数据（参考generateVirtualRelations的单循环结构）
+  if (originTarget.nodeEvents && Array.isArray(originTarget.nodeEvents)) {
+    originTarget.nodeEvents.forEach((eventData, index) => {
+      // 检查事件数据是否有效
+      if (!eventData || (!eventData.source_id && !eventData.target_id)) {
+        console.warn(`虚拟节点事件数据无效，跳过连线生成`, { eventData })
+        return
+      }
+
+      // 查找源节点：根据eventData.source_id匹配对应的虚拟节点
+      const sourceNode = eventData.source_id
+        ? nodes.find(
+            (node) =>
+              node.originNode?.id === eventData.source_id || node.id === eventData.source_id,
+          )
+        : null
+
+      if (!sourceNode) {
+        console.warn(`虚拟节点事件警告: 找不到源节点 ${eventData.source_id}，事件索引: ${index}`)
+        return
+      }
+
+      // 检查目标是否为轨迹目标
+      const targetId = eventData.target_id || target.id
+      const trajectoryData = dataManager.trajectoryManager.findByTargetId(targetId)
+      const isTrajectoryTarget = !!(
+        trajectoryData &&
+        trajectoryData.trajectory &&
+        trajectoryData.trajectory.length > 0
+      )
+
+      // 预先获取静态目标数据，避免作用域问题
+      const staticTargetData = !isTrajectoryTarget
+        ? dataManager.targetLocationManager.findById(targetId)
+        : null
+
+      if (!isTrajectoryTarget && !staticTargetData) {
+        console.warn(`虚拟节点连线缺少目标点`, { eventData, targetId })
+        return
+      }
+
+      const connectionId = `${sourceNode.id}-event-connection-${index}`
+
+      let positions
+
+      if (isTrajectoryTarget) {
+        // 对于轨迹目标，使用CallbackProperty动态获取位置
+        positions = new Cesium.CallbackProperty((time, result) => {
+          // 尝试从实体中获取轨迹位置
+          let trajectoryEntity
+          // const trajectoryEntity = getEntityByIds([
+          //   targetId + '@trajectory@' + layerId.value,
+          //   targetId + '@point@' + layerId.value,
+          // ])
+
+          let targetPosition
+          if (trajectoryEntity && trajectoryEntity.position) {
+            targetPosition = trajectoryEntity.position.getValue(time)
+          }
+
+          if (!targetPosition) {
+            // 如果无法从实体获取位置，使用插值计算
+            const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
+            const interpolatedPosition = interpolateTrajectoryPosition(
+              trajectoryData.trajectory,
+              currentTimeStr,
+            )
+
+            if (interpolatedPosition) {
+              targetPosition = Cesium.Cartesian3.fromDegrees(
+                interpolatedPosition.longitude,
+                interpolatedPosition.latitude,
+                interpolatedPosition.height || 0,
+              )
+            } else {
+              // 使用最新点位作为备选
+              const latestPoint = trajectoryData.trajectory[trajectoryData.trajectory.length - 1]
+              targetPosition = Cesium.Cartesian3.fromDegrees(
+                latestPoint.longitude,
+                latestPoint.latitude,
+                latestPoint.altitude || latestPoint.height || 0,
+              )
+            }
+          }
+
+          const sourcePosition = Cesium.Cartesian3.fromDegrees(
+            sourceNode.position[0],
+            sourceNode.position[1],
+            sourceNode.position[2] || 0,
+          )
+          return [sourcePosition, targetPosition]
+        }, false)
+      } else {
+        // 对于静态目标，使用固定位置
+        positions = [
+          window.Cesium.Cartesian3.fromDegrees(
+            sourceNode.position[0],
+            sourceNode.position[1],
+            sourceNode.position[2] || 0,
+          ),
+          window.Cesium.Cartesian3.fromDegrees(
+            staticTargetData.longitude,
+            staticTargetData.latitude,
+            staticTargetData.height || 0,
+          ),
+        ]
+      }
+
+      // 获取连线样式配置
+      const styleConfig = getRelationStyleConfig(eventData.type || 'virtual_connection')
+      const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
+
+      // 标签文本
+      const labelText = eventData.description || eventData.name || `虚拟事件连线${index + 1}`
+
+      // 创建虚拟节点连线时间可用性区间
+      let availability = null
+      if (eventData.startTime) {
+        const startTime = window.Cesium.JulianDate.fromIso8601(eventData.startTime)
+        console.log('startTime', startTime)
+        let endTime = startTime
+
+        // 如果有结束时间，使用结束时间；否则使用开始时间加上持续时间或默认持续时间
+        if (eventData.endTime) {
+          endTime = window.Cesium.JulianDate.fromIso8601(eventData.endTime)
+        } else if (eventData.duration) {
+          // duration是分钟数，转换为秒
+          endTime = window.Cesium.JulianDate.addSeconds(
+            startTime,
+            eventData.duration * 60,
+            new window.Cesium.JulianDate(),
+          )
+        } else {
+          // 默认虚拟节点连线持续30分钟
+          endTime = window.Cesium.JulianDate.addSeconds(
+            startTime,
+            1800,
+            new window.Cesium.JulianDate(),
+          )
+        }
+
+        availability = new window.Cesium.TimeIntervalCollection([
+          new window.Cesium.TimeInterval({
+            start: startTime,
+            stop: endTime,
+          }),
+        ])
+
+        console.log('availability', availability)
+      }
+
+      const virtualConnection = {
+        id: connectionId,
+        name: `虚拟节点${sourceNode.name}连线`,
+        type: eventData.type || 'virtual_node_connection',
+        source_id: sourceNode.id,
+        target_id: eventData.target_id || target.id,
+
+        // 设置时间可用性
+        availability: availability,
+        // LineWithLabel组件需要的属性
+        positions,
+        width: styleConfig.width || 2,
+        material: material,
+        showLabel: true, // 添加缺少的 showLabel 属性
+        distanceDisplayCondition: distanceConfigs.distanceDisplayCondition,
+        labelStyle: {
+          ...distanceConfigs,
+          text: labelText,
+          font: '8pt sans-serif',
+          fillColor: '#fff',
+          outlineColor: '#000000',
+          showBackground: true,
+          backgroundColor: 'rgba(233,211,0,0.3)',
+          outlineWidth: 2,
+          pixelOffset: [0, -20],
+          verticalOrigin: 1,
+        },
+        curveConfig: {
+          enabled: styleConfig.curve?.enabled || false,
+          height: styleConfig.curve?.height || 100000,
+        },
+        materialType: styleConfig.material,
+
+        // 虚拟连线特有属性
+        isVirtual: true,
+        virtualType: 'node_connection',
+
+        // 保留原始事件数据
+        originalEventData: eventData,
+      }
+
+      connections.push(virtualConnection)
+    })
+  }
+
+  console.log('生成虚拟节点事件数量:', connections.length)
+  return connections
+}
+
+// 生成轨迹虚拟节点连线函数
+const generateTrajectoryVirtualNodeEvents = (trajectory, nodes) => {
+  const { trajectoryData } = trajectory
+  const connections = []
+
+  // 获取目标基础数据
+  const base = dataManager.targetBaseManager.findById(trajectoryData.target_id)
+
+  // 从base的nodeEvents生成连线数据（参考generateVirtualNodeEvents的单循环结构）
+  if (base.nodeEvents && Array.isArray(base.nodeEvents)) {
+    base.nodeEvents.forEach((eventData, index) => {
+      // 检查事件数据是否有效
+      if (!eventData || (!eventData.source_id && !eventData.target_id)) {
+        console.warn(`轨迹虚拟节点事件数据无效，跳过连线生成`, { eventData })
+        return
+      }
+
+      // 查找源节点：根据eventData.source_id匹配对应的轨迹虚拟节点
+      const sourceNode = eventData.source_id
+        ? nodes.find(
+            (node) =>
+              node.originNode?.id === eventData.source_id || node.id === eventData.source_id,
+          )
+        : null
+
+      if (!sourceNode) {
+        console.warn(
+          `轨迹虚拟节点事件警告: 找不到源节点 ${eventData.source_id}，事件索引: ${index}`,
+        )
+        return
+      }
+      // 检查目标是否为轨迹目标
+      const targetId = eventData.target_id || trajectory.trajectoryData.target_id
+      const targetTrajectoryData = dataManager.trajectoryManager.findByTargetId(targetId)
+      const isTrajectoryTarget = !!(
+        targetTrajectoryData &&
+        targetTrajectoryData.trajectory &&
+        targetTrajectoryData.trajectory.length > 0
+      )
+
+      // 预先获取静态目标数据，避免作用域问题
+      const staticTargetData = !isTrajectoryTarget
+        ? dataManager.targetLocationManager.findById(targetId)
+        : null
+
+      if (!isTrajectoryTarget && !staticTargetData) {
+        console.warn(`轨迹虚拟节点连线缺少目标点`, { eventData, targetId })
+        return
+      }
+
+      const connectionId = `${sourceNode.id}-trajectory-connection-${index}`
+
+      // 生成动态连线位置数组 - 从动态轨迹虚拟节点到目标位置
+      const positions = new window.Cesium.CallbackProperty((time, result) => {
+        try {
+          // 获取动态轨迹虚拟节点位置（轨迹点随时间移动）
+          let sourcePosition
+          if (sourceNode.position && typeof sourceNode.position.getValue === 'function') {
+            sourcePosition = sourceNode.position.getValue(time)
+          }
+
+          let targetPosition
+
+          if (isTrajectoryTarget) {
+            // 对于轨迹目标，使用插值计算动态位置
+            const currentTimeStr = window.Cesium.JulianDate.toIso8601(time)
+            const interpolatedPosition = interpolateTrajectoryPosition(
+              targetTrajectoryData.trajectory,
+              currentTimeStr,
+            )
+
+            if (interpolatedPosition) {
+              targetPosition = Cesium.Cartesian3.fromDegrees(
+                interpolatedPosition.longitude,
+                interpolatedPosition.latitude,
+                interpolatedPosition.height || 0,
+              )
+            } else {
+              // 使用最新点位作为备选
+              const latestPoint = targetTrajectoryData.trajectory[targetTrajectoryData.trajectory.length - 1]
+              targetPosition = Cesium.Cartesian3.fromDegrees(
+                latestPoint.longitude,
+                latestPoint.latitude,
+                latestPoint.altitude || latestPoint.height || 0,
+              )
+            }
+          } else {
+            // 对于静态目标，使用固定位置
+            targetPosition = window.Cesium.Cartesian3.fromDegrees(
+              staticTargetData.longitude,
+              staticTargetData.latitude,
+              staticTargetData.height || 0,
+            )
+          }
+
+          if (sourcePosition) {
+            return [sourcePosition, targetPosition]
+          }
+        } catch (error) {
+          console.warn('获取轨迹虚拟节点连线位置失败:', error)
+        }
+        return []
+      }, false)
+
+      // 获取连线样式配置
+      const styleConfig = getRelationStyleConfig(eventData.type || 'trajectory_virtual_connection')
+      const material = getMaterialProperty(styleConfig.material, styleConfig.materialProps)
+
+      // 标签文本
+      const labelText = eventData.description || eventData.name || `轨迹虚拟事件连线${index + 1}`
+
+      // 创建轨迹虚拟节点连线时间可用性区间
+      let availability = null
+      if (eventData.startTime) {
+        const startTime = window.Cesium.JulianDate.fromIso8601(eventData.startTime)
+        let endTime = startTime
+
+        // 如果有结束时间，使用结束时间；否则使用开始时间加上持续时间或默认持续时间
+        if (eventData.endTime) {
+          endTime = window.Cesium.JulianDate.fromIso8601(eventData.endTime)
+        } else if (eventData.duration) {
+          // duration是分钟数，转换为秒
+          endTime = window.Cesium.JulianDate.addSeconds(
+            startTime,
+            eventData.duration * 60,
+            new window.Cesium.JulianDate(),
+          )
+        } else {
+          // 默认轨迹虚拟节点连线持续45分钟
+          endTime = window.Cesium.JulianDate.addSeconds(
+            startTime,
+            2700,
+            new window.Cesium.JulianDate(),
+          )
+        }
+
+        availability = new window.Cesium.TimeIntervalCollection([
+          new window.Cesium.TimeInterval({
+            start: startTime,
+            stop: endTime,
+          }),
+        ])
+      }
+
+      const virtualConnection = {
+        id: connectionId,
+        name: `轨迹虚拟节点${sourceNode.name}连线`,
+        type: eventData.type || 'trajectory_virtual_node_connection',
+        source_id: sourceNode.id,
+        target_id: eventData.target_id || trajectory.trajectoryData.target_id,
+
+        // 设置时间可用性
+        availability: availability,
+        // LineWithLabel组件需要的属性
+        positions,
+        width: styleConfig.width || 2,
+        material: material,
+        showLabel: true, // 添加缺少的 showLabel 属性
+        distanceDisplayCondition: distanceConfigs.distanceDisplayCondition,
+        labelStyle: {
+          ...distanceConfigs,
+          text: labelText,
+          font: '8pt sans-serif',
+          fillColor: '#fff',
+          outlineColor: '#000000',
+          showBackground: true,
+          backgroundColor: 'rgba(233,211,0,0.3)',
+          outlineWidth: 2,
+          pixelOffset: [0, -20],
+          verticalOrigin: 1,
+        },
+        curveConfig: {
+          enabled: styleConfig.curve?.enabled || false,
+          height: styleConfig.curve?.height || 100000,
+        },
+        materialType: styleConfig.material,
+
+        // 轨迹虚拟连线特有属性
+        isVirtual: true,
+        virtualType: 'trajectory_node_connection',
+        isDynamic: true, // 标记为动态连线
+
+        // 保留原始事件数据
+        originalEventData: eventData,
+      }
+
+      connections.push(virtualConnection)
+    })
+  }
+
+  console.log('生成轨迹虚拟节点事件数量:', connections.length)
+  return connections
+}
+
 const onTargetDblClick = (target, event) => {
   emit('targetDblClick', target, event)
   const { originTarget } = target
@@ -1927,7 +2383,8 @@ const onTargetDblClick = (target, event) => {
       activeRings.value.delete(ringId)
       virtualNodes.value.delete(nodesId)
       virtualRelations.value.delete(nodesId)
-      console.log('移除圆环、虚拟节点和连线:', ringId)
+      virtualEvents.value.delete(nodesId)
+      console.log('移除圆环、虚拟节点、连线:', ringId)
     } else {
       console.log('target', target)
       // 创建新的圆环配置
@@ -1949,21 +2406,18 @@ const onTargetDblClick = (target, event) => {
       if (originTarget.nodeCount) {
         const nodes = generateVirtualNodes(target)
         virtualNodes.value.set(nodesId, nodes)
-        console.log('创建虚拟节点:', nodesId, nodes)
+        // console.log('创建虚拟节点:', nodesId, nodes)
 
         // 生成虚拟节点连线
         const relations = generateVirtualRelations(target, nodes)
-        console.log('生成的虚拟连线数据:', relations)
-        console.log('连线数量:', relations.length)
-        // if (relations.length > 0) {
-        //   console.log('第一条连线详情:', relations[0])
-        //   console.log('positions:', relations[0].positions)
-        //   console.log('material:', relations[0].material)
-        //   console.log('labelStyle:', relations[0].labelStyle)
-        // }
+        // console.log('生成的虚拟连线数据:', relations)
+        // console.log('连线数量:', relations.length)
         virtualRelations.value.set(nodesId, relations)
-        // console.log('virtualRelations Map大小:', virtualRelations.value.size)
-        // console.log('virtualRelations内容:', Array.from(virtualRelations.value.entries()))
+
+        // 生成虚拟节点连线
+        const connections = generateVirtualNodeEvents(target, nodes)
+        virtualEvents.value.set(nodesId, connections)
+        console.log('创建虚拟节点连线:', nodesId, connections)
       }
     }
   }
@@ -2014,7 +2468,8 @@ const onTrajectoryDblClick = (trajectory, event) => {
       activeRings.value.delete(ringId)
       virtualNodes.value.delete(nodesId)
       virtualRelations.value.delete(nodesId)
-      console.log('移除轨迹圆环、虚拟节点和连线:', ringId)
+      virtualEvents.value.delete(nodesId)
+      console.log('移除轨迹圆环、虚拟节点、连线:', ringId)
     } else {
       console.log('轨迹目标:', trajectory)
       // 使用CallbackProperty动态获取轨迹的实时位置
@@ -2070,6 +2525,11 @@ const onTrajectoryDblClick = (trajectory, event) => {
         console.log('生成的轨迹动态虚拟连线数据:', relations)
         console.log('轨迹动态连线数量:', relations.length)
         virtualRelations.value.set(nodesId, relations)
+
+        // 生成轨迹虚拟节点连线
+        const connections = generateTrajectoryVirtualNodeEvents(trajectory, nodes)
+        virtualEvents.value.set(nodesId, connections)
+        console.log('创建轨迹虚拟节点连线:', nodesId, connections)
       }
     }
   } else {

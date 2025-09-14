@@ -3,6 +3,7 @@
     :id="entityId"
     :show="show"
     :position="labelPosition"
+    :availability="availability"
     @click="handleClick"
     @mouseover="handleMouseover"
     @mouseout="handleMouseout"
@@ -35,6 +36,11 @@ const props = defineProps({
     type: Boolean,
   },
   distanceDisplayCondition: {
+    type: Object,
+    default: () => null,
+  },
+  // 时间可用性
+  availability: {
     type: Object,
     default: () => null,
   },
