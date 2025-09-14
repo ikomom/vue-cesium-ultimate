@@ -108,7 +108,7 @@
   </template>
 
   <!-- 虚拟节点连线渲染 -->
-  <!-- <template v-for="[relationsId, relations] in virtualRelations" :key="relationsId">
+  <template v-for="[relationsId, relations] in virtualRelations" :key="relationsId">
     <template v-for="relation in relations" :key="relation.id">
       <LineWithLabel
         :id="relation.id"
@@ -122,7 +122,7 @@
         :target-position="relation.targetPosition"
       />
     </template>
-  </template> -->
+  </template>
 
   <!-- 虚拟节点事件渲染 -->
   <template v-for="[eventsId, events] in virtualEvents" :key="eventsId">
