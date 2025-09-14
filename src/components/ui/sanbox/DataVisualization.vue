@@ -1194,6 +1194,33 @@ const updateTrajectoryVisibility = (trajectoryId, isVisible, currentTime) => {
     console.log(
       `轨迹可见性变化: ${trajectoryId} ${wasVisible ? '可见' : '不可见'} -> ${isVisible ? '可见' : '不可见'} at ${currentTime}`,
     )
+
+    // // 如果轨迹被隐藏，同时隐藏对应的activeRings、virtualNodes、virtualRelations、virtualEvents
+    // if (!isVisible) {
+    //   const ringId = `ring-${trajectoryId}`
+    //   const nodesId = `nodes-${trajectoryId}`
+
+    //   // 移除对应的圆环、虚拟节点、虚拟连线和虚拟事件
+    //   if (activeRings.value.has(ringId)) {
+    //     activeRings.value.delete(ringId)
+    //     console.log(`隐藏轨迹时移除圆环: ${ringId}`)
+    //   }
+
+    //   if (virtualNodes.value.has(nodesId)) {
+    //     virtualNodes.value.delete(nodesId)
+    //     console.log(`隐藏轨迹时移除虚拟节点: ${nodesId}`)
+    //   }
+
+    //   if (virtualRelations.value.has(nodesId)) {
+    //     virtualRelations.value.delete(nodesId)
+    //     console.log(`隐藏轨迹时移除虚拟连线: ${nodesId}`)
+    //   }
+
+    //   if (virtualEvents.value.has(nodesId)) {
+    //     virtualEvents.value.delete(nodesId)
+    //     console.log(`隐藏轨迹时移除虚拟事件: ${nodesId}`)
+    //   }
+    // }
   }
 }
 
