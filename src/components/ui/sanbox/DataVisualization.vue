@@ -2709,7 +2709,7 @@ const onTrajectoryDblClick = (trajectory, event) => {
       // 如果轨迹目标包含virtualNodes属性，生成动态虚拟节点
       if (base.virtualNodes && base.virtualNodes.length > 0) {
         const nodes = generateTrajectoryVirtualNodes(trajectory)
-        
+
         // 只有在成功生成虚拟节点时才继续处理连线
         if (nodes && nodes.length > 0) {
           virtualNodes.value.set(nodesId, nodes)
@@ -2719,8 +2719,8 @@ const onTrajectoryDblClick = (trajectory, event) => {
           virtualRelations.value.set(nodesId, relations)
 
           // 生成轨迹虚拟节点连线
-          // const connections = generateTrajectoryVirtualNodeEvents(trajectory, nodes)
-          // virtualEvents.value.set(nodesId, connections)
+          const connections = generateTrajectoryVirtualNodeEvents(trajectory, nodes)
+          virtualEvents.value.set(nodesId, connections)
           console.log('创建轨迹虚拟节点连线:', nodesId, relations)
         } else {
           console.warn('轨迹虚拟节点生成失败，跳过连线创建:', trajectory.id)
