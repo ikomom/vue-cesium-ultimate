@@ -1,0 +1,152 @@
+{
+  "targets": [
+    {
+      "id": "target_041",
+      "name": "北京通信中心",
+      "type": "通信",
+      "description": "北京地区主要通信枢纽中心",
+      "status": "运营中",
+      "capacity": "大型",
+      "operator": "北京通信集团",
+      "createdAt": "2024-01-20T08:00:00.000Z"
+    },
+    {
+      "id": "target_022",
+      "name": "上海雷达站B",
+      "type": "雷达",
+      "description": "上海地区重要雷达监控站点",
+      "status": "运营中",
+      "capacity": "中型",
+      "operator": "上海雷达管理中心",
+      "createdAt": "2024-01-20T08:15:00.000Z"
+    },
+    {
+      "id": "target_023",
+      "name": "广州雷达站C",
+      "type": "雷达",
+      "description": "广州地区雷达监控设施",
+      "status": "运营中",
+      "capacity": "中型",
+      "operator": "广州雷达管理中心",
+      "createdAt": "2024-01-20T08:30:00.000Z"
+    }
+  ],
+  "points": [
+    {
+      "id": "target_041",
+      "name": "北京通信中心",
+      "longitude": 116.3974,
+      "latitude": 39.9093,
+      "height": 15000,
+      "region": "华北",
+      "province": "北京市",
+      "city": "北京市",
+      "address": "北京市海淀区通信中心大楼",
+      "createdAt": "2024-01-20T08:00:00.000Z"
+    },
+    {
+      "id": "target_022",
+      "name": "上海雷达站B",
+      "longitude": 121.4737,
+      "latitude": 31.2304,
+      "height": 0,
+      "region": "华东",
+      "province": "上海市",
+      "city": "上海市",
+      "address": "上海市浦东新区雷达监控中心",
+      "createdAt": "2024-01-20T08:15:00.000Z"
+    },
+    {
+      "id": "target_023",
+      "name": "广州雷达站C",
+      "longitude": 113.2644,
+      "latitude": 23.1291,
+      "height": 0,
+      "region": "华南",
+      "province": "广东省",
+      "city": "广州市",
+      "address": "广州市天河区雷达站",
+      "createdAt": "2024-01-20T08:30:00.000Z"
+    }
+  ],
+  "relations": [
+    {
+      "id": "circle_connector_001",
+      "description": "通信站A到雷达站B的圆环连接器",
+      "source_id": "target_041",
+      "target_id": "target_022",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "高",
+      "distance": 1067,
+      "capacity": "高速连接",
+      "frequency": "实时连接",
+      "sourcePoint": {
+        "id": "target_041",
+        "name": "北京通信中心",
+        "type": "通信",
+        "longitude": 116.3974,
+        "latitude": 39.9093,
+        "height": 15000
+      },
+      "targetPoint": {
+        "id": "target_022",
+        "name": "上海雷达站B",
+        "type": "雷达",
+        "longitude": 121.4737,
+        "latitude": 31.2304,
+        "height": 0
+      },
+      "ringRadius": 50000,
+      "nodeCount": 6,
+      "ringMaterial": "rgba(0, 255, 255, 0.3)",
+      "ringOutlineColor": "#00ffff",
+      "nodeColor": "#ff6b35",
+      "connectionMaterial": "POLYLINE_DYNAMIC_TEXTURE",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 1.0,
+      "createdAt": "2024-01-20T08:30:00.000Z"
+    },
+    {
+      "id": "circle_connector_002",
+      "description": "北京通信中心到广州雷达站C的圆环连接器",
+      "source_id": "target_041",
+      "target_id": "target_023",
+      "type": "圆环连接",
+      "status": "正常",
+      "priority": "中",
+      "distance": 1956,
+      "capacity": "中速连接",
+      "frequency": "定时连接",
+      "sourcePoint": {
+        "id": "target_041",
+        "name": "北京通信中心",
+        "type": "通信",
+        "longitude": 116.3974,
+        "latitude": 39.9093,
+        "height": 15000
+      },
+      "targetPoint": {
+        "id": "target_023",
+        "name": "广州雷达站C",
+        "type": "雷达",
+        "longitude": 113.2644,
+        "latitude": 23.1291,
+        "height": 0
+      },
+      "ringRadius": 80000,
+      "nodeCount": 8,
+      "ringMaterial": "rgba(255, 107, 53, 0.3)",
+      "ringOutlineColor": "#ff6b35",
+      "nodeColor": "#00ffff",
+      "connectionMaterial": "POLYLINE_DYNAMIC_TEXTURE",
+      "showNodeLabels": true,
+      "showConnections": true,
+      "enableAnimation": true,
+      "animationSpeed": 0.8,
+      "createdAt": "2024-01-20T09:15:00.000Z"
+    }
+  ]
+}

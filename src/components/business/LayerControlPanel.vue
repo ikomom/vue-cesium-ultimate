@@ -100,6 +100,30 @@
               >
                 <i class="icon-calendar"></i>
               </button>
+              <button
+                class="btn-icon btn-mini"
+                :class="{ active: layer.showControls.showRings }"
+                @click="toggleShowControl(layer.id, 'showRings')"
+                title="圆环"
+              >
+                <i class="icon-ring"></i>
+              </button>
+              <button
+                class="btn-icon btn-mini"
+                :class="{ active: layer.showControls.showVirtualNodes }"
+                @click="toggleShowControl(layer.id, 'showVirtualNodes')"
+                title="虚拟节点"
+              >
+                <i class="icon-node"></i>
+              </button>
+              <button
+                class="btn-icon btn-mini"
+                :class="{ active: layer.showControls.showVirtualRelations }"
+                @click="toggleShowControl(layer.id, 'showVirtualRelations')"
+                title="虚拟关系"
+              >
+                <i class="icon-virtual-link"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -305,6 +329,10 @@ const getLayerDataCount = (layer) => {
 const toggleShowControl = (layerId, controlType) => {
   const layer = globalLayerManager.getLayer(layerId)
   if (layer) {
+    // 确保控制属性存在，如果不存在则初始化为false
+    if (!layer.showControls.hasOwnProperty(controlType)) {
+      layer.showControls[controlType] = false
+    }
     layer.showControls[controlType] = !layer.showControls[controlType]
     console.log(`🎛️ 图层 [${layer.name}] ${controlType} 已${layer.showControls[controlType] ? '开启' : '关闭'}`)
   }
@@ -801,5 +829,14 @@ onMounted(() => {
 }
 .icon-layer::before {
   content: '📄';
+}
+.icon-ring::before {
+  content: '⭕';
+}
+.icon-node::before {
+  content: '🔵';
+}
+.icon-virtual-link::before {
+  content: '🔗';
 }
 </style>

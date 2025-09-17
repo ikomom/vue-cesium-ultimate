@@ -46,9 +46,12 @@ export class Layer {
     this.showControls = reactive({
       showPoints: true,
       showRelation: false,
-      showTrajectory: false,
+      showTrajectory: true,
       showEvents: false,
       showTargetStatus: true,
+      showRings: true,
+      showVirtualNodes: true,
+      showVirtualRelations: true,
     })
 
     // 每个图层都有自己的数据管理器
@@ -105,7 +108,13 @@ export class Layer {
         // 同步到数据管理器
         this.syncToDataManager(key, dataObject[key])
         hasUpdated = true
-        console.log(`${this.getDataTypeDisplayName(key)}: ${dataObject[key].length} 项`)
+        // 根据数据类型显示不同的统计信息
+        if (key === 'trajectories') {
+          const trajectoryCount = Object.keys(dataObject[key]).length
+          console.log(`${this.getDataTypeDisplayName(key)}: ${trajectoryCount} 个目标轨迹`)
+        } else {
+          console.log(`${this.getDataTypeDisplayName(key)}: ${dataObject[key].length} 项`)
+        }
       } else {
         console.warn(`⚠️ 数据类型 ${key} 不存在，跳过更新`)
       }

@@ -46,3 +46,11 @@ export function getEventData() {
 export function getTargetStatusData() {
   return fetch('/data/targetStatusData.json').then((res) => res.json())
 }
+
+/**
+ * 获取圆环连接器数据
+ * @returns {Promise} 返回圆环连接器数据的Promise对象
+ */
+export function getCircleConnectorData() {
+  return fetch('/data/circleConnectorData.json').then((res) => res.json())
+}

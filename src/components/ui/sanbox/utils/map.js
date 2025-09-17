@@ -8,9 +8,9 @@ export function addMaterial(type, material) {
   const Cesium = window.Cesium
 
   // 检查材质是否已存在
-  if (!Cesium.Material._materialCache.getMaterial(type)) {
-    // 将新材质添加到材质缓存中
-    Cesium.Material._materialCache.addMaterial(type, material)
+  if (!window.Cesium.Material._materialCache.getMaterial(type)) {
+    // 如果材质不存在，则添加到缓存中
+    window.Cesium.Material._materialCache.addMaterial(type, material)
     return true
   }
   return false
@@ -25,21 +25,21 @@ export function addMaterial(type, material) {
  */
 export function generateCurve(startPoint, endPoint, height) {
   // 计算起点和终点的中点
-  let addPointCartesian = new Cesium.Cartesian3()
-  Cesium.Cartesian3.add(startPoint, endPoint, addPointCartesian)
-  let midPointCartesian = new Cesium.Cartesian3()
-  Cesium.Cartesian3.divideByScalar(addPointCartesian, 2, midPointCartesian)
+  let addPointCartesian = new window.Cesium.Cartesian3()
+  window.Cesium.Cartesian3.add(startPoint, endPoint, addPointCartesian)
+  let midPointCartesian = new window.Cesium.Cartesian3()
+  window.Cesium.Cartesian3.divideByScalar(addPointCartesian, 2, midPointCartesian)
 
   // 将中点转换为地理坐标并设置高度
-  let midPointCartographic = Cesium.Cartographic.fromCartesian(midPointCartesian)
-  midPointCartographic.height = height || Cesium.Cartesian3.distance(startPoint, endPoint) / 5
+  let midPointCartographic = window.Cesium.Cartographic.fromCartesian(midPointCartesian)
+  midPointCartographic.height = height || window.Cesium.Cartesian3.distance(startPoint, endPoint) / 5
 
   // 将带高度的中点转回笛卡尔坐标
-  let midPoint = new Cesium.Cartesian3()
-  Cesium.Ellipsoid.WGS84.cartographicToCartesian(midPointCartographic, midPoint)
+  let midPoint = new window.Cesium.Cartesian3()
+  window.Cesium.Ellipsoid.WGS84.cartographicToCartesian(midPointCartographic, midPoint)
 
   // 创建CatmullRom样条曲线
-  let spline = new Cesium.CatmullRomSpline({
+  let spline = new window.Cesium.CatmullRomSpline({
     times: [0.0, 0.5, 1.0],
     points: [startPoint, midPoint, endPoint],
   })

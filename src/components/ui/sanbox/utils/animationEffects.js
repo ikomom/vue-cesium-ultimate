@@ -301,11 +301,11 @@ class AnimationEffectManager {
     if (!enabled) return null
 
     return (time, baseColor) => {
-      const seconds = Cesium.JulianDate.toDate(time).getTime() / 1000
+      const seconds = window.Cesium.JulianDate.toDate(time).getTime() / 1000
       const glow = Math.sin(seconds * 2 * Math.PI) * 0.3 + 0.7
       const glowIntensity = intensity * glow
 
-      return new Cesium.Color(
+      return new window.Cesium.Color(
         Math.min(1.0, baseColor.red * (1 + glowIntensity * 0.3)),
         Math.min(1.0, baseColor.green * (1 + glowIntensity * 0.3)),
         Math.min(1.0, baseColor.blue * (1 + glowIntensity * 0.3)),
@@ -327,10 +327,10 @@ class AnimationEffectManager {
     const shakeIntensity = intensityMap[intensity] || intensityMap.medium
 
     return (time) => {
-      const seconds = Cesium.JulianDate.toDate(time).getTime() / 1000
+      const seconds = window.Cesium.JulianDate.toDate(time).getTime() / 1000
       const shakeX = (Math.random() - 0.5) * shakeIntensity
       const shakeY = (Math.random() - 0.5) * shakeIntensity
-      return new Cesium.Cartesian2(shakeX, shakeY)
+      return new window.Cesium.Cartesian2(shakeX, shakeY)
     }
   }
 }

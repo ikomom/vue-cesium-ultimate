@@ -23,7 +23,7 @@ export class ParabolaFlyLineMaterialProperty {
     this._gradient = undefined
     this._gradientSubscription = undefined
 
-    this.color = new Cesium.Color.fromCssColorString(options.color || defaultColor)
+    this.color = new window.Cesium.Color.fromCssColorString(options.color || defaultColor)
     this.speed = options.speed || defaultSpeed
     this.percent = options.percent || defaultPercent
     this.gradient = options.gradient || defaultGradient
@@ -47,7 +47,7 @@ export class ParabolaFlyLineMaterialProperty {
     result.color = this._getPropertyValue(
       this._color,
       time,
-      Cesium.Color.fromCssColorString(defaultColor),
+      window.Cesium.Color.fromCssColorString(defaultColor),
     )
     result.speed = this._getPropertyValue(this._speed, time, defaultSpeed)
     result.percent = this._getPropertyValue(this._percent, time, defaultPercent)
@@ -58,7 +58,7 @@ export class ParabolaFlyLineMaterialProperty {
 
   _getPropertyValue(property, time, defaultValue) {
     const Cesium = window.Cesium
-    if (Cesium.defined(property) && typeof property.getValue === 'function') {
+    if (window.Cesium.defined(property) && typeof property.getValue === 'function') {
       return property.getValue(time) || defaultValue
     }
     return property !== undefined ? property : defaultValue
@@ -86,12 +86,12 @@ export class ParabolaFlyLineMaterialProperty {
     const Cesium = window.Cesium
     // 如果两个都是 Property 对象，使用 Cesium.Property.equals
     if (
-      Cesium.defined(a) &&
-      Cesium.defined(a.equals) &&
-      Cesium.defined(b) &&
-      Cesium.defined(b.equals)
+      window.Cesium.defined(a) &&
+    window.Cesium.defined(a.equals) &&
+    window.Cesium.defined(b) &&
+    window.Cesium.defined(b.equals)
     ) {
-      return Cesium.Property.equals(a, b)
+      return window.Cesium.Property.equals(a, b)
     }
     // 否则直接比较值
     return a === b
@@ -109,10 +109,10 @@ export class ParabolaFlyLineMaterialProperty {
    */
   get isConstant() {
     return (
-      Cesium.Property.isConstant(this._color) &&
-      Cesium.Property.isConstant(this._speed) &&
-      Cesium.Property.isConstant(this._percent) &&
-      Cesium.Property.isConstant(this._gradient)
+      window.Cesium.Property.isConstant(this._color) &&
+    window.Cesium.Property.isConstant(this._speed) &&
+    window.Cesium.Property.isConstant(this._percent) &&
+    window.Cesium.Property.isConstant(this._gradient)
     )
   }
 }
@@ -134,7 +134,7 @@ export function initParabolaFlyLineMaterialProperty() {
     fabric: {
       type,
       uniforms: {
-        color: Cesium.Color.fromCssColorString(defaultColor),
+        color: window.Cesium.Color.fromCssColorString(defaultColor),
         speed: defaultSpeed,
         percent: defaultPercent,
         gradient: defaultGradient,

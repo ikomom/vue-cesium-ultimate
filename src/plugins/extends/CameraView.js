@@ -21,4 +21,4 @@ class CameraView extends mars3d.TaskItem {
     this._map.cancelFlyTo()
   }
 }
-mars3d.thing.Task.register("camera", CameraView)
+mars3d.thing.Task.register('camera', CameraView)
