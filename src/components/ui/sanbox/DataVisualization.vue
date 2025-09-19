@@ -281,6 +281,10 @@ const virtualEvents = ref(new Map()) // 虚拟节点上的事件
 // 轨迹时间记录管理
 const trajectoryTimeLog = ref(new Map()) // 存储每个轨迹的开始时间和消失时间
 
+// 悬浮状态管理
+const hoveredTarget = ref(null) // 当前悬浮的目标
+const originalEyeOffset = ref(new Map()) // 存储原始的eyeOffset设置
+
 // 缓存配置对象，避免重复计算
 const distanceConfigs = getDistanceConfigs()
 
@@ -1833,7 +1837,7 @@ const generateVirtualRelations = (target, nodes) => {
           const trajectory = currentTrajectoryData.trajectory
           const firstTimestamp = trajectory[0].timestamp
           const lastTimestamp = trajectory[trajectory.length - 1].timestamp
-          
+
           if (currentTimeStr < firstTimestamp || currentTimeStr > lastTimestamp) {
             // 当前时间超出轨迹时间范围，隐藏连线
             return null
@@ -2197,7 +2201,7 @@ const generateVirtualNodeEvents = (target, nodes) => {
           const trajectory = currentTrajectoryData.trajectory
           const firstTimestamp = trajectory[0].timestamp
           const lastTimestamp = trajectory[trajectory.length - 1].timestamp
-          
+
           if (currentTimeStr < firstTimestamp || currentTimeStr > lastTimestamp) {
             // 当前时间超出轨迹时间范围，隐藏连线
             return null
@@ -2657,11 +2661,26 @@ const onRelationClick = debounceEvent((relation, event) => {
 
 // 悬浮事件处理函数
 const onTargetHover = debounceEvent((target, event) => {
+  // 如果已有其他目标悬浮，先恢复其状态
+  if (hoveredTarget.value && hoveredTarget.value.id !== target.id) {
+    restoreTargetDepth(hoveredTarget.value)
+  }
+
+  // 设置当前目标为悬浮状态并置顶显示
+  hoveredTarget.value = target
+  bringTargetToFront(target)
+
   setPointer('pointer')
   emit('targetHover', target, event)
 }, 100)
 
 const onTargetLeave = debounceEvent((target, event) => {
+  // 恢复目标的原始深度设置
+  if (hoveredTarget.value && hoveredTarget.value.id === target.id) {
+    restoreTargetDepth(target)
+    hoveredTarget.value = null
+  }
+
   setPointer('auto')
   emit('targetLeave', target, event)
 }, 100)
@@ -2842,6 +2861,110 @@ onMounted(() => {
     }
   })
 })
+
+/**
+ * 将目标置顶显示（通过修改eyeOffset）
+ * @param {Object} target - 目标对象
+ */
+const bringTargetToFront = (target) => {
+  if (!viewer.value || !target) return
+
+  const entityId = target.id
+  const entity = viewer.value.entities.getById(entityId)
+  if (entity) {
+    // 保存原始的eyeOffset设置
+    if (entity.billboard && entity.billboard.eyeOffset) {
+      const originalOffset = entity.billboard.eyeOffset.getValue()
+      originalEyeOffset.value.set(target.id, originalOffset)
+    } else if (entity.billboard) {
+      // 如果没有设置eyeOffset，保存默认值
+      originalEyeOffset.value.set(target.id, new window.Cesium.Cartesian3(0, 0, 0))
+    }
+
+    // 设置eyeOffset向前偏移，使其显示在最前面
+    if (entity.billboard) {
+      entity.billboard.eyeOffset = new window.Cesium.Cartesian3(0, 0, -1000)
+    }
+    if (entity.point) {
+      if (entity.point.eyeOffset) {
+        const originalPointOffset = entity.point.eyeOffset.getValue()
+        originalEyeOffset.value.set(target.id + '_point', originalPointOffset)
+      } else {
+        originalEyeOffset.value.set(target.id + '_point', new window.Cesium.Cartesian3(0, 0, 0))
+      }
+      entity.point.eyeOffset = new window.Cesium.Cartesian3(0, 0, -1000)
+    }
+    if (entity.label) {
+      if (entity.label.eyeOffset) {
+        const originalLabelOffset = entity.label.eyeOffset.getValue()
+        originalEyeOffset.value.set(target.id + '_label', originalLabelOffset)
+      } else {
+        originalEyeOffset.value.set(target.id + '_label', new window.Cesium.Cartesian3(0, 0, 0))
+      }
+      entity.label.eyeOffset = new window.Cesium.Cartesian3(0, 0, -1000)
+    }
+  }
+}
+
+/**
+ * 恢复目标的原始eyeOffset设置
+ * @param {Object} target - 目标对象
+ */
+const restoreTargetDepth = (target) => {
+  if (!viewer.value || !target) return
+
+  const entityId = target.id
+  const entity = viewer.value.entities.getById(entityId)
+
+  console.log('Restore Debug info:', {
+    target,
+    targetId: target.id,
+    layerId: layerId.value,
+    entityId,
+    entity,
+    originalOffsets: {
+      billboard: originalEyeOffset.value.get(target.id),
+      point: originalEyeOffset.value.get(target.id + '_point'),
+      label: originalEyeOffset.value.get(target.id + '_label')
+    }
+  })
+
+  if (entity) {
+    // 恢复原始的eyeOffset设置
+    const originalOffset = originalEyeOffset.value.get(target.id)
+    if (entity.billboard) {
+      if (originalOffset) {
+        entity.billboard.eyeOffset = originalOffset
+      } else {
+        // 如果没有保存的原始值，恢复为默认值
+        entity.billboard.eyeOffset = new window.Cesium.Cartesian3(0, 0, 0)
+      }
+    }
+
+    const originalPointOffset = originalEyeOffset.value.get(target.id + '_point')
+    if (entity.point) {
+      if (originalPointOffset) {
+        entity.point.eyeOffset = originalPointOffset
+      } else {
+        entity.point.eyeOffset = new window.Cesium.Cartesian3(0, 0, 0)
+      }
+    }
+
+    const originalLabelOffset = originalEyeOffset.value.get(target.id + '_label')
+    if (entity.label) {
+      if (originalLabelOffset) {
+        entity.label.eyeOffset = originalLabelOffset
+      } else {
+        entity.label.eyeOffset = new window.Cesium.Cartesian3(0, 0, 0)
+      }
+    }
+
+    // 清除保存的原始设置
+    originalEyeOffset.value.delete(target.id)
+    originalEyeOffset.value.delete(target.id + '_point')
+    originalEyeOffset.value.delete(target.id + '_label')
+  }
+}
 
 // 暴露轨迹时间记录相关函数供外部调用
 defineExpose({
