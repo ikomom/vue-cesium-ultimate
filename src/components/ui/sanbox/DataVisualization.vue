@@ -1837,7 +1837,6 @@ const generateVirtualRelations = (target, nodes) => {
           const trajectory = currentTrajectoryData.trajectory
           const firstTimestamp = trajectory[0].timestamp
           const lastTimestamp = trajectory[trajectory.length - 1].timestamp
-
           if (currentTimeStr < firstTimestamp || currentTimeStr > lastTimestamp) {
             // 当前时间超出轨迹时间范围，隐藏连线
             return null
@@ -2201,7 +2200,6 @@ const generateVirtualNodeEvents = (target, nodes) => {
           const trajectory = currentTrajectoryData.trajectory
           const firstTimestamp = trajectory[0].timestamp
           const lastTimestamp = trajectory[trajectory.length - 1].timestamp
-
           if (currentTimeStr < firstTimestamp || currentTimeStr > lastTimestamp) {
             // 当前时间超出轨迹时间范围，隐藏连线
             return null
