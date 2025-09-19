@@ -856,4 +856,23 @@ onMounted(() => {
 .icon-virtual-link::before {
   content: '🔗';
 }
+/* 视图切换和面板控制图标 */
+.icon-tree::before {
+  content: '🌳';
+}
+.icon-list::before {
+  content: '📋';
+}
+.icon-minimize::before {
+  content: '🔽';
+}
+.icon-maximize::before {
+  content: '🔼';
+}
+.icon-refresh::before {
+  content: '🔄';
+}
+.icon-point::before {
+  content: '📍';
+}
 </style>
