@@ -3,7 +3,7 @@
     ref="panelRef"
     class="layer-control-panel"
     :style="panelStyle"
-    :class="{ 'is-collapsed': isCollapsed, 'is-dragging': isDragging }"
+    :class="{ 'is-collapsed': isCollapsed, 'is-dragging': isDragging, 'is-expanded': isExpanded }"
   >
     <div ref="dragHandleRef" class="panel-header" :style="dragHandleStyle" @click="toggleCollapse">
       <div class="header-left">
@@ -12,129 +12,61 @@
         <i class="collapse-icon" :class="isCollapsed ? 'icon-expand' : 'icon-collapse'"></i>
       </div>
       <div class="header-right" v-show="!isCollapsed">
+        <!-- 视图切换按钮 -->
+        <div class="view-toggle">
+          <button
+            class="btn-icon btn-toggle"
+            :class="{ active: viewMode === 'tree' }"
+            @click.stop="setViewMode('tree')"
+            title="树形视图"
+          >
+            <i class="icon-tree"></i>
+          </button>
+          <button
+            class="btn-icon btn-toggle"
+            :class="{ active: viewMode === 'list' }"
+            @click.stop="setViewMode('list')"
+            title="列表视图"
+          >
+            <i class="icon-list"></i>
+          </button>
+        </div>
         <button class="btn-icon" @click.stop="showCreateDialog = true" title="新增图层">
           <i class="icon-plus"></i>
         </button>
         <button class="btn-icon" @click.stop="refreshLayers" title="刷新">
           <i class="icon-refresh"></i>
         </button>
+        <button class="btn-icon" @click.stop="togglePanelSize" :title="isExpanded ? '缩小面板' : '放大面板'">
+          <i :class="isExpanded ? 'icon-minimize' : 'icon-maximize'"></i>
+        </button>
       </div>
     </div>
 
     <div class="panel-content" v-show="!isCollapsed">
-      <!-- 图层列表 -->
-      <div class="layer-list">
-        <div
-          v-for="layer in sortedLayers"
-          :key="layer.id"
-          class="layer-item"
-          :class="{ active: layer.id === activeLayerId, 'layer-hidden': !layer.visible }"
-        >
-          <div class="layer-info" @click="setActiveLayer(layer.id)">
-            <div class="layer-icon">
-              <i class="icon-layers"></i>
-            </div>
-            <div class="layer-details">
-              <div class="layer-name">{{ layer.name }}</div>
-              <div class="layer-meta">
-                <span class="layer-count">{{ getLayerDataCount(layer) }}</span>
-              </div>
-            </div>
-          </div>
+      <!-- 树形视图 -->
+      <LayerTreeView
+          v-if="viewMode === 'tree'"
+          :active-layer-id="activeLayerId"
+          @layer-visibility-toggle="toggleLayerVisibility"
+          @point-visibility-toggle="handlePointVisibilityToggle"
+          @point-select="handlePointSelect"
+          @relation-select="handleRelationSelect"
+        />
 
-          <div class="layer-controls">
-            <!-- 主要控制行 -->
-            <div class="main-controls">
-              <!-- 可见性控制 -->
-              <button
-                class="btn-icon"
-                :class="{ active: layer.visible }"
-                @click="toggleLayerVisibility(layer.id)"
-                :title="layer.visible ? '隐藏图层' : '显示图层'"
-              >
-                <i :class="layer.visible ? 'icon-eye' : 'icon-eye-off'"></i>
-              </button>
-
-              <!-- 编辑按钮 -->
-              <button class="btn-icon" @click="editLayer(layer)" title="编辑图层">
-                <i class="icon-edit"></i>
-              </button>
-
-              <!-- 删除按钮 -->
-              <button class="btn-icon btn-danger" @click="deleteLayer(layer.id)" title="删除图层">
-                <i class="icon-trash"></i>
-              </button>
-            </div>
-
-            <!-- 显示控制行 -->
-            <div class="show-controls">
-              <button
-                class="btn-icon btn-mini"
-                :class="{ active: layer.showControls.showPoints }"
-                @click="toggleShowControl(layer.id, 'showPoints')"
-                title="点位"
-              >
-                <i class="icon-point"></i>
-              </button>
-              <button
-                class="btn-icon btn-mini"
-                :class="{ active: layer.showControls.showRelation }"
-                @click="toggleShowControl(layer.id, 'showRelation')"
-                title="关系"
-              >
-                <i class="icon-link"></i>
-              </button>
-              <button
-                class="btn-icon btn-mini"
-                :class="{ active: layer.showControls.showTrajectory }"
-                @click="toggleShowControl(layer.id, 'showTrajectory')"
-                title="轨迹"
-              >
-                <i class="icon-route"></i>
-              </button>
-              <button
-                class="btn-icon btn-mini"
-                :class="{ active: layer.showControls.showEvents }"
-                @click="toggleShowControl(layer.id, 'showEvents')"
-                title="事件"
-              >
-                <i class="icon-calendar"></i>
-              </button>
-              <button
-                class="btn-icon btn-mini"
-                :class="{ active: layer.showControls.showRings }"
-                @click="toggleShowControl(layer.id, 'showRings')"
-                title="圆环"
-              >
-                <i class="icon-ring"></i>
-              </button>
-              <button
-                class="btn-icon btn-mini"
-                :class="{ active: layer.showControls.showVirtualNodes }"
-                @click="toggleShowControl(layer.id, 'showVirtualNodes')"
-                title="虚拟节点"
-              >
-                <i class="icon-node"></i>
-              </button>
-              <button
-                class="btn-icon btn-mini"
-                :class="{ active: layer.showControls.showVirtualRelations }"
-                @click="toggleShowControl(layer.id, 'showVirtualRelations')"
-                title="虚拟关系"
-              >
-                <i class="icon-virtual-link"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 空状态 -->
-      <div v-if="layers.length === 0" class="empty-state">
-        <i class="icon-layers"></i>
-        <p>暂无图层</p>
-        <button class="btn-primary" @click="showCreateDialog = true">创建第一个图层</button>
-      </div>
+      <!-- 列表视图 -->
+      <LayerListView
+        v-else
+        :active-layer-id="activeLayerId"
+        @set-active-layer="setActiveLayer"
+        @layer-visibility-toggle="toggleLayerVisibility"
+        @edit-layer="editLayer"
+        @delete-layer="deleteLayer"
+        @toggle-show-control="toggleShowControl"
+        @create-layer="showCreateDialog = true"
+        @event-select="handleEventSelect"
+        @relation-select="handleRelationSelect"
+      />
     </div>
 
     <!-- 图层统计 -->
@@ -147,57 +79,24 @@
     </div>
   </div>
 
-  <!-- 创建/编辑图层对话框 - 移到面板外部 -->
-  <div v-if="showCreateDialog || showEditDialog" class="dialog-overlay" @click="closeDialogs">
-    <div class="dialog" @click.stop>
-      <div class="dialog-header">
-        <h4>{{ showCreateDialog ? '新增图层' : '编辑图层' }}</h4>
-        <button class="btn-close" @click="closeDialogs">
-          <i class="icon-close"></i>
-        </button>
-      </div>
-
-      <div class="dialog-content">
-        <form @submit.prevent="submitForm">
-          <div class="form-group">
-            <label>图层名称</label>
-            <input v-model="formData.name" type="text" placeholder="请输入图层名称" required />
-          </div>
-
-          <div class="form-group">
-            <label>层级顺序</label>
-            <input
-              v-model.number="formData.zIndex"
-              type="number"
-              placeholder="数值越大越靠前"
-              min="0"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input v-model="formData.visible" type="checkbox" />
-              <span>默认可见</span>
-            </label>
-          </div>
-        </form>
-      </div>
-
-      <div class="dialog-footer">
-        <button class="btn-secondary" @click="closeDialogs">取消</button>
-        <button class="btn-primary" @click="submitForm">
-          {{ showCreateDialog ? '创建' : '保存' }}
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- 图层对话框 -->
+    <LayerDialog
+      :visible="showCreateDialog || showEditDialog"
+      :is-edit="showEditDialog"
+      :editing-layer="editingLayer"
+      @submit="handleLayerSave"
+      @close="closeDialogs"
+    />
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useGlobalMapStore } from '@/stores/globalMap'
 import { useDraggableCollapse } from '@/composables/useDraggableCollapse.js'
 import { storeToRefs } from 'pinia'
+import LayerTreeView from './LayerTreeView.vue'
+import LayerListView from './LayerListView.vue'
+import LayerDialog from './LayerDialog.vue'
 
 const globalMapStore = useGlobalMapStore()
 const { globalLayerManager } = globalMapStore
@@ -228,18 +127,16 @@ const {
   },
 })
 
-// 响应式数据 - 直接使用图层管理器的响应式数据
+// 视图模式
+const viewMode = ref('tree') // 'tree' | 'list'
 
+// 面板尺寸状态
+const isExpanded = ref(false)
+
+// 对话框状态
 const showCreateDialog = ref(false)
 const showEditDialog = ref(false)
 const editingLayer = ref(null)
-
-// 表单数据
-const formData = ref({
-  name: '',
-  zIndex: 0,
-  visible: true,
-})
 
 // 计算属性
 const sortedLayers = computed(() => {
@@ -251,6 +148,14 @@ const statistics = computed(() => {
 })
 
 // 方法
+const setViewMode = (mode) => {
+  viewMode.value = mode
+}
+
+const togglePanelSize = () => {
+  isExpanded.value = !isExpanded.value
+}
+
 const setActiveLayer = (layerId) => {
   globalLayerManager.setActiveLayer(layerId)
 }
@@ -264,59 +169,10 @@ const toggleLayerVisibility = (layerId) => {
   }
 }
 
-const editLayer = (layer) => {
-  editingLayer.value = layer
-  formData.value = {
-    name: layer.name,
-    zIndex: layer.zIndex,
-    visible: layer.visible,
-  }
-  showEditDialog.value = true
-}
-
 const deleteLayer = (layerId) => {
   if (confirm('确定要删除这个图层吗？此操作不可撤销。')) {
     globalLayerManager.removeLayer(layerId)
   }
-}
-
-const closeDialogs = () => {
-  showCreateDialog.value = false
-  showEditDialog.value = false
-  editingLayer.value = null
-  resetForm()
-}
-
-const resetForm = () => {
-  formData.value = {
-    name: '',
-    zIndex: 0,
-    visible: true,
-  }
-}
-
-const submitForm = () => {
-  if (!formData.value.name) {
-    alert('请填写图层名称')
-    return
-  }
-
-  if (showCreateDialog.value) {
-    // 创建新图层
-    const layer = globalLayerManager.createLayer({
-      name: formData.value.name,
-      zIndex: formData.value.zIndex,
-      visible: formData.value.visible,
-    })
-  } else if (showEditDialog.value && editingLayer.value) {
-    // 编辑现有图层
-    const layer = editingLayer.value
-    layer.setName(formData.value.name)
-    layer.setZIndex(formData.value.zIndex)
-    layer.setVisible(formData.value.visible)
-  }
-
-  closeDialogs()
 }
 
 const getLayerDataCount = (layer) => {
@@ -336,6 +192,57 @@ const toggleShowControl = (layerId, controlType) => {
     layer.showControls[controlType] = !layer.showControls[controlType]
     console.log(`🎛️ 图层 [${layer.name}] ${controlType} 已${layer.showControls[controlType] ? '开启' : '关闭'}`)
   }
+}
+
+const refreshLayers = () => {
+  // 刷新图层数据
+  console.log('刷新图层数据')
+}
+
+const handlePointSelect = (pointId) => {
+  console.log('选择点位:', pointId)
+}
+
+const handleRelationSelect = (relationId) => {
+  console.log('选择关系:', relationId)
+  // 可以在这里添加关系选择的具体逻辑，比如高亮显示关系
+}
+
+const handleEventSelect = (eventId) => {
+  console.log('选择事件:', eventId)
+  // 可以在这里添加事件选择的具体逻辑，比如显示事件详情
+}
+
+const handlePointVisibilityToggle = (pointId) => {
+  // 处理点位可见性切换
+  console.log('切换点位可见性:', pointId)
+  // 可以在这里添加点位显示/隐藏的地图操作
+}
+
+// LayerDialog事件处理
+const editLayer = (layer) => {
+  editingLayer.value = layer
+  showEditDialog.value = true
+}
+
+const closeDialogs = () => {
+  showCreateDialog.value = false
+  showEditDialog.value = false
+  editingLayer.value = null
+}
+
+const handleLayerSave = (layerData) => {
+  if (showCreateDialog.value) {
+    // 创建新图层
+    globalLayerManager.createLayer(layerData)
+  } else if (showEditDialog.value && editingLayer.value) {
+    // 编辑现有图层
+    const layer = editingLayer.value
+    layer.setName(layerData.name)
+    layer.setZIndex(layerData.zIndex)
+    layer.setVisible(layerData.visible)
+  }
+  closeDialogs()
 }
 
 // 生命周期
@@ -364,7 +271,13 @@ onMounted(() => {
 }
 
 .layer-control-panel.is-collapsed {
-  height: auto;
+  height: 40px;
+}
+
+.layer-control-panel.is-expanded {
+  width: 500px;
+  height: 600px;
+  max-height: 80vh;
 }
 
 .layer-control-panel.is-dragging {
@@ -838,5 +751,53 @@ onMounted(() => {
 }
 .icon-virtual-link::before {
   content: '🔗';
+}
+.icon-tree::before {
+  content: '🌳';
+}
+.icon-list::before {
+  content: '☰';
+}
+
+.icon-maximize::before {
+  content: '⛶';
+}
+
+.icon-minimize::before {
+  content: '⊟';
+}
+
+/* 视图切换按钮样式 */
+.view-toggle {
+  display: flex;
+  gap: 2px;
+  margin-right: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.btn-toggle {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 0 !important;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.btn-toggle.active {
+  background: rgba(59, 130, 246, 0.3) !important;
+  color: #60a5fa;
+}
+
+.btn-toggle:first-child {
+  border-radius: 3px 0 0 3px !important;
+}
+
+.btn-toggle:last-child {
+  border-radius: 0 3px 3px 0 !important;
 }
 </style>

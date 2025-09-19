@@ -44,15 +44,15 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       getCircleConnectorData(),
     ])
       .then((res) => {
-        console.log('????????????????????????????????',res[6])
-        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',res[3])
+        console.log('????????????????????????????????', res[6])
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', res[3])
         targetBaseData.value = [...(res[0] || [])]
         targetLocationData.value = [...(res[1] || [])]
         relationData.value = [...(res[2] || [])]
         trajectoryData.value = { ...(res[3] || {}) }
         eventData.value = [...(res[4] || [])]
         targetStatusData.value = [...(res[5] || [])]
-        circleConnectorData.value = {...res[6]}
+        circleConnectorData.value = { ...res[6] }
       })
       .finally(() => {
         loading.value = false
@@ -112,7 +112,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       targets: circleConnectorData.value.targets || [],
       points: circleConnectorData.value.points || [],
       relations: circleConnectorData.value.relations || [],
-      trajectories: {...circleConnectorData.value.trajectories}  || [],
+      trajectories: { ...circleConnectorData.value.trajectories } || [],
     })
 
     // 全数据图层
@@ -122,14 +122,14 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       visible: false,
     })
 
-    // allDataLayer.updateAllData({
-    //   targets: targetBaseData.value,
-    //   trajectories: trajectoryData.value,
-    //   points: targetLocationData.value,
-    //   relations: relationData.value,
-    //   events: eventData.value,
-    //   targetStatuses: targetStatusData.value,
-    // })
+    allDataLayer.updateAllData({
+      targets: targetBaseData.value,
+      trajectories: trajectoryData.value,
+      points: targetLocationData.value,
+      relations: relationData.value,
+      events: eventData.value,
+      targetStatuses: targetStatusData.value,
+    })
 
     // 全局时间轴更新
     globalLayerManager.updateGlobalTimeline()
