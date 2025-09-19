@@ -44,8 +44,6 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       getCircleConnectorData(),
     ])
       .then((res) => {
-        console.log('????????????????????????????????',res[6])
-        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',res[3])
         targetBaseData.value = [...(res[0] || [])]
         targetLocationData.value = [...(res[1] || [])]
         relationData.value = [...(res[2] || [])]
@@ -70,11 +68,11 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       zIndex: 1,
       visible: false,
     })
-    // targetBaseLayer.updateAllData({
-    //   targets: targetBaseData.value,
-    //   points: targetLocationData.value.slice(0, 20),
-    //   relations: relationData.value.slice(0, 6),
-    // })
+    targetBaseLayer.updateAllData({
+      targets: targetBaseData.value,
+      points: targetLocationData.value.slice(0, 20),
+      relations: relationData.value.slice(0, 6),
+    })
 
     // 创建目标位置数据图层
     const targetLocationLayer = globalLayerManager.createLayer({
@@ -82,11 +80,11 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       zIndex: 2,
       visible: false,
     })
-    // targetLocationLayer.updateAllData({
-    //   targets: targetBaseData.value,
-    //   points: targetLocationData.value.slice(20),
-    //   relations: relationData.value.slice(6),
-    // })
+    targetLocationLayer.updateAllData({
+      targets: targetBaseData.value,
+      points: targetLocationData.value.slice(20),
+      relations: relationData.value.slice(6),
+    })
 
     // 创建关系连线图层
     const relationLayer = globalLayerManager.createLayer({
@@ -122,14 +120,14 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       visible: false,
     })
 
-    // allDataLayer.updateAllData({
-    //   targets: targetBaseData.value,
-    //   trajectories: trajectoryData.value,
-    //   points: targetLocationData.value,
-    //   relations: relationData.value,
-    //   events: eventData.value,
-    //   targetStatuses: targetStatusData.value,
-    // })
+    allDataLayer.updateAllData({
+      targets: targetBaseData.value,
+      trajectories: trajectoryData.value,
+      points: targetLocationData.value,
+      relations: relationData.value,
+      events: eventData.value,
+      targetStatuses: targetStatusData.value,
+    })
 
     // 全局时间轴更新
     globalLayerManager.updateGlobalTimeline()

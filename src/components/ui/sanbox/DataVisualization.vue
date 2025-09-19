@@ -2661,12 +2661,13 @@ const onRelationClick = debounceEvent((relation, event) => {
 const onTargetHover = debounceEvent((target, event) => {
   // 如果已有其他目标悬浮，先恢复其状态
   if (hoveredTarget.value && hoveredTarget.value.id !== target.id) {
-    restoreTargetDepth(hoveredTarget.value)
+    const restoreResult = restoreTargetDepth(hoveredTarget.value)
+    console.log('Previous target restore result:', restoreResult)
   }
 
   // 设置当前目标为悬浮状态并置顶显示
   hoveredTarget.value = target
-  bringTargetToFront(target)
+  const bringResult = bringTargetToFront(target)
 
   setPointer('pointer')
   emit('targetHover', target, event)
@@ -2675,7 +2676,8 @@ const onTargetHover = debounceEvent((target, event) => {
 const onTargetLeave = debounceEvent((target, event) => {
   // 恢复目标的原始深度设置
   if (hoveredTarget.value && hoveredTarget.value.id === target.id) {
-    restoreTargetDepth(target)
+    const restoreResult = restoreTargetDepth(target)
+    console.log('Target leave restore result:', restoreResult)
     hoveredTarget.value = null
   }
 
@@ -2865,42 +2867,96 @@ onMounted(() => {
  * @param {Object} target - 目标对象
  */
 const bringTargetToFront = (target) => {
-  if (!viewer.value || !target) return
+  if (!viewer.value) {
+    return false
+  }
+
+  if (!target || !target.id) {
+    return false
+  }
 
   const entityId = target.id
   const entity = viewer.value.entities.getById(entityId)
-  if (entity) {
-    // 保存原始的eyeOffset设置
-    if (entity.billboard && entity.billboard.eyeOffset) {
-      const originalOffset = entity.billboard.eyeOffset.getValue()
-      originalEyeOffset.value.set(target.id, originalOffset)
-    } else if (entity.billboard) {
-      // 如果没有设置eyeOffset，保存默认值
-      originalEyeOffset.value.set(target.id, new window.Cesium.Cartesian3(0, 0, 0))
+
+  if (!entity) {
+    return false
+  }
+
+  let hasModified = false
+
+  try {
+    // 处理 billboard
+    if (entity.billboard) {
+      // 保存原始的eyeOffset设置
+      if (entity.billboard.eyeOffset) {
+        try {
+          const originalOffset = entity.billboard.eyeOffset.getValue ?
+            entity.billboard.eyeOffset.getValue() :
+            entity.billboard.eyeOffset
+          originalEyeOffset.value.set(target.id, originalOffset)
+        } catch (e) {
+          console.warn('Failed to get billboard eyeOffset value:', e)
+          originalEyeOffset.value.set(target.id, new window.Cesium.Cartesian3(0, 0, 0))
+        }
+      } else {
+        originalEyeOffset.value.set(target.id, new window.Cesium.Cartesian3(0, 0, 111101))
+      }
+
+      // 设置eyeOffset向前偏移
+      entity.billboard.eyeOffset = new window.Cesium.Cartesian3(0, 0, -1000)
+      hasModified = true
+      console.log('✅ Billboard eyeOffset set to front')
     }
 
-    // 设置eyeOffset向前偏移，使其显示在最前面
-    if (entity.billboard) {
-      entity.billboard.eyeOffset = new window.Cesium.Cartesian3(0, 0, -1000)
-    }
+    // 处理 point
     if (entity.point) {
       if (entity.point.eyeOffset) {
-        const originalPointOffset = entity.point.eyeOffset.getValue()
-        originalEyeOffset.value.set(target.id + '_point', originalPointOffset)
+        try {
+          const originalPointOffset = entity.point.eyeOffset.getValue ?
+            entity.point.eyeOffset.getValue() :
+            entity.point.eyeOffset
+          originalEyeOffset.value.set(target.id + '_point', originalPointOffset)
+        } catch (e) {
+          console.warn('Failed to get point eyeOffset value:', e)
+          originalEyeOffset.value.set(target.id + '_point', new window.Cesium.Cartesian3(0, 0, 0))
+        }
       } else {
-        originalEyeOffset.value.set(target.id + '_point', new window.Cesium.Cartesian3(0, 0, 0))
+        originalEyeOffset.value.set(target.id + '_point', new window.Cesium.Cartesian3(0, 0, 111101))
       }
+
       entity.point.eyeOffset = new window.Cesium.Cartesian3(0, 0, -1000)
+      hasModified = true
+      console.log('✅ Point eyeOffset set to front')
     }
+
+    // 处理 label
     if (entity.label) {
       if (entity.label.eyeOffset) {
-        const originalLabelOffset = entity.label.eyeOffset.getValue()
-        originalEyeOffset.value.set(target.id + '_label', originalLabelOffset)
+        try {
+          const originalLabelOffset = entity.label.eyeOffset.getValue ?
+            entity.label.eyeOffset.getValue() :
+            entity.label.eyeOffset
+          originalEyeOffset.value.set(target.id + '_label', originalLabelOffset)
+        } catch (e) {
+          console.warn('Failed to get label eyeOffset value:', e)
+          originalEyeOffset.value.set(target.id + '_label', new window.Cesium.Cartesian3(0, 0, 0))
+        }
       } else {
-        originalEyeOffset.value.set(target.id + '_label', new window.Cesium.Cartesian3(0, 0, 0))
+        originalEyeOffset.value.set(target.id + '_label', new window.Cesium.Cartesian3(0, 0, 111101))
       }
+
       entity.label.eyeOffset = new window.Cesium.Cartesian3(0, 0, -1000)
+      hasModified = true
+      console.log('✅ Label eyeOffset set to front')
     }
+
+    if (!hasModified) {
+      return false
+    }
+    return true
+
+  } catch (error) {
+    return false
   }
 }
 
@@ -2909,7 +2965,15 @@ const bringTargetToFront = (target) => {
  * @param {Object} target - 目标对象
  */
 const restoreTargetDepth = (target) => {
-  if (!viewer.value || !target) return
+  if (!viewer.value) {
+    console.warn('restoreTargetDepth: viewer not available')
+    return false
+  }
+
+  if (!target || !target.id) {
+    console.warn('restoreTargetDepth: invalid target', target)
+    return false
+  }
 
   const entityId = target.id
   const entity = viewer.value.entities.getById(entityId)
@@ -2920,6 +2984,7 @@ const restoreTargetDepth = (target) => {
     layerId: layerId.value,
     entityId,
     entity,
+    entityExists: !!entity,
     originalOffsets: {
       billboard: originalEyeOffset.value.get(target.id),
       point: originalEyeOffset.value.get(target.id + '_point'),
@@ -2927,40 +2992,75 @@ const restoreTargetDepth = (target) => {
     }
   })
 
-  if (entity) {
-    // 恢复原始的eyeOffset设置
-    const originalOffset = originalEyeOffset.value.get(target.id)
+  if (!entity) {
+    console.warn('restoreTargetDepth: entity not found for ID:', entityId)
+    // 仍然清理保存的偏移量
+    originalEyeOffset.value.delete(target.id)
+    originalEyeOffset.value.delete(target.id + '_point')
+    originalEyeOffset.value.delete(target.id + '_label')
+    return false
+  }
+
+  let hasRestored = false
+
+  try {
+    // 恢复 billboard 的原始eyeOffset设置
     if (entity.billboard) {
+      const originalOffset = originalEyeOffset.value.get(target.id)
       if (originalOffset) {
         entity.billboard.eyeOffset = originalOffset
       } else {
         // 如果没有保存的原始值，恢复为默认值
         entity.billboard.eyeOffset = new window.Cesium.Cartesian3(0, 0, 0)
       }
+      hasRestored = true
+      console.log('✅ Billboard eyeOffset restored')
     }
 
-    const originalPointOffset = originalEyeOffset.value.get(target.id + '_point')
+    // 恢复 point 的原始eyeOffset设置
     if (entity.point) {
+      const originalPointOffset = originalEyeOffset.value.get(target.id + '_point')
       if (originalPointOffset) {
         entity.point.eyeOffset = originalPointOffset
       } else {
         entity.point.eyeOffset = new window.Cesium.Cartesian3(0, 0, 0)
       }
+      hasRestored = true
+      console.log('✅ Point eyeOffset restored')
     }
 
-    const originalLabelOffset = originalEyeOffset.value.get(target.id + '_label')
+    // 恢复 label 的原始eyeOffset设置
     if (entity.label) {
+      const originalLabelOffset = originalEyeOffset.value.get(target.id + '_label')
       if (originalLabelOffset) {
         entity.label.eyeOffset = originalLabelOffset
       } else {
         entity.label.eyeOffset = new window.Cesium.Cartesian3(0, 0, 0)
       }
+      hasRestored = true
+      console.log('✅ Label eyeOffset restored')
     }
 
     // 清除保存的原始设置
     originalEyeOffset.value.delete(target.id)
     originalEyeOffset.value.delete(target.id + '_point')
     originalEyeOffset.value.delete(target.id + '_label')
+
+    if (!hasRestored) {
+      console.warn('restoreTargetDepth: No visual components found to restore')
+      return false
+    }
+
+    console.log('✅ restoreTargetDepth completed successfully for:', target.id)
+    return true
+
+  } catch (error) {
+    console.error('restoreTargetDepth error:', error, { target, entity })
+    // 即使出错也要清理保存的偏移量
+    originalEyeOffset.value.delete(target.id)
+    originalEyeOffset.value.delete(target.id + '_point')
+    originalEyeOffset.value.delete(target.id + '_label')
+    return false
   }
 }
 
