@@ -135,30 +135,7 @@
                 >
                   <i class="icon-calendar"></i>
                 </button>
-                <button
-                  class="btn-icon btn-mini"
-                  :class="{ active: layer.showControls.showRings }"
-                  @click.stop="toggleShowControl(layer.id, 'showRings')"
-                  title="圆环"
-                >
-                  <i class="icon-ring"></i>
-                </button>
-                <button
-                  class="btn-icon btn-mini"
-                  :class="{ active: layer.showControls.showVirtualNodes }"
-                  @click.stop="toggleShowControl(layer.id, 'showVirtualNodes')"
-                  title="虚拟节点"
-                >
-                  <i class="icon-node"></i>
-                </button>
-                <button
-                  class="btn-icon btn-mini"
-                  :class="{ active: layer.showControls.showVirtualRelations }"
-                  @click.stop="toggleShowControl(layer.id, 'showVirtualRelations')"
-                  title="虚拟关系"
-                >
-                  <i class="icon-virtual-link"></i>
-                </button>
+
               </div>
             </div>
           </div>
@@ -358,7 +335,7 @@ onMounted(() => {
 
 <style scoped>
 .layer-control-panel {
-  width: 320px;
+  width: 360px;
   background: rgba(30, 30, 30, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
@@ -393,68 +370,152 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   cursor: grab;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
+  min-height: 48px;
+  position: relative;
+}
+
+.panel-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
 }
 
 .panel-header:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .panel-header:active {
   cursor: grabbing;
+  transform: scale(0.998);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
+  min-width: 0;
+}
+
+.header-left .icon-layers {
+  font-size: 18px;
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .title {
   font-size: 16px;
   font-weight: 600;
   color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collapse-icon {
+  margin-left: 8px;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 2px;
+}
+
+.collapse-icon:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
 }
 
 .header-right {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.view-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 2px;
+  margin-right: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-toggle {
+  width: 32px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  transition: all 0.2s ease !important;
+  position: relative;
+}
+
+.btn-toggle.active {
+  background: rgba(59, 130, 246, 0.8) !important;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  transform: none !important;
+}
+
+.btn-toggle:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .btn-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: none;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 12px;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .btn-icon:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-icon:hover::before {
+  left: 100%;
 }
 
 .btn-icon:active {
-  transform: scale(0.95);
-}
-
-.collapse-icon {
-  margin-left: auto;
-  font-size: 12px;
-  opacity: 0.7;
-  transition: transform 0.3s ease;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .icon-expand::before {
@@ -556,41 +617,105 @@ onMounted(() => {
 .layer-info {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   cursor: pointer;
-  padding-right: 8px;
+  padding: 4px 16px 4px 0;
+  gap: 16px;
+  min-height: 60px;
 }
 
 .layer-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 20px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.layer-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  opacity: 0.8;
+}
+
+.layer-item:hover .layer-icon {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12));
+  transform: scale(1.05);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.layer-item.active .layer-icon {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(59, 130, 246, 0.25));
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow:
+    0 4px 12px rgba(59, 130, 246, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .layer-details {
   flex: 1;
+  min-width: 0;
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .layer-name {
-  font-weight: 500;
+  font-weight: 600;
   color: #ffffff;
-  margin-bottom: 4px;
-  line-height: 1.2;
+  line-height: 1.4;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
 }
 
 .layer-meta {
   display: flex;
-  gap: 12px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.3;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+.layer-meta span {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.layer-meta span:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 .layer-controls {
@@ -609,36 +734,96 @@ onMounted(() => {
 
 .show-controls {
   display: flex;
-  gap: 3px;
+  gap: 4px;
   justify-content: center;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .btn-icon.btn-mini {
-  width: 24px;
-  height: 24px;
-  font-size: 11px;
-  padding: 3px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-icon.btn-mini::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .btn-icon.btn-mini:hover {
   background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.05);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-icon.btn-mini:hover::before {
+  left: 100%;
+}
+
+.btn-icon.btn-mini.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.7));
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow:
+    0 2px 8px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.btn-icon.btn-mini.active:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(59, 130, 246, 0.8));
+  box-shadow:
+    0 4px 12px rgba(59, 130, 246, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .btn-icon.active {
-  background: #3b82f6;
-  color: #fff;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.7));
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow:
+    0 2px 8px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.btn-icon.active:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(59, 130, 246, 0.8));
+  box-shadow:
+    0 4px 12px rgba(59, 130, 246, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-icon.btn-danger {
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .btn-icon.btn-danger:hover {
-  background: #ef4444;
-  color: #fff;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(239, 68, 68, 0.7));
+  color: #ffffff;
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow:
+    0 4px 12px rgba(239, 68, 68, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary {
