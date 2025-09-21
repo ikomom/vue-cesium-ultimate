@@ -50,7 +50,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
         trajectoryData.value = { ...(res[3] || {}) }
         eventData.value = [...(res[4] || [])]
         targetStatusData.value = [...(res[5] || [])]
-        circleConnectorData.value = { ...res[6] }
+        circleConnectorData.value = {...res[6]}
       })
       .finally(() => {
         loading.value = false
@@ -110,7 +110,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       targets: circleConnectorData.value.targets || [],
       points: circleConnectorData.value.points || [],
       relations: circleConnectorData.value.relations || [],
-      trajectories: { ...circleConnectorData.value.trajectories } || [],
+      trajectories: {...circleConnectorData.value.trajectories}  || [],
     })
 
     // 全数据图层

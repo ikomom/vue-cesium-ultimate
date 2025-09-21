@@ -21,6 +21,26 @@
       "createdAt": "2024-01-20T08:15:00.000Z"
     },
     {
+      "id": "target_022-1",
+      "name": "上海雷达站C",
+      "type": "雷达",
+      "description": "上海地区重要雷达监控站点",
+      "status": "运营中",
+      "capacity": "中型",
+      "operator": "上海雷达管理中心",
+      "createdAt": "2024-01-20T08:15:00.000Z"
+    },
+    {
+      "id": "target_022-2",
+      "name": "上海雷达站D",
+      "type": "雷达",
+      "description": "上海地区重要雷达监控站点",
+      "status": "运营中",
+      "capacity": "中型",
+      "operator": "上海雷达管理中心",
+      "createdAt": "2024-01-20T08:15:00.000Z"
+    },
+    {
       "id": "target_023",
       "name": "广州雷达站C",
       "type": "雷达",
@@ -56,6 +76,32 @@
       "address": "上海市浦东新区雷达监控中心",
       "createdAt": "2024-01-20T08:15:00.000Z"
     },
+    {
+      "id": "target_022-1",
+      "name": "上海雷达站C",
+      "longitude": 122.4737,
+      "latitude": 31.2304,
+      "height": 0,
+      "region": "华东",
+      "province": "上海市",
+      "city": "上海市",
+      "address": "上海市浦东新区雷达监控中心",
+      "createdAt": "2024-01-20T08:15:00.000Z"
+    },
+
+    {
+      "id": "target_022-2",
+      "name": "上海雷达站D",
+      "longitude": 119.4737,
+      "latitude": 31.2304,
+      "height": 0,
+      "region": "华东",
+      "province": "上海市",
+      "city": "上海市",
+      "address": "上海市浦东新区雷达监控中心",
+      "createdAt": "2024-01-20T08:15:00.000Z"
+    },
+    
     {
       "id": "target_023",
       "name": "广州雷达站C",
