@@ -97,10 +97,10 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       zIndex: 3,
       visible: false,
     })
-    // relationLayer.updateAllData({
-    //   targets: targetBaseData.value,
-    //   trajectories: trajectoryData.value,
-    // })
+    relationLayer.updateAllData({
+      targets: targetBaseData.value,
+      trajectories: trajectoryData.value,
+    })
     // 创建圆环连接器数据图层
     const circleConnectorLayer = globalLayerManager.createLayer({
       name: '圆环连接器',
