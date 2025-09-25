@@ -1334,20 +1334,12 @@ const processFusionLines = logFuncWrap(() => {
       if (!sourceTarget) return null
       const { source, target, positions } = sourceTarget
 
-      // 为ConditionalOpacityLineMaterialProperty设置时间范围
+      // 简化材质创建，只保留点击透明度变换功能
       const materialProps = { ...styleConfig.materialProps }
-      if (styleConfig.material === MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY && fusionLine.startTime && fusionLine.endTime) {
-        // 将ISO时间字符串转换为JulianDate
-        const startTime = window.Cesium.JulianDate.fromIso8601(fusionLine.startTime)
-        const endTime = window.Cesium.JulianDate.fromIso8601(fusionLine.endTime)
-        materialProps.timeRange = { start: startTime, end: endTime }
-        console.log('🎯 设置融合线时间范围:', fusionLine.id, {
-          startTime: fusionLine.startTime,
-          endTime: fusionLine.endTime,
-          julianStart: startTime,
-          julianEnd: endTime
-        })
-      }
+      console.log('🎯 创建融合线材质:', fusionLine.id, {
+        materialType: styleConfig.material,
+        materialProps
+      })
 
       const material = getMaterialProperty(styleConfig.material, materialProps)
       // 标签文本优先级：描述 > 名称 > 类型
