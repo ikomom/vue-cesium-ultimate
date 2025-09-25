@@ -7,6 +7,7 @@ import {
   getShipTrajectoryData,
   getTargetStatusData,
   getCircleConnectorData,
+  getFusionLineData,
 } from '@/api/index.js'
 import { ref, markRaw, computed } from 'vue'
 import LayerManager from '@/components/ui/layer'
@@ -29,6 +30,8 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
   const trajectoryData = ref({})
   // 圆环连接器数据
   const circleConnectorData = ref({})
+  // 融合线数据
+  const fusionLineData = ref([])
   const loading = ref(false)
 
   function init() {
@@ -42,6 +45,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       getEventData(),
       getTargetStatusData(),
       getCircleConnectorData(),
+      getFusionLineData(),
     ])
       .then((res) => {
         targetBaseData.value = [...(res[0] || [])]
@@ -51,6 +55,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
         eventData.value = [...(res[4] || [])]
         targetStatusData.value = [...(res[5] || [])]
         circleConnectorData.value = {...res[6]}
+        fusionLineData.value = [...(res[7] || [])]
       })
       .finally(() => {
         loading.value = false
@@ -113,10 +118,24 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
       trajectories: {...circleConnectorData.value.trajectories}  || [],
     })
 
+    // 融合线数据图层
+    const fusionLineLayer = globalLayerManager.createLayer({
+      name: '融合线数据',
+      zIndex: 5,
+      visible: false,
+    })
+
+    // 设置显示控制 - 启用融合线显示
+    fusionLineLayer.setShowControl('showFusionLines', true)
+
+    fusionLineLayer.updateAllData({
+      fusionLines: fusionLineData.value,
+    })
+
     // 全数据图层
     const allDataLayer = globalLayerManager.createLayer({
       name: '全数据',
-      zIndex: 5,
+      zIndex: 6,
       visible: false,
     })
 
@@ -142,22 +161,23 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
   const activeLayer = computed(() => globalLayerManager.getLayer(activeLayerId.value))
 
   return {
-    // 方法
-    init,
-    initDefaultLayers,
-    getLayerManager,
-    // 变量
-    layers,
-    activeLayerId,
-    activeLayer,
-    globalLayerManager,
-    targetBaseData,
-    targetLocationData,
-    relationData,
-    targetStatusData,
-    eventData,
-    trajectoryData,
-    circleConnectorData,
-    loading,
-  }
+      // 方法
+      init,
+      initDefaultLayers,
+      getLayerManager,
+      // 变量
+      layers,
+      activeLayerId,
+      activeLayer,
+      globalLayerManager,
+      targetBaseData,
+      targetLocationData,
+      relationData,
+      targetStatusData,
+      eventData,
+      trajectoryData,
+      circleConnectorData,
+      fusionLineData,
+      loading,
+    }
 })

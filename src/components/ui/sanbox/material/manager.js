@@ -4,6 +4,7 @@ import {
   ParabolaFlyLineMaterialProperty,
   PulseLineMaterialProperty,
   PolylineTrailLinkMaterialProperty,
+  ConditionalOpacityLineMaterialProperty,
 } from './property'
 
 /**
@@ -29,6 +30,10 @@ export function getMaterialProperty(materialType, options = {}) {
     case MATERIAL_TYPES.POLYLINE_TRAIL_LINK:
     case MATERIAL_TYPES.PolylineTrailLink:
       return new PolylineTrailLinkMaterialProperty(options)
+
+    case MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY:
+    case MATERIAL_TYPES.PolylineConditionalOpacity:
+      return new ConditionalOpacityLineMaterialProperty(options)
 
     // Cesium内置材质类型
     case MATERIAL_TYPES.POLYLINE_ARROW:
@@ -60,6 +65,7 @@ export function getSupportedCustomMaterialTypes() {
     MATERIAL_TYPES.POLYLINE_FLY_LINE,
     MATERIAL_TYPES.POLYLINE_PULSE_LINE,
     MATERIAL_TYPES.POLYLINE_TRAIL_LINK,
+    MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY,
   ]
 }
 
@@ -110,6 +116,18 @@ export function getDefaultMaterialOptions(materialType) {
         speed: 1.0,
         percent: 0.3,
         alpha: 0.8,
+      }
+
+    case MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY:
+    case MATERIAL_TYPES.PolylineConditionalOpacity:
+      return {
+        color: new window.Cesium.Color(0.0, 1.0, 1.0, 0.7),
+        width: 2.0,
+        opacityInRange: 0.7,
+        opacityOutRange: 0.3,
+        opacityOnClick: 0.9,
+        timeRange: null,
+        isClicked: false,
       }
 
     default:

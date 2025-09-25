@@ -9,6 +9,7 @@ export const LAYER_DATA_TYPE = {
   TRAJECTORIES: 'trajectories',
   EVENTS: 'events',
   TARGET_STATUS: 'targetStatuses',
+  FUSION_LINES: 'fusionLines',
 }
 
 /**
@@ -40,6 +41,7 @@ export class Layer {
       trajectories: {},
       events: [],
       targetStatuses: [],
+      fusionLines: [],
     })
 
     // 显示控制
@@ -52,6 +54,7 @@ export class Layer {
       showRings: true,
       showVirtualNodes: true,
       showVirtualRelations: true,
+      showFusionLines: true,
     })
 
     // 每个图层都有自己的数据管理器
@@ -138,6 +141,8 @@ export class Layer {
       relations: '关系数据',
       trajectories: '轨迹数据',
       events: '事件数据',
+      targetStatuses: '目标状态数据',
+      fusionLines: '融合线数据',
     }
     return displayNames[dataType] || dataType
   }
@@ -166,6 +171,9 @@ export class Layer {
         break
       case LAYER_DATA_TYPE.TARGET_STATUS:
         this.dataManager.targetStatusManager.updateData(data)
+        break
+      case LAYER_DATA_TYPE.FUSION_LINES:
+        this.dataManager.fusionLineManager.updateData(data)
         break
       default:
         console.warn(`⚠️ 图层 [${this.name}] 未知的数据类型: ${dataType}`)

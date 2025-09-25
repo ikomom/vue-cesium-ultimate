@@ -54,3 +54,11 @@ export function getTargetStatusData() {
 export function getCircleConnectorData() {
   return fetch('/data/circleConnectorData.json').then((res) => res.json())
 }
+
+/**
+ * 获取融合线数据
+ * @returns {Promise} 返回融合线数据的Promise对象
+ */
+export function getFusionLineData() {
+  return fetch('/data/fusionLineData.json').then((res) => res.json())
+}

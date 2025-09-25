@@ -987,8 +987,6 @@ const processPoint = logFuncWrap(() => {
 const processRelation = logFuncWrap(() => {
   const allRelation = dataManager.relationManager.getAll()
 
-  console.log('关系数据1111111111111111', allRelation)
-
   if (!allRelation || allRelation.length === 0) {
     console.log('没有关系数据需要处理')
     renderRelations.value = []
@@ -1037,7 +1035,7 @@ const processRelation = logFuncWrap(() => {
       }
     })
     .filter(Boolean)
-  console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
+  // console.log('关系数据', { renderRelations: toRaw(renderRelations.value) })
 }, '关系数据')
 
 // 处理轨迹数据
@@ -1195,9 +1193,9 @@ const updateTrajectoryVisibility = (trajectoryId, isVisible, currentTime) => {
   if (wasVisible !== isVisible) {
     timeRecord.isVisible = isVisible
 
-    console.log(
-      `轨迹可见性变化: ${trajectoryId} ${wasVisible ? '可见' : '不可见'} -> ${isVisible ? '可见' : '不可见'} at ${currentTime}`,
-    )
+    // console.log(
+    //   `轨迹可见性变化: ${trajectoryId} ${wasVisible ? '可见' : '不可见'} -> ${isVisible ? '可见' : '不可见'} at ${currentTime}`,
+    // )
 
     // // 如果轨迹被隐藏，同时隐藏对应的activeRings、virtualNodes、virtualRelations、virtualEvents
     // if (!isVisible) {
@@ -2815,7 +2813,7 @@ const onEventLeave = debounceEvent((data, event) => {
 
 // 组件挂载时确保处理初始数据
 onMounted(() => {
-  console.log('🎯 DataVisualization - 组件已挂载，开始处理初始数据')
+  // console.log('🎯 DataVisualization - 组件已挂载，开始处理初始数据')
 
   // 确保在组件挂载后处理所有初始数据
   nextTick(() => {
@@ -2833,9 +2831,9 @@ onMounted(() => {
 
   // 等待viewer初始化完成后添加时间轴监听器
   watchEffect(() => {
-    console.log('🎯 viewer.value', viewer.value)
+    // console.log('🎯 viewer.value', viewer.value)
     if (viewer.value && viewer.value.clock) {
-      console.log('🎯 viewer已初始化，添加时间轴监听器')
+      // console.log('🎯 viewer已初始化，添加时间轴监听器')
       viewer.value.clock.onTick.addEventListener((clock) => {
         const currentTime = clock.currentTime
         const currentTimeStr = window.Cesium.JulianDate.toIso8601(currentTime)

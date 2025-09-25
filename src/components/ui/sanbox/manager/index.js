@@ -10,6 +10,7 @@ import TargetStatusManager from './TargetStatusManager.js'
 import RelationManager from './RelationManager.js'
 import TrajectoryManager from './TrajectoryManager.js'
 import EventManager from './EventManager.js'
+import FusionLineManager from './FusionLineManager.js'
 
 /**
  * 数据管理器工厂类
@@ -23,6 +24,7 @@ class DataManagerFactory {
     relationData = [],
     trajectoryData = [],
     eventData = [],
+    fusionLineData = [],
   ) {
     this.targetBaseManager = this.createTargetBaseManager(targetBaseData)
     this.targetLocationManager = this.createTargetLocationManager(targetLocationData)
@@ -30,6 +32,7 @@ class DataManagerFactory {
     this.relationManager = this.createRelationManager(relationData)
     this.trajectoryManager = this.createTrajectoryManager(trajectoryData)
     this.eventManager = this.createEventManager(eventData)
+    this.fusionLineManager = this.createFusionLineManager(fusionLineData)
   }
 
   /**
@@ -108,6 +111,19 @@ class DataManagerFactory {
       this.eventManager.setInitialData(initialData)
     }
     return this.eventManager
+  }
+
+  /**
+   * 创建融合线数据管理器
+   * @param {Array} initialData - 初始数据
+   * @returns {FusionLineManager} 管理器实例
+   */
+  createFusionLineManager(initialData = []) {
+    this.fusionLineManager = new FusionLineManager()
+    if (initialData.length > 0) {
+      this.fusionLineManager.setInitialData(initialData)
+    }
+    return this.fusionLineManager
   }
 
   /**
@@ -194,6 +210,7 @@ export {
   RelationManager,
   TrajectoryManager,
   EventManager,
+  FusionLineManager,
   DataManagerFactory,
   dataManagerFactory,
 }
@@ -206,6 +223,7 @@ export default {
   RelationManager,
   TrajectoryManager,
   EventManager,
+  FusionLineManager,
   DataManagerFactory,
   dataManagerFactory,
 }

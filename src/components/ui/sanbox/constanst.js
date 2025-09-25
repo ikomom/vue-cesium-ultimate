@@ -10,6 +10,7 @@ export const MATERIAL_TYPES = {
   POLYLINE_PULSE_LINE: 'PolylinePulseLine',
   POLYLINE_DYNAMIC_TEXTURE: 'PolylineDynamicTexture',
   POLYLINE_TRAIL_LINK: 'PolylineTrailLink',
+  POLYLINE_CONDITIONAL_OPACITY: 'PolylineConditionalOpacity',
   // 基础材质类型
   COLOR: 'Color',
   // 兼容性别名
@@ -21,5 +22,6 @@ export const MATERIAL_TYPES = {
   PolylinePulseLine: 'PolylinePulseLine',
   PolylineDynamicTexture: 'PolylineDynamicTexture',
   PolylineTrailLink: 'PolylineTrailLink',
+  PolylineConditionalOpacity: 'PolylineConditionalOpacity',
   Color: 'Color',
 }
