@@ -295,6 +295,7 @@ export class Layer {
         relations: this.data.relations.length,
         trajectories: Object.keys(this.data.trajectories).length,
         events: this.data.events.length,
+        fusionLines: this.data.fusionLines.length,
       },
     }
   }

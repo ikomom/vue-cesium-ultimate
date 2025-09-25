@@ -27,12 +27,14 @@
             :points="layer.data.points"
             :target-status="layer.data.targetStatus"
             :events="layer.data.events"
+            :fusion-lines="layer.data.fusionLines"
             :visible="layer.visible"
             :show-points="layer.showControls.showPoints"
             :show-relation="layer.showControls.showRelation"
             :show-trajectory="layer.showControls.showTrajectory"
             :show-events="layer.showControls.showEvents"
             :show-target-status="layer.showControls.showTargetStatus"
+            :show-fusion-lines="layer.showControls.showFusionLines"
             @target-click="onTargetClick"
             @target-dbl-click="onTargetDblClick"
             @target-hover="onTargetHover"
@@ -46,6 +48,9 @@
             @event-click="onEventClick"
             @event-hover="onEventHover"
             @event-leave="onEventLeave"
+            @fusion-line-click="onFusionLineClick"
+            @fusion-line-hover="onFusionLineHover"
+            @fusion-line-leave="onFusionLineLeave"
           />
         </template>
       </div>
@@ -138,6 +143,16 @@ const formatEntityData = (entity, type) => {
         严重程度: entity.severity || '一般',
         发生时间: entity.timestamp || '未知',
         描述: entity.description || '无描述',
+      }
+    case '融合线':
+      return {
+        ...baseData,
+        起点: entity.startPoint || '未知',
+        终点: entity.endPoint || '未知',
+        距离: entity.distance ? `${entity.distance.toFixed(2)}km` : '未知',
+        开始时间: entity.startTime || '未知',
+        结束时间: entity.endTime || '未知',
+        状态: entity.status || '正常',
       }
     default:
       return baseData
@@ -281,6 +296,32 @@ const onEventHover = (eventData, event) => {
 }
 
 const onEventLeave = () => {
+  hideTooltip()
+}
+
+// 融合线事件处理函数
+const onFusionLineClick = (fusionLine, event) => {
+  console.log('点击融合线:', fusionLine)
+  
+  // 处理材质属性的点击状态
+  if (fusionLine.material && typeof fusionLine.material.setClicked === 'function') {
+    // 切换点击状态
+    const currentState = fusionLine.material.isClicked || false
+    fusionLine.material.setClicked(!currentState)
+    console.log('设置融合线点击状态:', fusionLine.id, !currentState)
+  }
+  
+  if (event.originalEvent?.button === 2) {
+    // 右键
+    showContextMenu(event, fusionLine, '融合线')
+  }
+}
+
+const onFusionLineHover = (fusionLine, event) => {
+  showTooltip(event, fusionLine, '融合线')
+}
+
+const onFusionLineLeave = () => {
   hideTooltip()
 }
 

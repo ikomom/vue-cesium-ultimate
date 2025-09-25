@@ -37,6 +37,24 @@
     />
   </template>
   <template>
+    <!-- 融合线 -->
+    <line-with-label
+      v-for="fusionLine in renderFusionLines"
+      :key="fusionLine.id"
+      :show="visible && showFusionLines"
+      :positions="fusionLine.positions"
+      :width="fusionLine.width"
+      :distance-display-condition="fusionLine.distanceDisplayCondition"
+      :material="fusionLine.material"
+      :show-label="false"
+      :label-style="fusionLine.labelStyle"
+      :curve-config="fusionLine.curveConfig"
+      @click="onFusionLineClick(fusionLine, $event)"
+      @mouseover="onFusionLineHover(fusionLine, $event)"
+      @mouseout="onFusionLineLeave(fusionLine, $event)"
+    />
+  </template>
+  <template>
     <!-- 轨迹实体 -->
     <vc-entity
       v-for="trajectory in renderTrajectory"
@@ -160,6 +178,7 @@ import { debounce } from 'lodash-es'
 import { DataManagerFactory } from '@/components/ui/sanbox/manager'
 import {
   getRelationStyleConfig,
+  getFusionLineStyleConfig,
   getTargetIconConfig,
   getDistanceConfigs,
   getEventStatusStyleConfig,
@@ -221,6 +240,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  fusionLines: {
+    type: Array,
+    default: () => [],
+  },
   showPoints: {
     type: Boolean,
     default: true,
@@ -238,6 +261,10 @@ const props = defineProps({
     default: true,
   },
   showTargetStatus: {
+    type: Boolean,
+    default: true,
+  },
+  showFusionLines: {
     type: Boolean,
     default: true,
   },
@@ -264,6 +291,9 @@ const emit = defineEmits([
   'eventClick',
   'eventHover',
   'eventLeave',
+  'fusionLineClick',
+  'fusionLineHover',
+  'fusionLineLeave',
 ])
 
 // 使用shallowRef优化性能，避免深度响应式
@@ -271,6 +301,7 @@ const renderPoints = shallowRef([])
 const renderRelations = shallowRef([])
 const renderTrajectory = shallowRef([])
 const renderEvents = shallowRef([])
+const renderFusionLines = shallowRef([])
 
 // 圆环状态管理
 const activeRings = ref(new Map()) // 存储活跃的圆环实体
@@ -550,7 +581,6 @@ const processPoint = logFuncWrap(() => {
           status: point.status || 'active',
         }
         dataManager.targetBaseManager.addItem(baseInfo)
-        console.log('🎯 添加基础数据:', baseInfo.id, baseInfo.name)
       }
     })
   }
@@ -1258,6 +1288,107 @@ const isTrajectoryVisibleAtTime = (trajectoryId, currentTime) => {
   return currentTime >= timeRecord.startTime && currentTime <= timeRecord.endTime
 }
 
+// 处理融合线数据
+const processFusionLines = logFuncWrap(() => {
+  console.log('🎯 processFusionLines被调用 - props.fusionLines:', props.fusionLines)
+
+  // 检查Cesium是否可用
+  if (!window.Cesium) {
+    console.warn('Cesium is not available yet, skipping processFusionLines')
+    return
+  }
+
+
+  // 首先处理props.fusionLines数据，将其添加到dataManager
+  if (props.fusionLines && props.fusionLines.length > 0) {
+    console.log('🎯 DataVisualization - 处理props.fusionLines数据:', props.fusionLines.length, '条融合线')
+    props.fusionLines.forEach((fusionLine) => {
+      // 检查是否已存在，避免重复添加
+      const existing = dataManager.fusionLineManager.findById(fusionLine.id)
+
+      if (!existing) {
+        // 将融合线数据添加到管理器
+        dataManager.fusionLineManager.addItem(fusionLine)
+        console.log('🎯 添加融合线数据:', fusionLine.id, fusionLine.name || fusionLine.type)
+      }
+    })
+  }
+
+  const allFusionLines = dataManager.fusionLineManager.getAll()
+
+  console.log('🎯 processFusionLines - 所有融合线数据:', allFusionLines.length, '条')
+
+  if (!allFusionLines || allFusionLines.length === 0) {
+    console.log('没有融合线数据需要处理')
+    renderFusionLines.value = []
+    return
+  }
+
+  console.log('🎯 从fusionLineManager获取的所有融合线数据:', allFusionLines.length, '条')
+
+  renderFusionLines.value = allFusionLines
+    .map((fusionLine) => {
+      const styleConfig = getFusionLineStyleConfig(fusionLine.type || 'default')
+      console.log('🎯 融合线样式配置:', fusionLine.id, styleConfig)
+      const sourceTarget = getSourceTarget(fusionLine, styleConfig)
+      if (!sourceTarget) return null
+      const { source, target, positions } = sourceTarget
+
+      // 为ConditionalOpacityLineMaterialProperty设置时间范围
+      const materialProps = { ...styleConfig.materialProps }
+      if (styleConfig.material === MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY && fusionLine.startTime && fusionLine.endTime) {
+        // 将ISO时间字符串转换为JulianDate
+        const startTime = window.Cesium.JulianDate.fromIso8601(fusionLine.startTime)
+        const endTime = window.Cesium.JulianDate.fromIso8601(fusionLine.endTime)
+        materialProps.timeRange = { start: startTime, end: endTime }
+        console.log('🎯 设置融合线时间范围:', fusionLine.id, {
+          startTime: fusionLine.startTime,
+          endTime: fusionLine.endTime,
+          julianStart: startTime,
+          julianEnd: endTime
+        })
+      }
+
+      const material = getMaterialProperty(styleConfig.material, materialProps)
+      // 标签文本优先级：描述 > 名称 > 类型
+      const labelText = fusionLine.description || fusionLine.name || fusionLine.type || '融合线'
+
+      return {
+        id: fusionLine.id + '@fusionLine@' + layerId.value,
+        name: fusionLine.name,
+        type: fusionLine.type,
+        target,
+        source,
+        // FusionLine组件属性
+        positions,
+        width: styleConfig.width,
+        material: material,
+        distanceDisplayCondition: distanceConfigs.distanceDisplayCondition,
+        labelStyle: {
+          ...distanceConfigs,
+          text: labelText,
+          font: '8pt sans-serif',
+          fillColor: '#fff',
+          outlineColor: '#000000',
+          showBackground: true,
+          backgroundColor: 'rgba(0,211,233,0.3)',
+          outlineWidth: 2,
+          pixelOffset: [0, -20],
+          verticalOrigin: 1,
+        },
+        curveConfig: {
+          enabled: styleConfig.curve?.enabled || false,
+          height: styleConfig.curve?.height || 100000,
+        },
+        materialType: styleConfig.material,
+        // 原始融合线数据
+        fusionLineData: fusionLine,
+      }
+    })
+    .filter(Boolean)
+  console.log('融合线数据处理完成', { renderFusionLines: toRaw(renderFusionLines.value) })
+}, '融合线数据')
+
 // 处理事件数据
 const processEvent = logFuncWrap(() => {
   const allEvent = dataManager.eventManager.getAll()
@@ -1372,6 +1503,21 @@ watch(
     } else {
       debounceUpdate(() => {
         processRelation()
+      })
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.fusionLines,
+  (newFusionLines) => {
+    // 立即处理初始数据，后续变化使用防抖
+    if (newFusionLines && newFusionLines.length > 0) {
+      processFusionLines()
+    } else {
+      debounceUpdate(() => {
+        processFusionLines()
       })
     }
   },
@@ -2795,6 +2941,21 @@ const onRelationLeave = debounceEvent((relation, event) => {
   emit('relationLeave', relation, event)
 }, 100)
 
+// 融合线事件处理函数
+const onFusionLineClick = debounceEvent((fusionLine, event) => {
+  emit('fusionLineClick', fusionLine, event)
+}, 50)
+
+const onFusionLineHover = debounceEvent((fusionLine, event) => {
+  setPointer('pointer')
+  emit('fusionLineHover', fusionLine, event)
+}, 100)
+
+const onFusionLineLeave = debounceEvent((fusionLine, event) => {
+  setPointer('auto')
+  emit('fusionLineLeave', fusionLine, event)
+}, 100)
+
 const onEventClick = debounceEvent((data, event) => {
   emit('eventClick', data, event)
 }, 50)
@@ -3071,6 +3232,9 @@ defineExpose({
   getAllTrajectoryTimeRecords,
   isTrajectoryVisibleAtTime,
   updateTrajectoryVisibility,
+
+  // 数据处理函数
+  processFusionLines,
 
   // 获取轨迹时间记录的响应式数据
   trajectoryTimeLog: readonly(trajectoryTimeLog),

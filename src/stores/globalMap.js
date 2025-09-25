@@ -105,7 +105,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     const circleConnectorLayer = globalLayerManager.createLayer({
       name: '圆环连接器',
       zIndex: 4,
-      visible: true,
+      visible: false,
     })
 
     // 设置显示控制 - 启用关系连线显示
@@ -122,7 +122,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     const fusionLineLayer = globalLayerManager.createLayer({
       name: '融合线数据',
       zIndex: 5,
-      visible: false,
+      visible: true,
     })
 
     // 设置显示控制 - 启用融合线显示
@@ -130,6 +130,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
 
     fusionLineLayer.updateAllData({
       fusionLines: fusionLineData.value,
+      points: targetLocationData.value,
     })
 
     // 全数据图层

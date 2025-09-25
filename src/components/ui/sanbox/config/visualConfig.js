@@ -312,6 +312,107 @@ export const relationStyles = {
     },
   },
 }
+
+// 融合线样式配置
+export const fusionLineStyles = {
+  数据融合: {
+    width: 2,
+    curve: {
+      enabled: true,
+      height: 40000,
+    },
+    material: MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY,
+    materialProps: {
+      color: '#00BFFF',
+      width: 5,
+      opacityInRange: 0.8,
+      opacityOutRange: 0.3,
+      opacityOnClick: 0.9,
+      timeRange: null, // 将在运行时设置
+    },
+  },
+  信息融合: {
+    width: 3,
+    curve: {
+      enabled: true,
+      height: 60000,
+    },
+    material: MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY,
+    materialProps: {
+      color: '#FF69B4',
+      width: 3,
+      opacityInRange: 0.8,
+      opacityOutRange: 0.3,
+      opacityOnClick: 0.9,
+      timeRange: null, // 将在运行时设置
+    },
+  },
+  传感器融合: {
+    width: 2,
+    curve: {
+      enabled: true,
+      height: 35000,
+    },
+    material: MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY,
+    materialProps: {
+      color: '#32CD32',
+      width: 2,
+      opacityInRange: 0.8,
+      opacityOutRange: 0.3,
+      opacityOnClick: 0.9,
+      timeRange: null, // 将在运行时设置
+    },
+  },
+  态势融合: {
+    width: 2,
+    curve: {
+      enabled: true,
+      height: 45000,
+    },
+    material: MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY,
+    materialProps: {
+      color: '#FFD700',
+      width: 2,
+      opacityInRange: 0.8,
+      opacityOutRange: 0.3,
+      opacityOnClick: 0.9,
+      timeRange: null, // 将在运行时设置
+    },
+  },
+  智能融合: {
+    width: 3,
+    curve: {
+      enabled: true,
+      height: 70000,
+    },
+    material: MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY,
+    materialProps: {
+      color: '#9370DB',
+      width: 3,
+      opacityInRange: 0.8,
+      opacityOutRange: 0.3,
+      opacityOnClick: 0.9,
+      timeRange: null, // 将在运行时设置
+    },
+  },
+  default: {
+    width: 5,
+    curve: {
+      enabled: true,
+      height: 50000,
+    },
+    material: MATERIAL_TYPES.POLYLINE_CONDITIONAL_OPACITY,
+    materialProps: {
+      color: '#87CEEB',
+      width: 5,
+      opacityInRange: 0.7,
+      opacityOutRange: 0.3,
+      opacityOnClick: 0.9,
+      timeRange: null, // 将在运行时设置
+    },
+  },
+}
+
 // 事件状态样式配置
 export const eventStatusStyles = {
   预警中: {
@@ -444,12 +545,21 @@ export function getTargetIconConfig(type) {
 }
 
 /**
- * 根据关系类型获取样式配置
- * @param {string} type 关系类型
+ * 获取关系样式配置
+ * @param {string} type - 关系类型
  * @returns {object} 样式配置
  */
 export function getRelationStyleConfig(type) {
   return relationStyles[type] || defaultConfig.relationStyle
+}
+
+/**
+ * 获取融合线样式配置
+ * @param {string} type - 融合线类型
+ * @returns {object} 样式配置
+ */
+export function getFusionLineStyleConfig(type) {
+  return fusionLineStyles[type] || fusionLineStyles.default
 }
 
 /**
@@ -466,6 +576,14 @@ export function getAllTargetTypes() {
  */
 export function getAllRelationTypes() {
   return Object.keys(relationStyles)
+}
+
+/**
+ * 获取所有融合线类型
+ * @returns {string[]} 融合线类型数组
+ */
+export function getAllFusionLineTypes() {
+  return Object.keys(fusionLineStyles)
 }
 
 /**

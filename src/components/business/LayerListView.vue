@@ -164,6 +164,7 @@ const deleteLayer = (layerId) => {
 
 const getLayerDataCount = (layer) => {
   const info = layer.getInfo()
+  console.log('图层数据统计:', info.dataCount)
   const total = Object.values(info.dataCount).reduce((sum, count) => sum + count, 0)
   return `${total} 项`
 }

@@ -5,7 +5,7 @@ const defaultColor = 'cyan'
 const defaultOpacityInRange = 0.7
 const defaultOpacityOutRange = 0.3
 const defaultOpacityOnClick = 0.9
-const defaultWidth = 2.0
+const defaultWidth = 5.0
 
 /**
  * 条件透明度连线材质属性
@@ -24,21 +24,27 @@ export class ConditionalOpacityLineMaterialProperty {
     this._opacityInRange = undefined
     this._opacityOutRange = undefined
     this._opacityOnClick = undefined
+    this._lastLogTime = undefined // 用于控制日志输出频率
 
     // 基础属性
-    this.color = new window.Cesium.Color.fromCssColorString(options.color || defaultColor)
+    this._baseColor = new window.Cesium.Color.fromCssColorString(options.color || defaultColor)
     this.width = options.width || defaultWidth
-    
+
     // 透明度配置
     this.opacityInRange = options.opacityInRange || defaultOpacityInRange
     this.opacityOutRange = options.opacityOutRange || defaultOpacityOutRange
     this.opacityOnClick = options.opacityOnClick || defaultOpacityOnClick
-    
+
     // 时间范围配置 { start: JulianDate, end: JulianDate }
     this.timeRange = options.timeRange || null
-    
+
     // 点击状态
     this.isClicked = options.isClicked || false
+
+    // 使用CallbackProperty实现动态颜色（包含透明度）
+    this.color = new window.Cesium.CallbackProperty((time, result) => {
+      return this._calculateDynamicColor(time, result)
+    }, false) // false表示不是常量，会随时间变化
   }
 
   /**
@@ -56,37 +62,61 @@ export class ConditionalOpacityLineMaterialProperty {
       result = {}
     }
 
-    // 获取基础颜色
-    const baseColor = this._getPropertyValue(
-      this._color,
-      time,
-      window.Cesium.Color.fromCssColorString(defaultColor)
-    )
+    // 使用CallbackProperty的动态颜色
+    result.color = this.color.getValue(time)
+    result.width = this._getPropertyValue(this._width, time, this.width)
 
-    // 计算当前透明度
-    let currentOpacity = this.opacityOutRange
+    return result
+  }
 
-    // 如果被点击，使用点击透明度
+  /**
+   * 计算动态颜色（包含透明度）
+   * @param {JulianDate} time - 当前时间
+   * @param {Color} result - 结果颜色对象
+   * @returns {Color} 计算后的颜色
+   */
+  _calculateDynamicColor(time, result) {
+    if (!result) {
+      result = new window.Cesium.Color()
+    }
+
+    // 复制基础颜色
+    window.Cesium.Color.clone(this._baseColor, result)
+
+    // 计算透明度
+    let opacity = this.opacityOutRange
+
     if (this.isClicked) {
-      currentOpacity = this.opacityOnClick
+      // 点击状态下使用点击透明度
+      opacity = this.opacityOnClick
     } else if (this.timeRange && time) {
       // 检查时间是否在范围内
-      const timeRange = this._getPropertyValue(this._timeRange, time, this.timeRange)
+      const timeRange = this._getPropertyValue(this.timeRange, time, this.timeRange)
+      
       if (timeRange && timeRange.start && timeRange.end) {
-        const currentTime = window.Cesium.JulianDate.toDate(time)
-        const startTime = window.Cesium.JulianDate.toDate(timeRange.start)
-        const endTime = window.Cesium.JulianDate.toDate(timeRange.end)
+        const isInRange = window.Cesium.JulianDate.greaterThanOrEquals(time, timeRange.start) &&
+                         window.Cesium.JulianDate.lessThanOrEquals(time, timeRange.end)
         
-        if (currentTime >= startTime && currentTime <= endTime) {
-          currentOpacity = this.opacityInRange
+        opacity = isInRange ? this.opacityInRange : this.opacityOutRange
+        
+        // 减少日志输出频率，避免性能问题
+        if (this._lastLogTime === undefined || 
+            window.Cesium.JulianDate.secondsDifference(time, this._lastLogTime) > 1) {
+          console.log('[ConditionalOpacityLineMaterialProperty] 时间范围检查:', {
+            currentTime: window.Cesium.JulianDate.toIso8601(time),
+            startTime: window.Cesium.JulianDate.toIso8601(timeRange.start),
+            endTime: window.Cesium.JulianDate.toIso8601(timeRange.end),
+            isInRange,
+            opacity
+          })
+          this._lastLogTime = window.Cesium.JulianDate.clone(time)
         }
       }
     }
 
-    // 应用透明度到颜色
-    result.color = baseColor.withAlpha(currentOpacity)
-    result.width = this._getPropertyValue(this._width, time, defaultWidth)
-
+    // 设置透明度
+    result.alpha = opacity
+    
     return result
   }
 
@@ -94,8 +124,12 @@ export class ConditionalOpacityLineMaterialProperty {
    * 设置点击状态
    * @param {boolean} clicked - 是否被点击
    */
-  setClickedState(clicked) {
+  setClicked(clicked) {
     this.isClicked = clicked
+    // 触发CallbackProperty重新计算
+    this.color._callback = (time, result) => {
+      return this._calculateDynamicColor(time, result)
+    }
     this._definitionChanged.raiseEvent(this)
   }
 
@@ -117,11 +151,11 @@ export class ConditionalOpacityLineMaterialProperty {
     if (!this.timeRange || !time) {
       return false
     }
-    
+
     const currentTime = window.Cesium.JulianDate.toDate(time)
     const startTime = window.Cesium.JulianDate.toDate(this.timeRange.start)
     const endTime = window.Cesium.JulianDate.toDate(this.timeRange.end)
-    
+
     return currentTime >= startTime && currentTime <= endTime
   }
 
@@ -206,7 +240,7 @@ export function initConditionalOpacityLineMaterialProperty() {
   }
 
   const type = ConditionalOpacityLineMaterialProperty.prototype.getType()
-  
+
   // 添加材质到Cesium
   addMaterial(type, {
     translucent: true,
