@@ -3,7 +3,7 @@ import { addMaterial } from '../../utils/map.js'
 
 const defaultColor = 'cyan'
 const defaultOpacityInRange = 0.7
-const defaultOpacityOutRange = 0.3
+const defaultOpacityOutRange = 0.4  // 提高默认透明度，避免过于透明
 const defaultOpacityOnClick = 0.9
 const defaultWidth = 5.0
 
@@ -25,6 +25,8 @@ export class ConditionalOpacityLineMaterialProperty {
     this._opacityOutRange = undefined
     this._opacityOnClick = undefined
     this._lastLogTime = undefined // 用于控制日志输出频率
+    this._lastOpacity = undefined // 缓存上次计算的透明度，避免重复计算
+    this._lastClickState = false // 缓存上次的点击状态
 
     // 基础属性
     this._baseColor = new window.Cesium.Color.fromCssColorString(options.color || defaultColor)
@@ -83,12 +85,21 @@ export class ConditionalOpacityLineMaterialProperty {
     // 复制基础颜色
     window.Cesium.Color.clone(this._baseColor, result)
 
-    // 计算透明度
-    let opacity = this.opacityOutRange
+    // 计算透明度，确保始终有一个有效的初始值
+    let opacity = this._lastOpacity !== undefined ? this._lastOpacity : this.opacityOutRange
+    let needsUpdate = false
+
+    // 检查点击状态是否变化
+    if (this.isClicked !== this._lastClickState) {
+      needsUpdate = true
+      this._lastClickState = this.isClicked
+      console.log('[ConditionalOpacityLineMaterialProperty] 点击状态变化:', this.isClicked, '透明度将变为:', this.isClicked ? this.opacityOnClick : '根据时间范围计算')
+    }
 
     if (this.isClicked) {
       // 点击状态下使用点击透明度
       opacity = this.opacityOnClick
+      console.log('[ConditionalOpacityLineMaterialProperty] 使用点击透明度:', opacity)
     } else if (this.timeRange && time) {
       // 检查时间是否在范围内
       const timeRange = this._getPropertyValue(this.timeRange, time, this.timeRange)
@@ -99,23 +110,40 @@ export class ConditionalOpacityLineMaterialProperty {
         
         opacity = isInRange ? this.opacityInRange : this.opacityOutRange
         
-        // 减少日志输出频率，避免性能问题
-        if (this._lastLogTime === undefined || 
-            window.Cesium.JulianDate.secondsDifference(time, this._lastLogTime) > 1) {
-          console.log('[ConditionalOpacityLineMaterialProperty] 时间范围检查:', {
-            currentTime: window.Cesium.JulianDate.toIso8601(time),
-            startTime: window.Cesium.JulianDate.toIso8601(timeRange.start),
-            endTime: window.Cesium.JulianDate.toIso8601(timeRange.end),
-            isInRange,
-            opacity
-          })
-          this._lastLogTime = window.Cesium.JulianDate.clone(time)
+        // 只有透明度发生变化或需要更新时才输出日志
+        if (needsUpdate || opacity !== this._lastOpacity) {
+          if (this._lastLogTime === undefined || 
+              window.Cesium.JulianDate.secondsDifference(time, this._lastLogTime) > 1) {
+            console.log('[ConditionalOpacityLineMaterialProperty] 时间范围检查:', {
+              currentTime: window.Cesium.JulianDate.toIso8601(time),
+              startTime: window.Cesium.JulianDate.toIso8601(timeRange.start),
+              endTime: window.Cesium.JulianDate.toIso8601(timeRange.end),
+              isInRange,
+              opacity,
+              changed: opacity !== this._lastOpacity
+            })
+            this._lastLogTime = window.Cesium.JulianDate.clone(time)
+          }
         }
+      } else {
+        // 没有有效的时间范围时，使用范围外透明度
+        opacity = this.opacityOutRange
       }
+    } else {
+      // 非点击状态且没有时间范围时，使用范围外透明度
+      opacity = this.opacityOutRange
     }
+
+    // 确保透明度值在有效范围内 (0-1)
+    opacity = Math.max(0.2, Math.min(1.0, opacity)) // 提高最小透明度到0.2，确保更好的可见性
+
+    // 缓存透明度值
+    this._lastOpacity = opacity
 
     // 设置透明度
     result.alpha = opacity
+    
+    console.log('[ConditionalOpacityLineMaterialProperty] 最终透明度:', opacity, '点击状态:', this.isClicked)
     
     return result
   }
@@ -125,11 +153,15 @@ export class ConditionalOpacityLineMaterialProperty {
    * @param {boolean} clicked - 是否被点击
    */
   setClicked(clicked) {
-    this.isClicked = clicked
-    // 触发CallbackProperty重新计算
-    this.color._callback = (time, result) => {
-      return this._calculateDynamicColor(time, result)
+    if (this.isClicked === clicked) {
+      return // 状态没有变化，直接返回
     }
+    
+    this.isClicked = clicked
+    console.log('[ConditionalOpacityLineMaterialProperty] 点击状态变化:', clicked)
+    
+    // 不需要重新创建回调函数，CallbackProperty会自动检测到状态变化
+    // 只需要触发定义变化事件即可
     this._definitionChanged.raiseEvent(this)
   }
 
