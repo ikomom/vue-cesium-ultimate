@@ -68,12 +68,6 @@
         </div>
       </template>
     </el-tree>
-
-    <!-- 空状态 -->
-    <div v-if="layers.length === 0" class="empty-state">
-      <i class="icon-layers"></i>
-      <p>暂无图层数据</p>
-    </div>
   </div>
 </template>
 

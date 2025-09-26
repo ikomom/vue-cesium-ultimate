@@ -18,6 +18,14 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0'
-  }
+    host: '0.0.0.0',
+    proxy: {
+      // 配置接口转发到3001端口
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

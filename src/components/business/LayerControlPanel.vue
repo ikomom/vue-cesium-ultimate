@@ -56,90 +56,18 @@
         />
 
         <!-- 列表视图 -->
-        <div v-else class="layer-list">
-          <div
-            v-for="layer in sortedLayers"
-            :key="layer.id"
-            class="layer-item"
-            :class="{ active: layer.id === activeLayerId, 'layer-hidden': !layer.visible }"
-            @click="setActiveLayer(layer.id)"
-          >
-            <div class="layer-info">
-              <div class="layer-icon">
-                <i class="icon-layer"></i>
-              </div>
-              <div class="layer-details">
-                <div class="layer-name">{{ layer.name }}</div>
-                <div class="layer-meta">
-                  <span>Z-Index: {{ layer.zIndex }}</span>
-                  <span>{{ getLayerDataCount(layer) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="layer-controls">
-              <!-- 主要控制行 -->
-              <div class="main-controls">
-                <!-- 可见性控制 -->
-                <button
-                  class="btn-icon"
-                  :class="{ active: layer.visible }"
-                  @click.stop="toggleLayerVisibility(layer.id)"
-                  :title="layer.visible ? '隐藏图层' : '显示图层'"
-                >
-                  <i :class="layer.visible ? 'icon-eye' : 'icon-eye-off'"></i>
-                </button>
-
-                <!-- 编辑按钮 -->
-                <button class="btn-icon" @click.stop="editLayer(layer)" title="编辑图层">
-                  <i class="icon-edit"></i>
-                </button>
-
-                <!-- 删除按钮 -->
-                <button class="btn-icon btn-danger" @click.stop="deleteLayer(layer.id)" title="删除图层">
-                  <i class="icon-trash"></i>
-                </button>
-              </div>
-
-              <!-- 显示控制行 -->
-              <div class="show-controls">
-                <button
-                  class="btn-icon btn-mini"
-                  :class="{ active: layer.showControls.showPoints }"
-                  @click.stop="toggleShowControl(layer.id, 'showPoints')"
-                  title="点位"
-                >
-                  <i class="icon-point"></i>
-                </button>
-                <button
-                  class="btn-icon btn-mini"
-                  :class="{ active: layer.showControls.showRelation }"
-                  @click.stop="toggleShowControl(layer.id, 'showRelation')"
-                  title="关系"
-                >
-                  <i class="icon-link"></i>
-                </button>
-                <button
-                  class="btn-icon btn-mini"
-                  :class="{ active: layer.showControls.showTrajectory }"
-                  @click.stop="toggleShowControl(layer.id, 'showTrajectory')"
-                  title="轨迹"
-                >
-                  <i class="icon-route"></i>
-                </button>
-                <button
-                  class="btn-icon btn-mini"
-                  :class="{ active: layer.showControls.showEvents }"
-                  @click.stop="toggleShowControl(layer.id, 'showEvents')"
-                  title="事件"
-                >
-                  <i class="icon-calendar"></i>
-                </button>
-
-              </div>
-            </div>
-          </div>
-        </div>
+        <LayerListView
+          v-else
+          :active-layer-id="activeLayerId"
+          @set-active-layer="setActiveLayer"
+          @layer-visibility-toggle="toggleLayerVisibility"
+          @edit-layer="editLayer"
+          @delete-layer="deleteLayer"
+          @toggle-show-control="toggleShowControl"
+          @create-layer="showCreateDialog = true"
+          @event-select="handleEventSelect"
+          @relation-select="handleRelationSelect"
+        />
 
         <!-- 空状态 -->
         <div v-if="layers.length === 0" class="empty-state">
@@ -209,7 +137,7 @@ const {
 })
 
 // 视图模式
-const viewMode = ref('tree') // 'tree' | 'list'
+const viewMode = ref('list') // 'tree' | 'list'
 
 // 面板尺寸状态
 const isExpanded = ref(false)
@@ -220,10 +148,6 @@ const showEditDialog = ref(false)
 const editingLayer = ref(null)
 
 // 计算属性
-const sortedLayers = computed(() => {
-  return [...layers.value].sort((a, b) => b.zIndex - a.zIndex)
-})
-
 const statistics = computed(() => {
   return globalLayerManager.getStatistics()
 })
@@ -254,13 +178,6 @@ const deleteLayer = (layerId) => {
   if (confirm('确定要删除这个图层吗？此操作不可撤销。')) {
     globalLayerManager.removeLayer(layerId)
   }
-}
-
-const getLayerDataCount = (layer) => {
-  const info = layer.getInfo()
-  console.log('图层数据统计:', info.dataCount)
-  const total = Object.values(info.dataCount).reduce((sum, count) => sum + count, 0)
-  return `${total} 项`
 }
 
 // 切换显示控制
@@ -574,227 +491,7 @@ onMounted(() => {
   padding: 8px;
 }
 
-.layer-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.layer-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.08);
-  transition: all 0.2s ease;
-  min-height: 70px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.layer-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.layer-item.active {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-.layer-item.layer-hidden {
-  opacity: 0.5;
-  background: rgba(255, 255, 255, 0.02) !important;
-}
-
-.layer-item.layer-hidden .layer-name {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.layer-item.layer-hidden .layer-meta {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.layer-info {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  cursor: pointer;
-  padding: 4px 16px 4px 0;
-  gap: 16px;
-  min-height: 60px;
-}
-
-.layer-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 20px;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.layer-icon::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  opacity: 0.8;
-}
-
-.layer-item:hover .layer-icon {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12));
-  transform: scale(1.05);
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.layer-item.active .layer-icon {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(59, 130, 246, 0.25));
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow:
-    0 4px 12px rgba(59, 130, 246, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.layer-details {
-  flex: 1;
-  min-width: 0;
-  padding-top: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.layer-name {
-  font-weight: 600;
-  color: #ffffff;
-  line-height: 1.4;
-  font-size: 16px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0;
-}
-
-.layer-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.4;
-}
-
-.layer-meta span {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  white-space: nowrap;
-  font-weight: 500;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.layer-meta span:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
-}
-
-.layer-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 130px;
-  margin-left: 8px;
-}
-
-.main-controls {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-}
-
-.show-controls {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  padding: 6px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.btn-icon.btn-mini {
-  width: 28px;
-  height: 28px;
-  font-size: 12px;
-  padding: 4px;
-  border-radius: 6px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-icon.btn-mini::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.btn-icon.btn-mini:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.btn-icon.btn-mini:hover::before {
-  left: 100%;
-}
-
-.btn-icon.btn-mini.active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.7));
-  color: #ffffff;
-  border-color: rgba(59, 130, 246, 0.8);
-  box-shadow:
-    0 2px 8px rgba(59, 130, 246, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.btn-icon.btn-mini.active:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 1), rgba(59, 130, 246, 0.8));
-  box-shadow:
-    0 4px 12px rgba(59, 130, 246, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
+/* 图层列表样式已移至 LayerListView.vue 组件中 */
 
 .btn-icon.active {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.7));

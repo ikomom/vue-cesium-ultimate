@@ -3,7 +3,7 @@ import { addMaterial } from '../../utils/map.js'
 
 const defaultColor = 'cyan'
 const defaultOpacityInRange = 0.7
-const defaultOpacityOutRange = 0.4  // 提高默认透明度，避免过于透明
+const defaultOpacityOutRange = 0.4 // 提高默认透明度，避免过于透明
 const defaultOpacityOnClick = 0.9
 const defaultWidth = 5.0
 
@@ -93,35 +93,38 @@ export class ConditionalOpacityLineMaterialProperty {
     if (this.isClicked !== this._lastClickState) {
       needsUpdate = true
       this._lastClickState = this.isClicked
-      console.log('[ConditionalOpacityLineMaterialProperty] 点击状态变化:', this.isClicked, '透明度将变为:', this.isClicked ? this.opacityOnClick : '根据时间范围计算')
+      // console.log('[ConditionalOpacityLineMaterialProperty] 点击状态变化:', this.isClicked, '透明度将变为:', this.isClicked ? this.opacityOnClick : '根据时间范围计算')
     }
 
     if (this.isClicked) {
       // 点击状态下使用点击透明度
       opacity = this.opacityOnClick
-      console.log('[ConditionalOpacityLineMaterialProperty] 使用点击透明度:', opacity)
+      // console.log('[ConditionalOpacityLineMaterialProperty] 使用点击透明度:', opacity)
     } else if (this.timeRange && time) {
       // 检查时间是否在范围内
       const timeRange = this._getPropertyValue(this.timeRange, time, this.timeRange)
-      
+
       if (timeRange && timeRange.start && timeRange.end) {
-        const isInRange = window.Cesium.JulianDate.greaterThanOrEquals(time, timeRange.start) &&
-                         window.Cesium.JulianDate.lessThanOrEquals(time, timeRange.end)
-        
+        const isInRange =
+          window.Cesium.JulianDate.greaterThanOrEquals(time, timeRange.start) &&
+          window.Cesium.JulianDate.lessThanOrEquals(time, timeRange.end)
+
         opacity = isInRange ? this.opacityInRange : this.opacityOutRange
-        
+
         // 只有透明度发生变化或需要更新时才输出日志
         if (needsUpdate || opacity !== this._lastOpacity) {
-          if (this._lastLogTime === undefined || 
-              window.Cesium.JulianDate.secondsDifference(time, this._lastLogTime) > 1) {
-            console.log('[ConditionalOpacityLineMaterialProperty] 时间范围检查:', {
-              currentTime: window.Cesium.JulianDate.toIso8601(time),
-              startTime: window.Cesium.JulianDate.toIso8601(timeRange.start),
-              endTime: window.Cesium.JulianDate.toIso8601(timeRange.end),
-              isInRange,
-              opacity,
-              changed: opacity !== this._lastOpacity
-            })
+          if (
+            this._lastLogTime === undefined ||
+            window.Cesium.JulianDate.secondsDifference(time, this._lastLogTime) > 1
+          ) {
+            // console.log('[ConditionalOpacityLineMaterialProperty] 时间范围检查:', {
+            //   currentTime: window.Cesium.JulianDate.toIso8601(time),
+            //   startTime: window.Cesium.JulianDate.toIso8601(timeRange.start),
+            //   endTime: window.Cesium.JulianDate.toIso8601(timeRange.end),
+            //   isInRange,
+            //   opacity,
+            //   changed: opacity !== this._lastOpacity,
+            // })
             this._lastLogTime = window.Cesium.JulianDate.clone(time)
           }
         }
@@ -142,9 +145,9 @@ export class ConditionalOpacityLineMaterialProperty {
 
     // 设置透明度
     result.alpha = opacity
-    
-    console.log('[ConditionalOpacityLineMaterialProperty] 最终透明度:', opacity, '点击状态:', this.isClicked)
-    
+
+    // console.log('[ConditionalOpacityLineMaterialProperty] 最终透明度:', opacity, '点击状态:', this.isClicked)
+
     return result
   }
 
@@ -156,10 +159,10 @@ export class ConditionalOpacityLineMaterialProperty {
     if (this.isClicked === clicked) {
       return // 状态没有变化，直接返回
     }
-    
+
     this.isClicked = clicked
-    console.log('[ConditionalOpacityLineMaterialProperty] 点击状态变化:', clicked)
-    
+    // console.log('[ConditionalOpacityLineMaterialProperty] 点击状态变化:', clicked)
+
     // 不需要重新创建回调函数，CallbackProperty会自动检测到状态变化
     // 只需要触发定义变化事件即可
     this._definitionChanged.raiseEvent(this)
@@ -279,7 +282,8 @@ export function initConditionalOpacityLineMaterialProperty() {
     fabric: {
       type,
       uniforms: {
-        color: window.Cesium.Color.fromCssColorString(defaultColor).withAlpha(defaultOpacityOutRange),
+        color:
+          window.Cesium.Color.fromCssColorString(defaultColor).withAlpha(defaultOpacityOutRange),
         width: defaultWidth,
       },
       // 使用简单的颜色材质，透明度通过color的alpha通道控制

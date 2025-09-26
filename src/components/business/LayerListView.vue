@@ -8,43 +8,54 @@
         class="layer-item"
         :class="{ active: layer.id === activeLayerId, 'layer-hidden': !layer.visible }"
       >
-        <div class="layer-info" @click="setActiveLayer(layer.id)">
-          <div class="layer-icon">
-            <i class="icon-layers"></i>
+        <div class="layer-header">
+          <div class="layer-info" @click="setActiveLayer(layer.id)">
+            <div class="layer-icon">
+              <i class="icon-layers"></i>
+            </div>
+            <div class="layer-details">
+              <div class="layer-name">{{ layer.name }}</div>
+              <div class="layer-meta">
+                <div class="layer-count">{{ getLayerDataCount(layer) }}</div>
+              </div>
+            </div>
           </div>
-          <div class="layer-details">
-            <div class="layer-name">{{ layer.name }}</div>
-            <div class="layer-meta">
-              <span class="layer-count">{{ getLayerDataCount(layer) }}</span>
+
+          <div class="layer-controls">
+            <!-- 主要控制行 -->
+            <div class="main-controls">
+              <!-- 可见性控制 -->
+              <button
+                class="btn-icon"
+                :class="{ active: layer.visible }"
+                @click="toggleLayerVisibility(layer.id)"
+                :title="layer.visible ? '隐藏图层' : '显示图层'"
+              >
+                <i :class="layer.visible ? 'icon-eye' : 'icon-eye-off'"></i>
+              </button>
+
+              <!-- 编辑按钮 -->
+              <button class="btn-icon" @click="editLayer(layer)" title="编辑图层">
+                <i class="icon-edit"></i>
+              </button>
+
+              <!-- 删除按钮 -->
+              <button class="btn-icon btn-danger" @click="deleteLayer(layer.id)" title="删除图层">
+                <i class="icon-trash"></i>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="layer-controls">
-          <!-- 主要控制行 -->
-          <div class="main-controls">
-            <!-- 可见性控制 -->
-            <button
-              class="btn-icon"
-              :class="{ active: layer.visible }"
-              @click="toggleLayerVisibility(layer.id)"
-              :title="layer.visible ? '隐藏图层' : '显示图层'"
-            >
-              <i :class="layer.visible ? 'icon-eye' : 'icon-eye-off'"></i>
-            </button>
-
-            <!-- 编辑按钮 -->
-            <button class="btn-icon" @click="editLayer(layer)" title="编辑图层">
-              <i class="icon-edit"></i>
-            </button>
-
-            <!-- 删除按钮 -->
-            <button class="btn-icon btn-danger" @click="deleteLayer(layer.id)" title="删除图层">
-              <i class="icon-trash"></i>
-            </button>
+        <!-- 时间信息单独一行 -->
+        <div class="layer-time-row" v-if="layer.startTime || layer.endTime">
+          <div class="layer-time">
+            {{ formatTimeRange(layer.startTime, layer.endTime) }}
           </div>
+        </div>
 
-          <!-- 显示控制行 -->
+        <!-- 显示控制行 -->
+        <div class="show-controls-row">
           <div class="show-controls">
             <button
               class="btn-icon btn-mini"
@@ -106,13 +117,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 空状态 -->
-    <div v-if="layers.length === 0" class="empty-state">
-      <i class="icon-layers"></i>
-      <p>暂无图层</p>
-      <button class="btn-primary" @click="$emit('create-layer')">创建第一个图层</button>
-    </div>
   </div>
 </template>
 
@@ -120,6 +124,7 @@
 import { computed } from 'vue'
 import { useGlobalMapStore } from '@/stores/globalMap'
 import { storeToRefs } from 'pinia'
+import dayjs from 'dayjs'
 
 const props = defineProps({
   activeLayerId: String,
@@ -165,13 +170,44 @@ const deleteLayer = (layerId) => {
 const getLayerDataCount = (layer) => {
   const info = layer.getInfo()
   console.log('图层数据统计:', info.dataCount)
-  const total = Object.values(info.dataCount).reduce((sum, count) => sum + count, 0)
+  // 只统计轨迹和点位数量
+  const pointCount = info.dataCount.points || 0
+  const trajectoryCount = info.dataCount.trajectories || 0
+  const total = pointCount + trajectoryCount
   return `${total} 项`
 }
 
 // 切换显示控制
 const toggleShowControl = (layerId, controlType) => {
   emit('toggle-show-control', layerId, controlType)
+}
+
+// 选择事件
+const selectEvent = (eventId) => {
+  emit('event-select', eventId)
+}
+
+// 选择关系
+const selectRelation = (relationId) => {
+  emit('relation-select', relationId)
+}
+
+// 格式化时间范围显示
+const formatTimeRange = (startTime, endTime) => {
+  if (!startTime && !endTime) return ''
+  
+  const formatTime = (time) => {
+    if (!time) return ''
+    return dayjs(time).format('YYYY-MM-DD HH:mm')
+  }
+  
+  if (startTime && endTime) {
+    return `${formatTime(startTime)} ~ ${formatTime(endTime)}`
+  } else if (startTime) {
+    return `从 ${formatTime(startTime)}`
+  } else {
+    return `至 ${formatTime(endTime)}`
+  }
 }
 
 </script>
@@ -190,7 +226,7 @@ const toggleShowControl = (layerId, controlType) => {
 
 .layer-item {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -223,11 +259,19 @@ const toggleShowControl = (layerId, controlType) => {
   color: rgba(255, 255, 255, 0.3);
 }
 
+/* 图层头部样式 */
+.layer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .layer-info {
-  flex: 1;
   display: flex;
   align-items: center;
   cursor: pointer;
+  flex: 1;
   padding-right: 8px;
 }
 
@@ -257,10 +301,37 @@ const toggleShowControl = (layerId, controlType) => {
 
 .layer-meta {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 4px;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.3;
+}
+
+.layer-count {
+  font-weight: 500;
+}
+
+/* 时间信息行样式 */
+.layer-time-row {
+  width: 100%;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.layer-time {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* 显示控制行样式 */
+.show-controls-row {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .layer-controls {
@@ -268,7 +339,6 @@ const toggleShowControl = (layerId, controlType) => {
   flex-direction: column;
   gap: 6px;
   min-width: 130px;
-  margin-left: 8px;
 }
 
 .main-controls {

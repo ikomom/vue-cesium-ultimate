@@ -5,7 +5,8 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import 'vue-cesium/dist/index.css'
-import { VueCesium, vueCesiumConfig } from './plugins/vue-cesium'
+// import { VueCesium, vueCesiumConfig } from './plugins/vue-cesium'
+import VueCesium from 'vue-cesium'
 
 // Element Plus
 import ElementPlus from 'element-plus'
@@ -19,7 +20,8 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-app.use(VueCesium, vueCesiumConfig)
+// app.use(VueCesium, vueCesiumConfig)
+app.use(VueCesium)
 app.use(ElementPlus)
 app.use(createPinia())
 app.use(router)

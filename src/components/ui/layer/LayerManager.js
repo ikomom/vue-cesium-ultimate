@@ -24,12 +24,16 @@ export class Layer {
       name: options.name || `图层_${this.id}`,
       visible: options.visible !== undefined ? options.visible : true,
       zIndex: options.zIndex || 0,
+      startTime: options.startTime || null,
+      endTime: options.endTime || null,
     })
 
     // 将响应式属性绑定到实例
     this.name = layerState.name
     this.visible = layerState.visible
     this.zIndex = layerState.zIndex
+    this.startTime = layerState.startTime
+    this.endTime = layerState.endTime
     this._state = layerState
     this.viewer = options.viewer
 
@@ -279,6 +283,35 @@ export class Layer {
   }
 
   /**
+   * 设置图层开始时间
+   */
+  setStartTime(startTime) {
+    this._state.startTime = startTime
+    this.startTime = startTime
+    this.updatedAt = new Date()
+  }
+
+  /**
+   * 设置图层结束时间
+   */
+  setEndTime(endTime) {
+    this._state.endTime = endTime
+    this.endTime = endTime
+    this.updatedAt = new Date()
+  }
+
+  /**
+   * 设置图层时间范围
+   */
+  setTimeRange(startTime, endTime) {
+    this._state.startTime = startTime
+    this._state.endTime = endTime
+    this.startTime = startTime
+    this.endTime = endTime
+    this.updatedAt = new Date()
+  }
+
+  /**
    * 获取图层信息
    */
   getInfo() {
@@ -287,6 +320,8 @@ export class Layer {
       name: this.name,
       visible: this.visible,
       zIndex: this.zIndex,
+      startTime: this.startTime,
+      endTime: this.endTime,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       dataCount: {
@@ -326,6 +361,28 @@ export class LayerManager {
     this.layers = reactive(new Map())
     this.activeLayerId = ref(null)
     this.viewer = null
+    
+    // 全局数据存储 - 使用reactive使其响应式
+    this.globalData = reactive({
+      targetBaseData: [],
+      targetLocationData: [],
+      relationData: [],
+      targetStatusData: [],
+      eventData: [],
+      trajectoryData: {},
+      circleConnectorData: {
+        targets: [],
+        points: [],
+        relations: [],
+        trajectories: {}
+      },
+      fusionLineData: [],
+      timeRange: {
+        startTime: null,
+        endTime: null
+      },
+      loading: false
+    })
   }
 
   setViewer(viewer) {
@@ -600,6 +657,104 @@ export class LayerManager {
   }
 
   /**
+   * 更新全局数据
+   * @param {string} dataType - 数据类型
+   * @param {any} data - 数据
+   */
+  updateGlobalData(dataType, data) {
+    if (this.globalData.hasOwnProperty(dataType)) {
+      this.globalData[dataType] = data
+      console.log(`🔄 全局数据更新: ${dataType}`, data?.length || Object.keys(data || {}).length)
+      return true
+    }
+    console.warn(`⚠️ 未知的全局数据类型: ${dataType}`)
+    return false
+  }
+
+  /**
+   * 批量更新全局数据
+   * @param {Object} dataUpdates - 数据更新对象
+   */
+  updateGlobalDataBatch(dataUpdates) {
+    if (!dataUpdates || typeof dataUpdates !== 'object') {
+      console.warn('updateGlobalDataBatch: 参数必须是一个对象')
+      return false
+    }
+
+    let hasUpdated = false
+    console.group('📊 批量更新全局数据')
+    
+    Object.keys(dataUpdates).forEach((key) => {
+      if (this.globalData.hasOwnProperty(key)) {
+        this.globalData[key] = dataUpdates[key]
+        hasUpdated = true
+        
+        if (key === 'trajectoryData') {
+          const trajectoryCount = Object.keys(dataUpdates[key]).length
+          console.log(`${key}: ${trajectoryCount} 个目标轨迹`)
+        } else if (typeof dataUpdates[key] === 'object' && dataUpdates[key].length !== undefined) {
+          console.log(`${key}: ${dataUpdates[key].length} 项`)
+        } else {
+          console.log(`${key}: 已更新`)
+        }
+      } else {
+        console.warn(`⚠️ 全局数据类型 ${key} 不存在，跳过更新`)
+      }
+    })
+    
+    console.groupEnd()
+    return hasUpdated
+  }
+
+  /**
+   * 获取全局数据
+   * @param {string} dataType - 数据类型
+   * @returns {any} 数据
+   */
+  getGlobalData(dataType) {
+    return this.globalData[dataType]
+  }
+
+  /**
+   * 获取所有全局数据
+   * @returns {Object} 所有全局数据
+   */
+  getAllGlobalData() {
+    return this.globalData
+  }
+
+  /**
+   * 设置全局时间范围
+   * @param {string} startTime - 开始时间
+   * @param {string} endTime - 结束时间
+   */
+  setGlobalTimeRange(startTime, endTime) {
+    this.globalData.timeRange.startTime = startTime
+    this.globalData.timeRange.endTime = endTime
+    console.log('🕒 全局时间范围已更新:', { startTime, endTime })
+  }
+
+  /**
+   * 获取全局时间范围
+   * @returns {Object} 时间范围对象
+   */
+  getGlobalTimeRange() {
+    return this.globalData.timeRange
+  }
+
+  /**
+   * 设置全局加载状态
+   * @param {boolean} loading - 加载状态
+   */
+  setGlobalLoading(loading) {
+    this.globalData.loading = loading
+  }
+
+  /**
+   * 获取全局加载状态
+   * @returns {boolean} 加载状态
+   */
+ /**
    * 更新全局时间轴
    * 统一管理所有图层的时间轴范围
    */

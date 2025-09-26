@@ -1,64 +1,41 @@
-import { apiClient } from '@/utils/apiClient.js'
-/**
- * 获取目标基础数据
- * @returns {Promise} 返回目标基础数据的Promise对象
- */
-export function getTargetBaseData() {
-  return fetch('/data/targetBaseData.json').then((res) => res.json())
+import { apiClient } from '@/utils'
+
+// 新的API函数 - 支持时间区间和target_ids查询
+export const getDataByTimeRange = async (options = {}) => {
+  return apiClient.post('/data', options)
 }
 
-/**
- * 获取目标位置数据
- * @returns {Promise} 返回目标位置数据的Promise对象
- */
-export function getTargetLocationData() {
-  return fetch('/data/targetLocationData.json').then((res) => res.json())
+// 原有的API函数保持兼容性，但内部使用新的时间查询
+export const getTargetBaseData = async () => {
+  return await getDataByTimeRange().then((data) => data.targetBaseData || [])
 }
 
-/**
- * 获取关系数据
- * @returns {Promise} 返回关系数据的Promise对象
- */
-export function getRelationData() {
-  return fetch('/data/relationData.json').then((res) => res.json())
+export const getTargetLocationData = async () => {
+  return await getDataByTimeRange().then((data) => data.targetLocationData || [])
 }
 
-/**
- * 获取船舶轨迹数据
- * @returns {Promise} 返回船舶轨迹数据的Promise对象
- */
-export function getShipTrajectoryData() {
-  return fetch('/data/shipTrajectoryData.json').then((res) => res.json())
+export const getRelationData = async () => {
+  return await getDataByTimeRange().then((data) => data.relationData || [])
 }
 
-/**
- * 获取事件数据
- * @returns {Promise} 返回事件数据的Promise对象
- */
-export function getEventData() {
-  return fetch('/data/eventData.json').then((res) => res.json())
+export const getEventData = async () => {
+  return await getDataByTimeRange().then((data) => data.eventData || [])
 }
 
-/**
- * 获取目标状态数据
- * @returns {Promise} 返回目标状态数据的Promise对象
- */
-export function getTargetStatusData() {
-  return fetch('/data/targetStatusData.json').then((res) => res.json())
+export const getShipTrajectoryData = async () => {
+  return await getDataByTimeRange().then((data) => data.trajectoryData || {})
 }
 
-/**
- * 获取圆环连接器数据
- * @returns {Promise} 返回圆环连接器数据的Promise对象
- */
-export function getCircleConnectorData() {
-  return fetch('/data/circleConnectorData.json').then((res) => res.json())
+export const getTargetStatusData = async () => {
+  return await getDataByTimeRange().then((data) => data.targetStatusData || [])
 }
 
-/**
- * 获取融合线数据
- * @returns {Promise} 返回融合线数据的Promise对象
- */
-export function getFusionLineData() {
-  return fetch('/data/fusionLineData.json').then((res) => res.json())
+export const getCircleConnectorData = async () => {
+  // 圆环连接器数据暂时使用本地文件
+  const response = await fetch('/data/circleConnectorData.json')
+  return await response.json()
+}
+
+export const getFusionLineData = async () => {
+  return await getDataByTimeRange().then((data) => data.fusionLineData || [])
 }
