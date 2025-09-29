@@ -31,3 +31,5 @@ coverage
 backend
 
 package-lock.json
+
+public/libs/mars3d/*

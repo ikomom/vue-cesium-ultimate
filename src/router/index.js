@@ -45,12 +45,22 @@ const routes = [
     },
   },
   {
+    path: '/mars3d-data-visualization',
+    name: 'Mars3DDataVisualization',
+    component: () => import('@/views/Mars3DDataVisualization.vue'),
+    meta: {
+      title: 'Mars3D数据可视化',
+      icon: 'mars3d'
+    }
+  },
+  {
     path: '/mars3d',
     name: 'Mars3d',
     component: () => import('@/views/mars3d/MapView.vue'),
     meta: {
       title: 'Mars3d地图页面',
-    },
+      icon: 'mars3d'
+    }
   },
   {
     path: '/circle-connector-demo',

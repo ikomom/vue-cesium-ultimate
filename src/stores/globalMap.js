@@ -14,7 +14,7 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
   const circleConnectorData = ref({})
   // 时间范围状态
   const timeRange = ref({
-    startTime: dayjs().subtract(1, 'day').toDate(),
+    startTime: dayjs().subtract(1, 'month').toDate(),
     endTime: dayjs().toDate(),
   })
 
@@ -283,5 +283,6 @@ export const useGlobalMapStore = defineStore('globalMap', () => {
     circleConnectorData,
     loading,
     timeRange,
+    rangeData,
   }
 })
