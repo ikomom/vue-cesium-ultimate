@@ -362,31 +362,41 @@ const loadRealTrajectoryData = async () => {
 
   console.log('加载真实轨迹数据:', Object.keys(trajectories).length, '条轨迹')
 
-  Object.entries(trajectories).forEach(([targetId, trajectory]) => {
-    if (trajectory && trajectory.positions && trajectory.positions.length > 0) {
+  Object.entries(trajectories).forEach(([targetId, trajectoryPoints]) => {
+    if (trajectoryPoints && Array.isArray(trajectoryPoints) && trajectoryPoints.length > 0) {
+      // 转换轨迹点格式，确保字段名匹配
+      const formattedTrajectoryPoints = trajectoryPoints.map((point) => ({
+        longitude: point.longitude,
+        latitude: point.latitude,
+        height: point.altitude || 0, // 使用altitude字段
+        time: new Date(point.timestamp), // 转换为Date对象
+      }))
+
       visualizationManager.value.addTrajectory({
         id: `trajectory_${targetId}`,
-        name: `${trajectory.name || targetId}轨迹`,
+        name: `${targetId}轨迹`,
         targetId: targetId,
-        positions: trajectory.positions.map((pos) => ({
-          longitude: pos.longitude || pos.lng,
-          latitude: pos.latitude || pos.lat,
-          height: pos.height || pos.alt || 0,
-          time: pos.timestamp || pos.time,
-        })),
-        pathMaterial: 'LineTrail',
+        trajectory: formattedTrajectoryPoints, // 使用转换后的数据
+        pathMaterial: 'PolylineTrail',
         pathColor: '#00ffff',
         pathWidth: 2,
         showPath: true,
-        showPoints: false,
+        showModel: true,
+        showLabel: true,
         metadata: {
           category: 'real_data',
           targetId: targetId,
-          ...trajectory,
+          originalData: trajectoryPoints,
         },
       })
 
-      dataStore.trajectories.push(trajectory)
+      console.log(`已添加轨迹: ${targetId}`, {
+        轨迹点数量: formattedTrajectoryPoints.length,
+        起始时间: formattedTrajectoryPoints[0]?.time,
+        结束时间: formattedTrajectoryPoints[formattedTrajectoryPoints.length - 1]?.time,
+      })
+
+      dataStore.trajectories.push({ targetId, points: trajectoryPoints })
     }
   })
 }

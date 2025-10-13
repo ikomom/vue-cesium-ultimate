@@ -1,0 +1,147 @@
+[
+  {
+    "label": "根节点1",
+    "id": "1",
+    "target_id": "target_1",
+    "children": [
+      {
+        "label": "分组1-1",
+        "id": "1-1",
+        "target_id": "target_group_1",
+        "children": [
+          {
+            "label": "通用测试节点",
+            "id": "1-1-1",
+            "target_id": "xxx"
+          },
+          {
+            "label": "B类型节点",
+            "id": "1-1-2",
+            "target_id": "target_b"
+          },
+          {
+            "label": "共享目标节点",
+            "id": "1-1-3",
+            "target_id": "shared_target"
+          }
+        ]
+      },
+      {
+        "label": "分组1-2",
+        "id": "1-2",
+        "target_id": "target_group_2",
+        "children": [
+          {
+            "label": "通用测试节点",
+            "id": "1-2-1",
+            "target_id": "xxx"
+          },
+          {
+            "label": "D类型节点",
+            "id": "1-2-2",
+            "target_id": "target_d"
+          },
+          {
+            "label": "共享目标节点",
+            "id": "1-2-3",
+            "target_id": "shared_target"
+          }
+        ]
+      },
+      {
+        "label": "分组1-3",
+        "id": "1-3",
+        "target_id": "target_group_3",
+        "children": [
+          {
+            "label": "深层节点",
+            "id": "1-3-1",
+            "target_id": "deep_node",
+            "children": [
+              {
+                "label": "共享目标节点",
+                "id": "1-3-1-1",
+                "target_id": "shared_target"
+              },
+              {
+                "label": "深层B节点",
+                "id": "1-3-1-2",
+                "target_id": "deep_b"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "根节点2",
+    "id": "2",
+    "target_id": "target_2",
+    "children": [
+      {
+        "label": "分组2-1",
+        "id": "2-1",
+        "target_id": "target_group_4",
+        "children": [
+          {
+            "label": "通用测试节点",
+            "id": "2-1-1",
+            "target_id": "xxx"
+          },
+          {
+            "label": "E类型节点",
+            "id": "2-1-2",
+            "target_id": "target_e"
+          },
+          {
+            "label": "共享目标节点",
+            "id": "2-1-3",
+            "target_id": "shared_target"
+          }
+        ]
+      },
+      {
+        "label": "分组2-2",
+        "id": "2-2",
+        "target_id": "target_group_5",
+        "children": [
+          {
+            "label": "F类型节点",
+            "id": "2-2-1",
+            "target_id": "target_f"
+          },
+          {
+            "label": "B类型节点",
+            "id": "2-2-2",
+            "target_id": "target_b"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "根节点3",
+    "id": "3",
+    "target_id": "target_3",
+    "children": [
+      {
+        "label": "单独分组",
+        "id": "3-1",
+        "target_id": "single_group",
+        "children": [
+          {
+            "label": "孤立节点",
+            "id": "3-1-1",
+            "target_id": "isolated"
+          },
+          {
+            "label": "共享目标节点",
+            "id": "3-1-2",
+            "target_id": "shared_target"
+          }
+        ]
+      }
+    ]
+  }
+]

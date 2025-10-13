@@ -50,8 +50,8 @@ const routes = [
     component: () => import('@/views/Mars3DDataVisualization.vue'),
     meta: {
       title: 'Mars3D数据可视化',
-      icon: 'mars3d'
-    }
+      icon: 'mars3d',
+    },
   },
   {
     path: '/mars3d',
@@ -59,8 +59,8 @@ const routes = [
     component: () => import('@/views/mars3d/MapView.vue'),
     meta: {
       title: 'Mars3d地图页面',
-      icon: 'mars3d'
-    }
+      icon: 'mars3d',
+    },
   },
   {
     path: '/circle-connector-demo',
@@ -68,6 +68,14 @@ const routes = [
     component: () => import('@/views/CircleConnectorDemo.vue'),
     meta: {
       title: '圆环节点连接器演示',
+    },
+  },
+  {
+    path: '/tree-demo',
+    name: 'TreeDemo',
+    component: () => import('@/views/TreeDemo.vue'),
+    meta: {
+      title: '树形控件演示 - 联动勾选',
     },
   },
 ]
